@@ -1,37 +1,36 @@
-/* ======================================================
-   CONFIGURACIÓN
-====================================================== */
+// ======================================================
+// CONFIGURACIÓN GOOGLE SHEETS
+// ======================================================
+
+const SHEET_ID =
+  "1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY";
+
+const SHEET_GID =
+  "683959855";
 
 
-/*
-  Google Sheets
-
-  Archivo:
-  1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY
-
-  Hoja:
-  DATA
-
-  GID:
-  683959855
-*/
+// URL DIRECTA DE GOOGLE VISUALIZATION
 
 const URL_DATOS =
-  "https://docs.google.com/spreadsheets/d/1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY/export?format=csv&gid=683959855";
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 
+
+// ======================================================
+// VARIABLES
+// ======================================================
 
 let datosOriginales = [];
 
 let datosFiltrados = [];
 
-let graficoMensual = null;
+let graficos = {};
 
 
-/* ======================================================
-   MESES
-====================================================== */
+// ======================================================
+// MESES
+// ======================================================
 
-const MESES_2026 = [
+const ORDEN_MESES = [
 
   "ENERO",
   "FEBRERO",
@@ -49,13 +48,38 @@ const MESES_2026 = [
 ];
 
 
-/* ======================================================
-   INICIO
-====================================================== */
+// ======================================================
+// COLORES PASTEL
+// ======================================================
+
+const COLORES = {
+
+  coinProm: "#8ecae6",
+
+  ventaProm: "#95d5b2",
+
+  coinTotal: "#a8dadc",
+
+  ventaTotal: "#f9d88c",
+
+  netwin: "#cdb4db",
+
+  tc: "#f4b183",
+
+  pago: "#f3a6b8",
+
+  restante: "#e9edf2"
+
+};
+
+
+// ======================================================
+// INICIO
+// ======================================================
 
 document.addEventListener(
   "DOMContentLoaded",
-  function () {
+  () => {
 
     configurarEventos();
 
@@ -65,25 +89,30 @@ document.addEventListener(
 );
 
 
-/* ======================================================
-   EVENTOS
-====================================================== */
+// ======================================================
+// EVENTOS
+// ======================================================
 
 function configurarEventos() {
+
 
   const filtros = [
 
     "filtroSala",
+
     "filtroMes",
+
     "filtroModelo",
+
     "filtroNumero",
+
     "filtroJuego"
 
   ];
 
 
   filtros.forEach(
-    function (id) {
+    id => {
 
       const elemento =
         document.getElementById(id);
@@ -136,11 +165,207 @@ function configurarEventos() {
 }
 
 
-/* ======================================================
-   CARGAR DATOS DIRECTAMENTE DESDE GOOGLE SHEETS
-====================================================== */
+// ======================================================
+// CARGAR GOOGLE SHEETS
+// ======================================================
 
 async function cargarDatos() {
+
+
+  cambiarEstadoConexion(
+    "Conectando con Google Sheets...",
+    "#f2b84b"
+  );
+
+
+  try {
+
+
+    const respuesta =
+      await fetch(
+        URL_DATOS +
+        "&t=" +
+        Date.now()
+      );
+
+
+    if (!respuesta.ok) {
+
+      throw new Error(
+        "Error HTTP " +
+        respuesta.status
+      );
+
+    }
+
+
+    const texto =
+      await respuesta.text();
+
+
+    const datos =
+      convertirRespuestaGViz(
+        texto
+      );
+
+
+    if (
+      !Array.isArray(datos) ||
+      datos.length === 0
+    ) {
+
+      throw new Error(
+        "Google Sheets no devolvió registros."
+      );
+
+    }
+
+
+    datosOriginales =
+      datos;
+
+
+    datosFiltrados =
+      [...datosOriginales];
+
+
+    cambiarEstadoConexion(
+      "Google Sheets conectado",
+      "#45a878"
+    );
+
+
+    llenarFiltros();
+
+    actualizarDashboard();
+
+
+  } catch (error) {
+
+
+    console.error(
+      "Error:",
+      error
+    );
+
+
+    cambiarEstadoConexion(
+      "Error al conectar con Google Sheets",
+      "#e46a6a"
+    );
+
+  }
+
+}
+
+
+// ======================================================
+// CONVERTIR RESPUESTA GVIZ
+// ======================================================
+
+function convertirRespuestaGViz(
+  texto
+) {
+
+
+  const inicio =
+    texto.indexOf("{");
+
+
+  const fin =
+    texto.lastIndexOf("}");
+
+
+  if (
+    inicio === -1 ||
+    fin === -1
+  ) {
+
+    throw new Error(
+      "Respuesta GViz inválida."
+    );
+
+  }
+
+
+  const json =
+    JSON.parse(
+      texto.substring(
+        inicio,
+        fin + 1
+      )
+    );
+
+
+  const tabla =
+    json.table;
+
+
+  if (!tabla) {
+
+    throw new Error(
+      "No se encontró la tabla de Google Sheets."
+    );
+
+  }
+
+
+  const columnas =
+    tabla.cols.map(
+      columna =>
+        columna.label ||
+        columna.id
+    );
+
+
+  return tabla.rows.map(
+    fila => {
+
+      const registro = {};
+
+
+      columnas.forEach(
+        (
+          columna,
+          indice
+        ) => {
+
+          const celda =
+            fila.c[
+              indice
+            ];
+
+
+          registro[columna] =
+            celda
+              ? (
+                  celda.f ??
+                  celda.v ??
+                  ""
+                )
+              : "";
+
+        }
+      );
+
+
+      return registro;
+
+    }
+  );
+
+}
+
+
+// ======================================================
+// ESTADO CONEXIÓN
+// ======================================================
+
+function cambiarEstadoConexion(
+  texto,
+  color
+) {
+
 
   const textoConexion =
     document.getElementById(
@@ -154,249 +379,30 @@ async function cargarDatos() {
     );
 
 
-  try {
+  if (textoConexion) {
 
-    if (textoConexion) {
-
-      textoConexion.textContent =
-        "Conectando con Google Sheets...";
-
-    }
-
-
-    if (indicador) {
-
-      indicador.style.background =
-        "#f2b84b";
-
-    }
-
-
-    const url =
-      URL_DATOS +
-      "&t=" +
-      Date.now();
-
-
-    const respuesta =
-      await fetch(url);
-
-
-    if (!respuesta.ok) {
-
-      throw new Error(
-        "Error HTTP: " +
-        respuesta.status
-      );
-
-    }
-
-
-    const texto =
-      await respuesta.text();
-
-
-    if (!texto) {
-
-      throw new Error(
-        "Google Sheets devolvió datos vacíos."
-      );
-
-    }
-
-
-    const resultado =
-      Papa.parse(
-        texto,
-        {
-
-          header: true,
-
-          skipEmptyLines: true,
-
-          transformHeader:
-            function (header) {
-
-              return header
-                .trim();
-
-            }
-
-        }
-      );
-
-
-    if (
-      resultado.errors &&
-      resultado.errors.length > 0
-    ) {
-
-      console.warn(
-        "Advertencias CSV:",
-        resultado.errors
-      );
-
-    }
-
-
-    datosOriginales =
-      resultado.data
-        .filter(
-          function (fila) {
-
-            return Object.values(fila)
-              .some(
-                function (valor) {
-
-                  return String(
-                    valor ?? ""
-                  ).trim() !== "";
-
-                }
-              );
-
-          }
-        );
-
-
-    if (
-      datosOriginales.length === 0
-    ) {
-
-      throw new Error(
-        "No se encontraron registros en DATA."
-      );
-
-    }
-
-
-    console.log(
-      "Datos cargados:",
-      datosOriginales
-    );
-
-
-    console.log(
-      "Columnas:",
-      Object.keys(
-        datosOriginales[0]
-      )
-    );
-
-
-    datosFiltrados =
-      [
-        ...datosOriginales
-      ];
-
-
-    if (textoConexion) {
-
-      textoConexion.textContent =
-        "Google Sheets conectado";
-
-    }
-
-
-    if (indicador) {
-
-      indicador.style.background =
-        "#5ca77d";
-
-    }
-
-
-    llenarFiltros();
-
-    actualizarDashboard();
-
+    textoConexion.textContent =
+      texto;
 
   }
-  catch (error) {
-
-    console.error(
-      "ERROR:",
-      error
-    );
 
 
-    if (textoConexion) {
+  if (indicador) {
 
-      textoConexion.textContent =
-        "Error de conexión";
-
-    }
-
-
-    if (indicador) {
-
-      indicador.style.background =
-        "#dc7777";
-
-    }
-
-
-    mostrarErrorConexion(
-      error.message
-    );
+    indicador.style.background =
+      color;
 
   }
 
 }
 
 
-/* ======================================================
-   ERROR
-====================================================== */
-
-function mostrarErrorConexion(
-  mensaje
-) {
-
-  const cuerpo =
-    document.getElementById(
-      "tablaCuerpo"
-    );
-
-
-  if (!cuerpo) return;
-
-
-  cuerpo.innerHTML = `
-
-    <tr>
-
-      <td
-        colspan="8"
-        style="
-          text-align:center;
-          padding:35px;
-          color:#c56f6f;
-        "
-      >
-
-        No se pudieron cargar los datos.
-
-        <br><br>
-
-        <small>
-          ${mensaje}
-        </small>
-
-      </td>
-
-    </tr>
-
-  `;
-
-}
-
-
-/* ======================================================
-   FILTROS
-====================================================== */
+// ======================================================
+// FILTROS
+// ======================================================
 
 function llenarFiltros() {
+
 
   llenarSelect(
     "filtroSala",
@@ -431,15 +437,16 @@ function llenarFiltros() {
 }
 
 
-/* ======================================================
-   SELECT
-====================================================== */
+// ======================================================
+// SELECT
+// ======================================================
 
 function llenarSelect(
   id,
   campo,
   textoInicial
 ) {
+
 
   const select =
     document.getElementById(id);
@@ -448,7 +455,7 @@ function llenarSelect(
   if (!select) return;
 
 
-  const valorAnterior =
+  const valorActual =
     select.value;
 
 
@@ -477,17 +484,13 @@ function llenarSelect(
       ...new Set(
 
         datosOriginales
-
           .map(
-            function (registro) {
-
-              return String(
-                registro[campo] ?? ""
-              ).trim();
-
-            }
+            registro =>
+              String(
+                registro[campo] ??
+                ""
+              ).trim()
           )
-
           .filter(Boolean)
 
       )
@@ -495,23 +498,20 @@ function llenarSelect(
 
 
   valores.sort(
-    function (a, b) {
-
-      return a.localeCompare(
+    (a, b) =>
+      a.localeCompare(
         b,
         "es",
         {
           numeric: true,
           sensitivity: "base"
         }
-      );
-
-    }
+      )
   );
 
 
   valores.forEach(
-    function (valor) {
+    valor => {
 
       const opcion =
         document.createElement(
@@ -537,23 +537,24 @@ function llenarSelect(
 
   if (
     valores.includes(
-      valorAnterior
+      valorActual
     )
   ) {
 
     select.value =
-      valorAnterior;
+      valorActual;
 
   }
 
 }
 
 
-/* ======================================================
-   FILTRO MES
-====================================================== */
+// ======================================================
+// FILTRO MES
+// ======================================================
 
 function llenarFiltroMes() {
+
 
   const select =
     document.getElementById(
@@ -584,8 +585,8 @@ function llenarFiltroMes() {
   );
 
 
-  MESES_2026.forEach(
-    function (mes) {
+  ORDEN_MESES.forEach(
+    mes => {
 
       const opcion =
         document.createElement(
@@ -595,7 +596,6 @@ function llenarFiltroMes() {
 
       opcion.value =
         mes;
-
 
       opcion.textContent =
         mes;
@@ -611,53 +611,54 @@ function llenarFiltroMes() {
 }
 
 
-/* ======================================================
-   APLICAR FILTROS
-====================================================== */
+// ======================================================
+// APLICAR FILTROS
+// ======================================================
 
 function aplicarFiltros() {
 
+
   const sala =
-    obtenerValorSelect(
+    obtenerValor(
       "filtroSala"
     );
 
 
   const mes =
-    obtenerValorSelect(
+    obtenerValor(
       "filtroMes"
     );
 
 
   const modelo =
-    obtenerValorSelect(
+    obtenerValor(
       "filtroModelo"
     );
 
 
   const numero =
-    obtenerValorSelect(
+    obtenerValor(
       "filtroNumero"
     );
 
 
   const juego =
-    obtenerValorSelect(
+    obtenerValor(
       "filtroJuego"
     );
 
 
   datosFiltrados =
     datosOriginales.filter(
-      function (registro) {
+      registro => {
 
 
         if (
           sala &&
-          normalizarTexto(
+          limpiarTexto(
             registro["LOCAL"]
           ) !==
-          normalizarTexto(sala)
+          limpiarTexto(sala)
         ) {
 
           return false;
@@ -680,10 +681,10 @@ function aplicarFiltros() {
 
         if (
           modelo &&
-          normalizarTexto(
+          limpiarTexto(
             registro["Modelo Com."]
           ) !==
-          normalizarTexto(modelo)
+          limpiarTexto(modelo)
         ) {
 
           return false;
@@ -693,10 +694,10 @@ function aplicarFiltros() {
 
         if (
           numero &&
-          normalizarTexto(
+          limpiarTexto(
             registro["Nro."]
           ) !==
-          normalizarTexto(numero)
+          limpiarTexto(numero)
         ) {
 
           return false;
@@ -706,10 +707,10 @@ function aplicarFiltros() {
 
         if (
           juego &&
-          normalizarTexto(
+          limpiarTexto(
             registro["Juego"]
           ) !==
-          normalizarTexto(juego)
+          limpiarTexto(juego)
         ) {
 
           return false;
@@ -728,49 +729,27 @@ function aplicarFiltros() {
 }
 
 
-/* ======================================================
-   OBTENER SELECT
-====================================================== */
-
-function obtenerValorSelect(id) {
-
-  const elemento =
-    document.getElementById(id);
-
-
-  if (!elemento) {
-
-    return "";
-
-  }
-
-
-  return String(
-    elemento.value || ""
-  ).trim();
-
-}
-
-
-/* ======================================================
-   LIMPIAR FILTROS
-====================================================== */
+// ======================================================
+// LIMPIAR
+// ======================================================
 
 function limpiarFiltros() {
 
-  const ids = [
+
+  [
 
     "filtroSala",
+
     "filtroMes",
+
     "filtroModelo",
+
     "filtroNumero",
+
     "filtroJuego"
 
-  ];
-
-
-  ids.forEach(
-    function (id) {
+  ].forEach(
+    id => {
 
       const elemento =
         document.getElementById(id);
@@ -787,9 +766,7 @@ function limpiarFiltros() {
 
 
   datosFiltrados =
-    [
-      ...datosOriginales
-    ];
+    [...datosOriginales];
 
 
   actualizarDashboard();
@@ -797,28 +774,30 @@ function limpiarFiltros() {
 }
 
 
-/* ======================================================
-   DASHBOARD
-====================================================== */
+// ======================================================
+// DASHBOARD
+// ======================================================
 
 function actualizarDashboard() {
 
+
   actualizarContador();
 
-  actualizarKPI();
+  construirGraficos();
 
-  crearGraficoMensual();
+  construirTabla();
 
-  actualizarTabla();
+  construirGraficoPago();
 
 }
 
 
-/* ======================================================
-   CONTADOR
-====================================================== */
+// ======================================================
+// CONTADOR
+// ======================================================
 
 function actualizarContador() {
+
 
   establecerTexto(
     "contadorResultados",
@@ -830,526 +809,19 @@ function actualizarContador() {
 }
 
 
-/* ======================================================
-   KPI
-====================================================== */
-
-function actualizarKPI() {
-
-  const coin =
-    sumarCampo(
-      datosFiltrados,
-      "COIN"
-    );
-
-
-  const venta =
-    sumarCampo(
-      datosFiltrados,
-      "VENTA"
-    );
-
-
-  const netwin =
-    sumarCampo(
-      datosFiltrados,
-      "NETWIN ($)"
-    );
-
-
-  const pago =
-    promedioCampo(
-      datosFiltrados,
-      "% PAGO"
-    );
-
-
-  const maquinas =
-    new Set(
-
-      datosFiltrados
-
-        .map(
-          function (registro) {
-
-            return String(
-              registro["Nro."] ?? ""
-            ).trim();
-
-          }
-        )
-
-        .filter(Boolean)
-
-    ).size;
-
-
-  const locales =
-    new Set(
-
-      datosFiltrados
-
-        .map(
-          function (registro) {
-
-            return String(
-              registro["LOCAL"] ?? ""
-            ).trim();
-
-          }
-        )
-
-        .filter(Boolean)
-
-    ).size;
-
-
-  establecerTexto(
-    "kpiCoin",
-    formatearNumero(coin)
-  );
-
-
-  establecerTexto(
-    "kpiVenta",
-    formatearNumero(venta)
-  );
-
-
-  establecerTexto(
-    "kpiNetwin",
-    formatearNumero(netwin)
-  );
-
-
-  establecerTexto(
-    "kpiPago",
-    formatearDecimal(pago) +
-    " %"
-  );
-
-
-  establecerTexto(
-    "kpiMaquinas",
-    formatearNumero(maquinas)
-  );
-
-
-  establecerTexto(
-    "kpiLocales",
-    formatearNumero(locales)
-  );
-
-}
-
-
-/* ======================================================
-   GRÁFICO
-====================================================== */
-
-function crearGraficoMensual() {
-
-  const canvas =
-    document.getElementById(
-      "graficoMensual"
-    );
-
-
-  if (!canvas) return;
-
-
-  if (graficoMensual) {
-
-    graficoMensual.destroy();
-
-  }
-
-
-  const resumen =
-    construirResumenMensual();
-
-
-  graficoMensual =
-    new Chart(
-      canvas,
-      {
-
-        type: "line",
-
-
-        data: {
-
-          labels:
-            resumen.labels,
-
-
-          datasets: [
-
-            crearSerie(
-              "COIN PROM",
-              resumen.coinProm,
-              "#9ecae1",
-              "y"
-            ),
-
-
-            crearSerie(
-              "COIN TOTAL",
-              resumen.coinTotal,
-              "#a8d5ba",
-              "y"
-            ),
-
-
-            crearSerie(
-              "VENTA PROM",
-              resumen.ventaProm,
-              "#f5d98b",
-              "y"
-            ),
-
-
-            crearSerie(
-              "VENTA TOTAL",
-              resumen.ventaTotal,
-              "#c9b6dc",
-              "y"
-            ),
-
-
-            crearSerie(
-              "NETWIN ($)",
-              resumen.netwin,
-              "#e8b4c3",
-              "y"
-            ),
-
-
-            crearSerie(
-              "T.C",
-              resumen.tc,
-              "#efc39b",
-              "tc"
-            ),
-
-
-            crearSerie(
-              "% PAGO",
-              resumen.pago,
-              "#b7c9e2",
-              "pago"
-            )
-
-          ]
-
-        },
-
-
-        options: {
-
-          responsive:
-            true,
-
-          maintainAspectRatio:
-            false,
-
-
-          interaction: {
-
-            mode:
-              "index",
-
-            intersect:
-              false
-
-          },
-
-
-          plugins: {
-
-            legend: {
-
-              position:
-                "bottom",
-
-              labels: {
-
-                usePointStyle:
-                  true,
-
-                padding:
-                  16,
-
-                color:
-                  "#667386",
-
-                font: {
-
-                  size:
-                    11
-
-                }
-
-              }
-
-            },
-
-
-            tooltip: {
-
-              backgroundColor:
-                "#334155",
-
-              titleColor:
-                "#ffffff",
-
-              bodyColor:
-                "#ffffff",
-
-              padding:
-                11,
-
-              displayColors:
-                true
-
-            }
-
-          },
-
-
-          scales: {
-
-            y: {
-
-              beginAtZero:
-                true,
-
-              grid: {
-
-                color:
-                  "#edf0f4"
-
-              },
-
-              ticks: {
-
-                color:
-                  "#7c8797",
-
-                callback:
-                  function (valor) {
-
-                    return formatearNumero(
-                      valor
-                    );
-
-                  }
-
-              }
-
-            },
-
-
-            tc: {
-
-              type:
-                "linear",
-
-              position:
-                "right",
-
-              beginAtZero:
-                false,
-
-              grid: {
-
-                drawOnChartArea:
-                  false
-
-              },
-
-              ticks: {
-
-                color:
-                  "#b5835d",
-
-                callback:
-                  function (valor) {
-
-                    return Number(
-                      valor
-                    ).toFixed(2);
-
-                  }
-
-              }
-
-            },
-
-
-            pago: {
-
-              type:
-                "linear",
-
-              position:
-                "right",
-
-              beginAtZero:
-                true,
-
-              min:
-                0,
-
-              max:
-                100,
-
-              grid: {
-
-                drawOnChartArea:
-                  false
-
-              },
-
-              ticks: {
-
-                color:
-                  "#a46f80",
-
-                callback:
-                  function (valor) {
-
-                    return valor +
-                      " %";
-
-                  }
-
-              }
-
-            },
-
-
-            x: {
-
-              grid: {
-
-                color:
-                  "#f0f2f5"
-
-              },
-
-              ticks: {
-
-                color:
-                  "#6f7b8f"
-
-              }
-
-            }
-
-          }
-
-        }
-
-      }
-    );
-
-}
-
-
-/* ======================================================
-   CREAR SERIE
-====================================================== */
-
-function crearSerie(
-  nombre,
-  datos,
-  color,
-  eje
-) {
-
-  return {
-
-    label:
-      nombre,
-
-    data:
-      datos,
-
-    borderColor:
-      color,
-
-    backgroundColor:
-      color,
-
-    pointBackgroundColor:
-      color,
-
-    pointBorderColor:
-      "#ffffff",
-
-    pointBorderWidth:
-      2,
-
-    pointRadius:
-      5,
-
-    pointHoverRadius:
-      7,
-
-    borderWidth:
-      3,
-
-    tension:
-      0.3,
-
-    yAxisID:
-      eje,
-
-    spanGaps:
-      true
-
-  };
-
-}
-
-
-/* ======================================================
-   RESUMEN MENSUAL
-====================================================== */
+// ======================================================
+// RESUMEN MENSUAL
+// ======================================================
 
 function construirResumenMensual() {
+
 
   const grupos = {};
 
 
-  MESES_2026.forEach(
-    function (mes) {
-
-      grupos[mes] = {
-
-        coinProm: [],
-
-        coinTotal: 0,
-
-        ventaProm: [],
-
-        ventaTotal: 0,
-
-        netwin: 0,
-
-        tc: [],
-
-        pago: []
-
-      };
-
-    }
-  );
-
-
   datosFiltrados.forEach(
-    function (registro) {
+    registro => {
+
 
       const año =
         obtenerNumero(
@@ -1358,7 +830,7 @@ function construirResumenMensual() {
 
 
       if (
-        año !== null &&
+        año &&
         año !== 2026
       ) {
 
@@ -1374,12 +846,43 @@ function construirResumenMensual() {
 
 
       if (
-        !grupos[mes]
+        !ORDEN_MESES.includes(
+          mes
+        )
       ) {
 
         return;
 
       }
+
+
+      if (
+        !grupos[mes]
+      ) {
+
+        grupos[mes] = {
+
+          coinProm: [],
+
+          ventaProm: [],
+
+          coinTotal: 0,
+
+          ventaTotal: 0,
+
+          netwin: 0,
+
+          tc: [],
+
+          pago: []
+
+        };
+
+      }
+
+
+      const grupo =
+        grupos[mes];
 
 
       const coin =
@@ -1428,19 +931,9 @@ function construirResumenMensual() {
         coinProm !== null
       ) {
 
-        grupos[mes]
-          .coinProm
-          .push(coinProm);
-
-      }
-
-
-      if (
-        coin !== null
-      ) {
-
-        grupos[mes]
-          .coinTotal += coin;
+        grupo.coinProm.push(
+          coinProm
+        );
 
       }
 
@@ -1449,9 +942,19 @@ function construirResumenMensual() {
         ventaProm !== null
       ) {
 
-        grupos[mes]
-          .ventaProm
-          .push(ventaProm);
+        grupo.ventaProm.push(
+          ventaProm
+        );
+
+      }
+
+
+      if (
+        coin !== null
+      ) {
+
+        grupo.coinTotal +=
+          coin;
 
       }
 
@@ -1460,8 +963,8 @@ function construirResumenMensual() {
         venta !== null
       ) {
 
-        grupos[mes]
-          .ventaTotal += venta;
+        grupo.ventaTotal +=
+          venta;
 
       }
 
@@ -1470,8 +973,8 @@ function construirResumenMensual() {
         netwin !== null
       ) {
 
-        grupos[mes]
-          .netwin += netwin;
+        grupo.netwin +=
+          netwin;
 
       }
 
@@ -1480,9 +983,9 @@ function construirResumenMensual() {
         tc !== null
       ) {
 
-        grupos[mes]
-          .tc
-          .push(tc);
+        grupo.tc.push(
+          tc
+        );
 
       }
 
@@ -1491,9 +994,9 @@ function construirResumenMensual() {
         pago !== null
       ) {
 
-        grupos[mes]
-          .pago
-          .push(pago);
+        grupo.pago.push(
+          pago
+        );
 
       }
 
@@ -1501,90 +1004,72 @@ function construirResumenMensual() {
   );
 
 
+  /*
+    IMPORTANTE:
+
+    Solo se incluyen meses que
+    realmente tienen registros.
+  */
+
+  const meses =
+    ORDEN_MESES.filter(
+      mes =>
+        grupos[mes]
+    );
+
+
   return {
 
-    labels:
-      MESES_2026,
-
+    labels: meses,
 
     coinProm:
-      MESES_2026.map(
-        function (mes) {
-
-          return promedioArray(
+      meses.map(
+        mes =>
+          promedioArray(
             grupos[mes].coinProm
-          );
-
-        }
+          )
       ),
-
-
-    coinTotal:
-      MESES_2026.map(
-        function (mes) {
-
-          return grupos[mes]
-            .coinTotal;
-
-        }
-      ),
-
 
     ventaProm:
-      MESES_2026.map(
-        function (mes) {
-
-          return promedioArray(
+      meses.map(
+        mes =>
+          promedioArray(
             grupos[mes].ventaProm
-          );
-
-        }
+          )
       ),
 
+    coinTotal:
+      meses.map(
+        mes =>
+          grupos[mes].coinTotal
+      ),
 
     ventaTotal:
-      MESES_2026.map(
-        function (mes) {
-
-          return grupos[mes]
-            .ventaTotal;
-
-        }
+      meses.map(
+        mes =>
+          grupos[mes].ventaTotal
       ),
-
 
     netwin:
-      MESES_2026.map(
-        function (mes) {
-
-          return grupos[mes]
-            .netwin;
-
-        }
+      meses.map(
+        mes =>
+          grupos[mes].netwin
       ),
-
 
     tc:
-      MESES_2026.map(
-        function (mes) {
-
-          return promedioArray(
+      meses.map(
+        mes =>
+          promedioArray(
             grupos[mes].tc
-          );
-
-        }
+          )
       ),
 
-
     pago:
-      MESES_2026.map(
-        function (mes) {
-
-          return promedioArray(
+      meses.map(
+        mes =>
+          promedioArray(
             grupos[mes].pago
-          );
-
-        }
+          )
       )
 
   };
@@ -1592,11 +1077,533 @@ function construirResumenMensual() {
 }
 
 
-/* ======================================================
-   TABLA
-====================================================== */
+// ======================================================
+// CREAR GRÁFICOS
+// ======================================================
 
-function actualizarTabla() {
+function construirGraficos() {
+
+
+  const resumen =
+    construirResumenMensual();
+
+
+  crearGraficoLinea(
+    "graficoCoinProm",
+    "COIN PROM",
+    resumen.labels,
+    resumen.coinProm,
+    COLORES.coinProm
+  );
+
+
+  crearGraficoLinea(
+    "graficoVentaProm",
+    "VENTA PROM",
+    resumen.labels,
+    resumen.ventaProm,
+    COLORES.ventaProm
+  );
+
+
+  crearGraficoLinea(
+    "graficoCoinTotal",
+    "COIN TOTAL",
+    resumen.labels,
+    resumen.coinTotal,
+    COLORES.coinTotal
+  );
+
+
+  crearGraficoLinea(
+    "graficoVentaTotal",
+    "VENTA TOTAL",
+    resumen.labels,
+    resumen.ventaTotal,
+    COLORES.ventaTotal
+  );
+
+
+  crearGraficoLinea(
+    "graficoNetwin",
+    "NETWIN ($)",
+    resumen.labels,
+    resumen.netwin,
+    COLORES.netwin
+  );
+
+
+  crearGraficoLinea(
+    "graficoTC",
+    "T.C.",
+    resumen.labels,
+    resumen.tc,
+    COLORES.tc,
+    true
+  );
+
+}
+
+
+// ======================================================
+// GRÁFICO DE LÍNEA
+// ======================================================
+
+function crearGraficoLinea(
+  id,
+  etiqueta,
+  labels,
+  datos,
+  color,
+  esTC = false
+) {
+
+
+  const canvas =
+    document.getElementById(id);
+
+
+  if (!canvas) return;
+
+
+  if (graficos[id]) {
+
+    graficos[id].destroy();
+
+  }
+
+
+  graficos[id] =
+    new Chart(
+      canvas,
+      {
+
+        type: "line",
+
+
+        data: {
+
+          labels: labels,
+
+          datasets: [
+
+            {
+
+              label:
+                etiqueta,
+
+              data:
+                datos,
+
+              borderColor:
+                color,
+
+              backgroundColor:
+                color,
+
+              pointBackgroundColor:
+                color,
+
+              pointBorderColor:
+                "#ffffff",
+
+              pointBorderWidth:
+                2,
+
+              pointRadius:
+                5,
+
+              pointHoverRadius:
+                7,
+
+              borderWidth:
+                3,
+
+              tension:
+                0.25,
+
+              fill:
+                false
+
+            }
+
+          ]
+
+        },
+
+
+        plugins: [
+          ChartDataLabels
+        ],
+
+
+        options: {
+
+          responsive: true,
+
+          maintainAspectRatio: false,
+
+
+          interaction: {
+
+            mode: "index",
+
+            intersect: false
+
+          },
+
+
+          plugins: {
+
+            legend: {
+
+              display: true,
+
+              position: "bottom",
+
+              labels: {
+
+                usePointStyle: true,
+
+                padding: 16,
+
+                color: "#667085",
+
+                font: {
+
+                  size: 11
+
+                }
+
+              }
+
+            },
+
+
+            datalabels: {
+
+              display: true,
+
+              align: "top",
+
+              anchor: "end",
+
+              color: "#667085",
+
+              font: {
+
+                size: 10,
+
+                weight: "600"
+
+              },
+
+              formatter:
+                valor => {
+
+                  if (
+                    esTC
+                  ) {
+
+                    return Number(
+                      valor
+                    ).toFixed(2);
+
+                  }
+
+                  return formatearNumero(
+                    valor
+                  );
+
+                }
+
+            },
+
+
+            tooltip: {
+
+              backgroundColor:
+                "#344054",
+
+              titleColor:
+                "#ffffff",
+
+              bodyColor:
+                "#ffffff",
+
+              padding: 10
+
+            }
+
+          },
+
+
+          scales: {
+
+            x: {
+
+              grid: {
+
+                color:
+                  "#eef1f4"
+
+              },
+
+              ticks: {
+
+                color:
+                  "#667085"
+
+              }
+
+            },
+
+
+            y: {
+
+              beginAtZero: true,
+
+              grid: {
+
+                color:
+                  "#eef1f4"
+
+              },
+
+              ticks: {
+
+                color:
+                  "#667085",
+
+                callback:
+                  valor => {
+
+                    if (
+                      esTC
+                    ) {
+
+                      return Number(
+                        valor
+                      ).toFixed(2);
+
+                    }
+
+                    return formatearNumero(
+                      valor
+                    );
+
+                  }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+    );
+
+}
+
+
+// ======================================================
+// GRÁFICO CIRCULAR % PAGO
+// ======================================================
+
+function construirGraficoPago() {
+
+
+  const canvas =
+    document.getElementById(
+      "graficoPago"
+    );
+
+
+  if (!canvas) return;
+
+
+  if (graficos.graficoPago) {
+
+    graficos.graficoPago.destroy();
+
+  }
+
+
+  const valores =
+    datosFiltrados
+      .map(
+        registro =>
+          obtenerNumero(
+            registro["% PAGO"]
+          )
+      )
+      .filter(
+        valor =>
+          valor !== null
+      );
+
+
+  let pago =
+    promedioArray(
+      valores
+    );
+
+
+  /*
+    Por seguridad mantenemos
+    el porcentaje entre 0 y 100.
+  */
+
+  pago =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        pago
+      )
+    );
+
+
+  const restante =
+    100 - pago;
+
+
+  establecerTexto(
+    "valorPago",
+    pago.toFixed(2) + "%"
+  );
+
+
+  graficos.graficoPago =
+    new Chart(
+      canvas,
+      {
+
+        type: "doughnut",
+
+
+        data: {
+
+          labels: [
+
+            "PAGO",
+
+            "RESTANTE"
+
+          ],
+
+
+          datasets: [
+
+            {
+
+              data: [
+
+                pago,
+
+                restante
+
+              ],
+
+
+              backgroundColor: [
+
+                COLORES.pago,
+
+                COLORES.restante
+
+              ],
+
+
+              borderColor: [
+
+                "#ffffff",
+
+                "#ffffff"
+
+              ],
+
+
+              borderWidth: 3
+
+            }
+
+          ]
+
+        },
+
+
+        plugins: [
+          ChartDataLabels
+        ],
+
+
+        options: {
+
+          responsive: true,
+
+          maintainAspectRatio: false,
+
+
+          cutout: "58%",
+
+
+          plugins: {
+
+            legend: {
+
+              position: "bottom",
+
+              labels: {
+
+                usePointStyle: true,
+
+                padding: 18,
+
+                color: "#667085"
+
+              }
+
+            },
+
+
+            datalabels: {
+
+              color: "#475467",
+
+              font: {
+
+                size: 14,
+
+                weight: "700"
+
+              },
+
+              formatter:
+                valor =>
+                  valor.toFixed(1) +
+                  "%"
+
+            }
+
+          }
+
+        }
+
+      }
+    );
+
+}
+
+
+// ======================================================
+// TABLA
+// ======================================================
+
+function construirTabla() {
+
 
   const cuerpo =
     document.getElementById(
@@ -1615,7 +1622,11 @@ function actualizarTabla() {
 
 
   resumen.labels.forEach(
-    function (mes, indice) {
+    (
+      mes,
+      indice
+    ) => {
+
 
       const fila =
         document.createElement(
@@ -1668,9 +1679,10 @@ function actualizarTabla() {
         </td>
 
         <td>
-          ${formatearDecimal(
-            resumen.pago[indice]
-          )} %
+          ${Number(
+            resumen.pago[indice] || 0
+          ).toFixed(2)}
+          %
         </td>
 
       `;
@@ -1686,125 +1698,115 @@ function actualizarTabla() {
 }
 
 
-/* ======================================================
-   SUMAR
-====================================================== */
+// ======================================================
+// OBTENER VALOR SELECT
+// ======================================================
 
-function sumarCampo(
-  datos,
-  campo
-) {
-
-  return datos.reduce(
-    function (
-      total,
-      registro
-    ) {
-
-      const numero =
-        obtenerNumero(
-          registro[campo]
-        );
+function obtenerValor(id) {
 
 
-      return total +
-        (
-          numero === null
-            ? 0
-            : numero
-        );
-
-    },
-    0
-  );
-
-}
+  const elemento =
+    document.getElementById(id);
 
 
-/* ======================================================
-   PROMEDIO CAMPO
-====================================================== */
+  if (!elemento) {
 
-function promedioCampo(
-  datos,
-  campo
-) {
-
-  const valores =
-    datos
-
-      .map(
-        function (registro) {
-
-          return obtenerNumero(
-            registro[campo]
-          );
-
-        }
-      )
-
-      .filter(
-        function (valor) {
-
-          return valor !== null;
-
-        }
-      );
-
-
-  return promedioArray(
-    valores
-  );
-
-}
-
-
-/* ======================================================
-   PROMEDIO ARRAY
-====================================================== */
-
-function promedioArray(
-  valores
-) {
-
-  if (
-    !valores ||
-    valores.length === 0
-  ) {
-
-    return 0;
+    return "";
 
   }
 
 
-  const suma =
-    valores.reduce(
-      function (
-        total,
-        valor
-      ) {
-
-        return total +
-          Number(valor || 0);
-
-      },
-      0
-    );
-
-
-  return suma /
-    valores.length;
+  return String(
+    elemento.value || ""
+  ).trim();
 
 }
 
 
-/* ======================================================
-   OBTENER NÚMERO
-====================================================== */
+// ======================================================
+// NORMALIZAR TEXTO
+// ======================================================
 
-function obtenerNumero(
-  valor
-) {
+function limpiarTexto(valor) {
+
+
+  if (
+    valor === null ||
+    valor === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(valor)
+    .trim()
+    .toUpperCase();
+
+}
+
+
+// ======================================================
+// NORMALIZAR MES
+// ======================================================
+
+function normalizarMes(valor) {
+
+
+  if (
+    valor === null ||
+    valor === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  let mes =
+    String(valor)
+      .trim()
+      .toUpperCase();
+
+
+  mes =
+    mes
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      );
+
+
+  const numero =
+    Number(mes);
+
+
+  if (
+    Number.isInteger(numero) &&
+    numero >= 1 &&
+    numero <= 12
+  ) {
+
+    return ORDEN_MESES[
+      numero - 1
+    ];
+
+  }
+
+
+  return mes;
+
+}
+
+
+// ======================================================
+// OBTENER NÚMERO
+// ======================================================
+
+function obtenerNumero(valor) {
+
 
   if (
     valor === null ||
@@ -1852,7 +1854,7 @@ function obtenerNumero(
 
     1,234.56
     1234.56
-    1234,56
+    1.234,56
   */
 
   if (
@@ -1860,29 +1862,67 @@ function obtenerNumero(
     texto.includes(".")
   ) {
 
-    texto =
-      texto.replace(
-        /,/g,
-        ""
-      );
+    if (
+      texto.lastIndexOf(",") >
+      texto.lastIndexOf(".")
+    ) {
 
-  }
-  else if (
+      texto =
+        texto
+          .replace(
+            /\./g,
+            ""
+          )
+          .replace(
+            ",",
+            "."
+          );
+
+    } else {
+
+      texto =
+        texto.replace(
+          /,/g,
+          ""
+        );
+
+    }
+
+  } else if (
     texto.includes(",")
   ) {
 
-    texto =
-      texto.replace(
-        ",",
-        "."
-      );
+    const partes =
+      texto.split(",");
+
+
+    if (
+      partes[1] &&
+      partes[1].length <= 2
+    ) {
+
+      texto =
+        texto.replace(
+          ",",
+          "."
+        );
+
+    } else {
+
+      texto =
+        texto.replace(
+          /,/g,
+          ""
+        );
+
+    }
 
   }
 
 
   texto =
     texto.replace(
-      /[^\d.-]/g,
+      /[^0-9.-]/g,
       ""
     );
 
@@ -1898,115 +1938,70 @@ function obtenerNumero(
 }
 
 
-/* ======================================================
-   NORMALIZAR TEXTO
-====================================================== */
+// ======================================================
+// PROMEDIO
+// ======================================================
 
-function normalizarTexto(
-  valor
+function promedioArray(
+  valores
 ) {
 
+
   if (
-    valor === null ||
-    valor === undefined
+    !valores ||
+    valores.length === 0
   ) {
 
-    return "";
+    return 0;
 
   }
 
 
-  return String(valor)
-    .trim()
-    .toUpperCase();
+  const validos =
+    valores.filter(
+      valor =>
+        valor !== null &&
+        Number.isFinite(
+          Number(valor)
+        )
+    );
+
+
+  if (
+    validos.length === 0
+  ) {
+
+    return 0;
+
+  }
+
+
+  const suma =
+    validos.reduce(
+      (
+        total,
+        valor
+      ) =>
+        total +
+        Number(valor),
+      0
+    );
+
+
+  return suma /
+    validos.length;
 
 }
 
 
-/* ======================================================
-   NORMALIZAR MES
-====================================================== */
-
-function normalizarMes(
-  valor
-) {
-
-  if (
-    valor === null ||
-    valor === undefined
-  ) {
-
-    return "";
-
-  }
-
-
-  let mes =
-    String(valor)
-      .trim()
-      .toUpperCase();
-
-
-  mes =
-    mes
-      .normalize("NFD")
-      .replace(
-        /[\u0300-\u036f]/g,
-        ""
-      );
-
-
-  const numero =
-    Number(mes);
-
-
-  if (
-    Number.isInteger(numero) &&
-    numero >= 1 &&
-    numero <= 12
-  ) {
-
-    return MESES_2026[
-      numero - 1
-    ];
-
-  }
-
-
-  return mes;
-
-}
-
-
-/* ======================================================
-   FORMATEAR NÚMERO
-====================================================== */
+// ======================================================
+// FORMATEAR NÚMERO
+// ======================================================
 
 function formatearNumero(
   valor
 ) {
 
-  const numero =
-    Number(valor) || 0;
-
-
-  return numero.toLocaleString(
-    "es-PE",
-    {
-      maximumFractionDigits: 2
-    }
-  );
-
-}
-
-
-/* ======================================================
-   FORMATEAR DECIMAL
-====================================================== */
-
-function formatearDecimal(
-  valor
-) {
 
   const numero =
     Number(valor) || 0;
@@ -2015,22 +2010,24 @@ function formatearDecimal(
   return numero.toLocaleString(
     "es-PE",
     {
-      minimumFractionDigits: 2,
+
       maximumFractionDigits: 2
+
     }
   );
 
 }
 
 
-/* ======================================================
-   ESTABLECER TEXTO
-====================================================== */
+// ======================================================
+// ESTABLECER TEXTO
+// ======================================================
 
 function establecerTexto(
   id,
   texto
 ) {
+
 
   const elemento =
     document.getElementById(id);
@@ -2046,15 +2043,11 @@ function establecerTexto(
 }
 
 
-/* ======================================================
-   ACTUALIZACIÓN AUTOMÁTICA
-====================================================== */
+// ======================================================
+// ACTUALIZACIÓN AUTOMÁTICA
+// ======================================================
 
 setInterval(
-  function () {
-
-    cargarDatos();
-
-  },
+  cargarDatos,
   5 * 60 * 1000
 );
