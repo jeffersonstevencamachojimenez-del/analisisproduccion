@@ -14,10 +14,7 @@ body {
   margin: 0;
   padding: 0;
 
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 
   background: #ffffff;
 
@@ -30,16 +27,13 @@ body {
 ====================================================== */
 
 .encabezado {
-
   width: 100%;
 
-  padding:
-    24px 35px;
+  padding: 24px 35px;
 
   background: #ffffff;
 
-  border-bottom:
-    1px solid #eaecf0;
+  border-bottom: 1px solid #eaecf0;
 
   display: flex;
 
@@ -48,12 +42,9 @@ body {
   justify-content: space-between;
 
   gap: 20px;
-
 }
 
-
 .encabezado h1 {
-
   margin: 0 0 6px 0;
 
   font-size: 27px;
@@ -61,18 +52,14 @@ body {
   font-weight: 700;
 
   color: #1d2939;
-
 }
 
-
 .encabezado p {
-
   margin: 0;
 
   font-size: 14px;
 
   color: #667085;
-
 }
 
 
@@ -81,7 +68,6 @@ body {
 ====================================================== */
 
 .conexion {
-
   display: flex;
 
   align-items: center;
@@ -93,12 +79,9 @@ body {
   color: #667085;
 
   white-space: nowrap;
-
 }
 
-
 .punto {
-
   width: 10px;
 
   height: 10px;
@@ -108,25 +91,21 @@ body {
   border-radius: 50%;
 
   background: #f2b84b;
-
 }
 
 
 /* ======================================================
-   4. CONTENEDOR PRINCIPAL
+   4. CONTENEDOR
 ====================================================== */
 
 .contenedor {
-
   width: 100%;
 
   max-width: 1600px;
 
   margin: 0 auto;
 
-  padding:
-    25px 35px 45px 35px;
-
+  padding: 25px 35px 45px 35px;
 }
 
 
@@ -135,16 +114,13 @@ body {
 ====================================================== */
 
 .barra-acciones {
-
   background: #ffffff;
 
-  border:
-    1px solid #eaecf0;
+  border: 1px solid #eaecf0;
 
   border-radius: 12px;
 
-  padding:
-    16px 20px;
+  padding: 16px 20px;
 
   margin-bottom: 18px;
 
@@ -155,49 +131,36 @@ body {
   align-items: center;
 
   gap: 15px;
-
 }
 
-
 .barra-acciones strong {
-
   font-size: 20px;
 
   color: #1d2939;
-
 }
 
-
 .barra-acciones span {
-
   margin-left: 5px;
 
   color: #667085;
 
   font-size: 13px;
-
 }
 
-
 .acciones {
-
   display: flex;
 
   align-items: center;
 
   gap: 10px;
-
 }
 
-
 .acciones button {
-
   border: 0;
 
   border-radius: 8px;
 
-  padding:
-    10px 16px;
+  padding: 10px 16px;
 
   background: #344054;
 
@@ -212,17 +175,12 @@ body {
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
-
 }
 
-
 .acciones button:hover {
-
   opacity: 0.88;
 
-  transform:
-    translateY(-1px);
-
+  transform: translateY(-1px);
 }
 
 
@@ -231,11 +189,9 @@ body {
 ====================================================== */
 
 .filtros {
-
   background: #ffffff;
 
-  border:
-    1px solid #eaecf0;
+  border: 1px solid #eaecf0;
 
   border-radius: 12px;
 
@@ -252,46 +208,34 @@ body {
   gap: 15px;
 
   align-items: end;
-
 }
 
-
 .filtro {
-
   display: flex;
 
   flex-direction: column;
 
   gap: 7px;
-
 }
 
-
 .filtro label {
-
   font-size: 11px;
 
   font-weight: 700;
 
   color: #667085;
 
-  letter-spacing:
-    0.04em;
-
+  letter-spacing: 0.04em;
 }
 
-
 .filtro select {
-
   width: 100%;
 
   min-height: 40px;
 
-  padding:
-    0 11px;
+  padding: 0 11px;
 
-  border:
-    1px solid #d0d5dd;
+  border: 1px solid #d0d5dd;
 
   border-radius: 8px;
 
@@ -304,55 +248,22 @@ body {
   outline: none;
 
   cursor: pointer;
-
 }
 
-
 .filtro select:focus {
-
-  border-color:
-    #98a2b3;
+  border-color: #98a2b3;
 
   box-shadow:
     0 0 0 3px
     rgba(152, 162, 179, 0.12);
-
 }
-
-
-/* FILTRO INDICADOR */
-
-#filtroIndicador {
-
-  font-weight: 600;
-
-  border-color:
-    #d0d5dd;
-
-}
-
-
-#filtroIndicador:focus {
-
-  border-color:
-    #b91c1c;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(185, 28, 28, 0.10);
-
-}
-
 
 .btn-limpiar {
-
   min-height: 40px;
 
-  padding:
-    0 15px;
+  padding: 0 15px;
 
-  border:
-    1px solid #d0d5dd;
+  border: 1px solid #d0d5dd;
 
   border-radius: 8px;
 
@@ -367,251 +278,44 @@ body {
   cursor: pointer;
 
   white-space: nowrap;
-
 }
-
 
 .btn-limpiar:hover {
-
   background: #f9fafb;
-
 }
 
 
 /* ======================================================
-   7. CONTENEDOR DE GRÁFICOS - 3 POR FILA
+   7. TABLAS AL COSTADO
 ====================================================== */
 
-.graficos {
+.tablas-grid {
+  width: 100%;
 
   display: grid;
 
   grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 20px;
-
-  width: 100%;
-
-}
-
-
-/* ======================================================
-   8. TARJETA DE GRÁFICO
-====================================================== */
-
-.grafico {
-
-  background: #ffffff;
-
-  border:
-    1px solid #eaecf0;
-
-  border-radius: 14px;
-
-  padding:
-    18px 20px 15px 20px;
-
-  min-width: 0;
-
-  box-shadow:
-    0 1px 2px
-    rgba(16, 24, 40, 0.03);
-
-}
-
-
-/* ======================================================
-   9. ENCABEZADO DEL GRÁFICO
-====================================================== */
-
-.grafico-header {
-
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  gap: 10px;
-
-  margin-bottom: 10px;
-
-}
-
-
-.grafico-header h2 {
-
-  margin: 0;
-
-  font-size: 16px;
-
-  font-weight: 700;
-
-  color: #1d2939;
-
-}
-
-
-.grafico-header span {
-
-  font-size: 11px;
-
-  color: #98a2b3;
-
-}
-
-
-/* ======================================================
-   10. ÁREA DEL CANVAS
-====================================================== */
-
-.grafico-contenido {
-
-  position: relative;
-
-  width: 100%;
-
-  height: 250px;
-
-}
-
-
-.grafico-contenido canvas {
-
-  width: 100% !important;
-
-  height: 100% !important;
-
-}
-
-
-/* ======================================================
-   11. PANEL % PAGO
-====================================================== */
-
-.pago-panel {
-
-  margin-top: 22px;
-
-  background: #ffffff;
-
-  border:
-    1px solid #eaecf0;
-
-  border-radius: 14px;
-
-  padding:
-    20px;
-
-  box-shadow:
-    0 1px 2px
-    rgba(16, 24, 40, 0.03);
-
-}
-
-
-.pago-contenido {
-
-  min-height: 350px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 50px;
-
-}
-
-
-.grafico-pago {
-
-  width: 360px;
-
-  height: 320px;
-
-  position: relative;
-
-}
-
-
-.grafico-pago canvas {
-
-  width: 100% !important;
-
-  height: 100% !important;
-
-}
-
-
-.pago-valor {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 6px;
-
-  align-items: flex-start;
-
-}
-
-
-.pago-valor strong {
-
-  font-size: 34px;
-
-  line-height: 1;
-
-  color: #1d2939;
-
-}
-
-
-.pago-valor span {
-
-  font-size: 13px;
-
-  color: #667085;
-
-}
-
-
-/* ======================================================
-   12. CONTENEDOR DE LAS DOS TABLAS
-====================================================== */
-
-.tablas-lado {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
+    minmax(0, 1.15fr)
     minmax(0, 1fr);
 
   gap: 20px;
 
-  width: 100%;
-
-  margin-top: 22px;
-
   align-items: start;
 
+  margin-top: 0;
 }
 
 
 /* ======================================================
-   13. PANEL TABLA
+   8. PANEL
 ====================================================== */
 
 .panel {
+  margin: 0;
 
   background: #ffffff;
 
-  border:
-    1px solid #eaecf0;
+  border: 1px solid #eaecf0;
 
   border-radius: 14px;
 
@@ -621,555 +325,442 @@ body {
     0 1px 2px
     rgba(16, 24, 40, 0.03);
 
+  min-width: 0;
 }
-
 
 .panel-header {
+  padding: 20px;
 
-  padding:
-    20px;
-
-  border-bottom:
-    1px solid #eaecf0;
-
+  border-bottom: 1px solid #eaecf0;
 }
 
-
 .panel-header h2 {
-
-  margin:
-    0 0 5px 0;
+  margin: 0 0 5px 0;
 
   font-size: 17px;
 
   color: #1d2939;
-
 }
 
-
 .panel-header span {
-
   font-size: 12px;
 
   color: #98a2b3;
-
 }
 
 
 /* ======================================================
-   14. TABLA
+   9. TABLA
 ====================================================== */
 
 .tabla-contenedor {
-
   width: 100%;
 
   overflow-x: auto;
 
+  overflow-y: auto;
+
+  max-height: 430px;
 }
 
-
 table {
-
   width: 100%;
 
   border-collapse: collapse;
 
   min-width: 600px;
-
 }
-
-
-/* ======================================================
-   ENCABEZADO ROJO
-====================================================== */
 
 thead {
-
-  background:
-    #b91c1c;
-
+  background: #b91c1c;
 }
 
+thead th {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 2;
+
+  background: #b91c1c;
+}
 
 th {
-
-  padding:
-    13px 14px;
+  padding: 13px 14px;
 
   text-align: left;
 
-  border-top:
-    1px solid #991b1b;
+  border-top: 1px solid #991b1b;
 
   border-right:
     1px solid
     rgba(255, 255, 255, 0.25);
 
-  border-bottom:
-    1px solid #991b1b;
+  border-bottom: 1px solid #991b1b;
 
-  color:
-    #ffffff;
+  color: #ffffff;
 
-  font-size:
-    11px;
+  font-size: 11px;
 
-  font-weight:
-    700;
+  font-weight: 700;
 
-  white-space:
-    nowrap;
-
+  white-space: nowrap;
 }
-
 
 th:last-child {
-
-  border-right:
-    0;
-
+  border-right: 0;
 }
-
-
-/* ======================================================
-   CELDAS
-====================================================== */
 
 td {
+  padding: 13px 14px;
 
-  padding:
-    13px 14px;
+  border-right: 1px solid #eaecf0;
 
-  border-right:
-    1px solid #eaecf0;
+  border-bottom: 1px solid #eaecf0;
 
-  border-bottom:
-    1px solid #eaecf0;
+  color: #475467;
 
-  color:
-    #475467;
+  font-size: 12px;
 
-  font-size:
-    12px;
-
-  white-space:
-    nowrap;
-
+  white-space: nowrap;
 }
-
 
 td:last-child {
-
-  border-right:
-    0;
-
+  border-right: 0;
 }
-
-
-/* ======================================================
-   EFECTO FILA
-====================================================== */
 
 tbody tr:hover {
-
-  background:
-    #fff5f5;
-
+  background: #fff5f5;
 }
-
 
 tbody tr:last-child td {
-
-  border-bottom:
-    0;
-
+  border-bottom: 0;
 }
-
 
 td strong {
-
-  color:
-    #344054;
-
+  color: #344054;
 }
 
 
 /* ======================================================
-   15. TABLA DE DETALLE POR MÁQUINA
+   10. GRÁFICOS
 ====================================================== */
 
-.panel-secundario {
+.graficos {
+  display: grid;
 
-  min-width:
-    0;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
 
+  gap: 20px;
+
+  width: 100%;
+
+  margin-top: 22px;
 }
 
+.grafico {
+  background: #ffffff;
 
-.panel-secundario table {
+  border: 1px solid #eaecf0;
 
-  min-width:
-    650px;
+  border-radius: 14px;
 
+  padding: 18px 20px 15px 20px;
+
+  min-width: 0;
+
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
 }
 
+.grafico-header {
+  display: flex;
 
-.panel-secundario th {
+  justify-content: space-between;
 
-  text-align:
-    left;
+  align-items: center;
 
+  gap: 10px;
+
+  margin-bottom: 10px;
 }
 
+.grafico-header h2 {
+  margin: 0;
 
-.panel-secundario td {
+  font-size: 16px;
 
-  vertical-align:
-    middle;
+  font-weight: 700;
 
+  color: #1d2939;
 }
 
+.grafico-header span {
+  font-size: 11px;
 
-/* NÚMERO DE MÁQUINAS */
-
-.panel-secundario td:nth-child(3) {
-
-  text-align:
-    center;
-
-  font-weight:
-    700;
-
-  color:
-    #344054;
-
-}
-
-
-/* INDICADOR */
-
-.panel-secundario td:nth-child(5) {
-
-  text-align:
-    right;
-
-  font-weight:
-    700;
-
-  color:
-    #344054;
-
+  color: #98a2b3;
 }
 
 
 /* ======================================================
-   16. SCROLLBAR
+   11. ALTURA DE GRÁFICOS
+====================================================== */
+
+.grafico-contenido {
+  position: relative;
+
+  width: 100%;
+
+  height: 210px;
+}
+
+.grafico-contenido canvas {
+  width: 100% !important;
+
+  height: 100% !important;
+}
+
+
+/* ======================================================
+   12. % PAGO
+====================================================== */
+
+.pago-panel {
+  margin-top: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #eaecf0;
+
+  border-radius: 14px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
+}
+
+.pago-contenido {
+  min-height: 300px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 50px;
+}
+
+.grafico-pago {
+  width: 330px;
+
+  height: 290px;
+
+  position: relative;
+}
+
+.grafico-pago canvas {
+  width: 100% !important;
+
+  height: 100% !important;
+}
+
+.pago-valor {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  align-items: flex-start;
+}
+
+.pago-valor strong {
+  font-size: 34px;
+
+  line-height: 1;
+
+  color: #1d2939;
+}
+
+.pago-valor span {
+  font-size: 13px;
+
+  color: #667085;
+}
+
+
+/* ======================================================
+   13. SCROLLBAR
 ====================================================== */
 
 ::-webkit-scrollbar {
+  width: 8px;
 
-  width:
-    8px;
-
-  height:
-    8px;
-
+  height: 8px;
 }
-
 
 ::-webkit-scrollbar-track {
-
-  background:
-    #f2f4f7;
-
+  background: #f2f4f7;
 }
-
 
 ::-webkit-scrollbar-thumb {
+  background: #d0d5dd;
 
-  background:
-    #d0d5dd;
-
-  border-radius:
-    10px;
-
+  border-radius: 10px;
 }
-
 
 ::-webkit-scrollbar-thumb:hover {
-
-  background:
-    #98a2b3;
-
+  background: #98a2b3;
 }
 
 
 /* ======================================================
-   17. RESPONSIVE - TABLET
+   14. TABLET
 ====================================================== */
 
-@media (
-  max-width: 1200px
-) {
+@media (max-width: 1200px) {
 
   .contenedor {
-
-    padding:
-      22px;
-
+    padding: 22px;
   }
 
-
   .filtros {
-
     grid-template-columns:
       repeat(3, minmax(150px, 1fr));
-
   }
 
+  .tablas-grid {
+    grid-template-columns: 1fr;
+  }
 
   .graficos {
-
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
-
-  }
-
-
-  .tablas-lado {
-
-    grid-template-columns:
-      1fr;
-
   }
 
 }
 
 
 /* ======================================================
-   18. RESPONSIVE - MÓVIL
+   15. MÓVIL
 ====================================================== */
 
-@media (
-  max-width: 800px
-) {
+@media (max-width: 800px) {
 
   .encabezado {
+    padding: 20px;
 
-    padding:
-      20px;
+    flex-direction: column;
 
-    flex-direction:
-      column;
-
-    align-items:
-      flex-start;
-
+    align-items: flex-start;
   }
-
 
   .encabezado h1 {
-
-    font-size:
-      23px;
-
+    font-size: 23px;
   }
-
 
   .contenedor {
-
-    padding:
-      16px;
-
+    padding: 16px;
   }
-
 
   .barra-acciones {
+    flex-direction: column;
 
-    flex-direction:
-      column;
-
-    align-items:
-      flex-start;
-
+    align-items: flex-start;
   }
-
 
   .filtros {
-
-    grid-template-columns:
-      1fr;
-
+    grid-template-columns: 1fr;
   }
 
+  .tablas-grid {
+    grid-template-columns: 1fr;
+
+    gap: 16px;
+  }
 
   .graficos {
-
-    grid-template-columns:
-      1fr;
-
+    grid-template-columns: 1fr;
   }
-
 
   .grafico-contenido {
-
-    height:
-      300px;
-
+    height: 240px;
   }
-
 
   .pago-contenido {
+    flex-direction: column;
 
-    flex-direction:
-      column;
+    gap: 20px;
 
-    gap:
-      20px;
-
-    padding:
-      10px 0 25px 0;
-
+    padding: 10px 0 25px 0;
   }
-
 
   .grafico-pago {
+    width: 100%;
 
-    width:
-      100%;
+    max-width: 350px;
 
-    max-width:
-      350px;
-
-    height:
-      300px;
-
+    height: 280px;
   }
-
 
   .pago-valor {
-
-    align-items:
-      center;
-
-  }
-
-
-  .tablas-lado {
-
-    grid-template-columns:
-      1fr;
-
-  }
-
-
-  .panel-secundario {
-
-    width:
-      100%;
-
+    align-items: center;
   }
 
 }
 
 
 /* ======================================================
-   19. MÓVIL PEQUEÑO
+   16. MÓVIL PEQUEÑO
 ====================================================== */
 
-@media (
-  max-width: 480px
-) {
+@media (max-width: 480px) {
 
   .encabezado {
-
-    padding:
-      17px;
-
+    padding: 17px;
   }
-
 
   .encabezado h1 {
-
-    font-size:
-      21px;
-
+    font-size: 21px;
   }
-
 
   .contenedor {
-
-    padding:
-      12px;
-
+    padding: 12px;
   }
-
 
   .grafico {
-
-    padding:
-      15px;
-
+    padding: 15px;
   }
-
 
   .grafico-header {
+    flex-direction: column;
 
-    flex-direction:
-      column;
-
-    align-items:
-      flex-start;
-
+    align-items: flex-start;
   }
-
 
   .grafico-contenido {
-
-    height:
-      270px;
-
+    height: 230px;
   }
-
 
   .pago-panel {
-
-    padding:
-      15px;
-
+    padding: 15px;
   }
-
 
   .pago-contenido {
-
-    min-height:
-      auto;
-
+    min-height: auto;
   }
-
 
   .panel-header {
-
-    padding:
-      16px;
-
+    padding: 16px;
   }
 
-
-  th {
-
-    padding:
-      11px 12px;
-
-  }
-
-
-  td {
-
-    padding:
-      11px 12px;
-
+  .tabla-contenedor {
+    max-height: 380px;
   }
 
 }
