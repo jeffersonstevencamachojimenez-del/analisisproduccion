@@ -1504,46 +1504,49 @@ function crearGraficoLinea(
             },
 
 
-            y: {
+        y: {
 
-              beginAtZero:
-                true,
+  beginAtZero:
+    false,
 
-              grid: {
+  grace:
+    "25%",
 
-                color:
-                  "#eef1f4"
+  grid: {
 
-              },
+    color:
+      "#eef1f4"
 
-              ticks: {
+  },
 
-                color:
-                  "#667085",
+  ticks: {
 
-                callback:
-                  function (valor) {
+    color:
+      "#667085",
 
-                    if (
-                      esTC
-                    ) {
+    callback:
+      function (valor) {
 
-                      return Number(
-                        valor
-                      ).toFixed(2);
+        if (
+          esTC
+        ) {
 
-                    }
+          return Number(
+            valor
+          ).toFixed(2);
+
+        }
 
 
-                    return formatearNumero(
-                      valor
-                    );
+        return formatearNumero(
+          valor
+        );
 
-                  }
+      }
 
-              }
+  }
 
-            }
+}
 
           }
 
