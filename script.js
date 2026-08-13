@@ -1,13 +1,8 @@
 // ======================================================
-// SCRIPT.JS
-// ANÁLISIS DE PRODUCCIÓN
-// GOOGLE SHEETS + FILTROS + GRÁFICOS + TABLAS
+// DASHBOARD DE PRODUCCIÓN
+// GOOGLE SHEETS + FILTROS + RANKING + GRÁFICOS
 // ======================================================
 
-
-// ======================================================
-// 01. CONFIGURACIÓN GOOGLE SHEETS
-// ======================================================
 
 const SHEET_ID =
   "1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY";
@@ -15,27 +10,18 @@ const SHEET_ID =
 const SHEET_GID =
   "683959855";
 
+
 const URL_DATOS =
   `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 
 
-// ======================================================
-// 02. VARIABLES
-// ======================================================
-
 let datosOriginales = [];
-
 let datosFiltrados = [];
 
 let graficos = {};
 
 
-// ======================================================
-// 03. MESES
-// ======================================================
-
 const MESES = [
-
   "ENERO",
   "FEBRERO",
   "MARZO",
@@ -48,42 +34,56 @@ const MESES = [
   "OCTUBRE",
   "NOVIEMBRE",
   "DICIEMBRE"
-
 ];
 
 
-// ======================================================
-// 04. COLORES
-// ======================================================
+const CONFIG_INDICADORES = {
 
-const COLORES = {
+  "COIN": {
+    campo: "COIN",
+    tipo: "suma"
+  },
 
-  coinProm: "#8ecae6",
+  "COIN PROM": {
+    campo: "COIN PROM",
+    tipo: "promedio"
+  },
 
-  ventaProm: "#95d5b2",
+  "VENTA": {
+    campo: "VENTA",
+    tipo: "suma"
+  },
 
-  coinTotal: "#a8dadc",
+  "VENTA PROM": {
+    campo: "VENTA PROM",
+    tipo: "promedio"
+  },
 
-  ventaTotal: "#f9d88c",
+  "NETWIN ($)": {
+    campo: "NETWIN ($)",
+    tipo: "suma"
+  },
 
-  netwin: "#cdb4db",
+  "T.C": {
+    campo: "T.C",
+    tipo: "promedio"
+  },
 
-  tc: "#f4b183",
-
-  pago: "#f3a6b8",
-
-  restante: "#e9edf2"
+  "% PAGO": {
+    campo: "% PAGO",
+    tipo: "promedio"
+  }
 
 };
 
 
-// ======================================================
-// 05. INICIO
-// ======================================================
+/* ======================================================
+   INICIO
+====================================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
-  function () {
+  () => {
 
     configurarEventos();
 
@@ -93,9 +93,9 @@ document.addEventListener(
 );
 
 
-// ======================================================
-// 06. EVENTOS
-// ======================================================
+/* ======================================================
+   EVENTOS
+====================================================== */
 
 function configurarEventos() {
 
@@ -104,7 +104,7 @@ function configurarEventos() {
     "filtroSala",
     "filtroMes",
     "filtroModelo",
-    "filtroNumero",
+    "filtroSerie",
     "filtroJuego",
     "filtroIndicador"
 
@@ -112,7 +112,7 @@ function configurarEventos() {
 
 
   filtros.forEach(
-    function (id) {
+    id => {
 
       const elemento =
         document.getElementById(id);
@@ -122,7 +122,7 @@ function configurarEventos() {
 
         elemento.addEventListener(
           "change",
-          aplicarFiltros
+          manejarCambioFiltro
         );
 
       }
@@ -131,47 +131,60 @@ function configurarEventos() {
   );
 
 
-  const btnLimpiar =
-    document.getElementById(
-      "btnLimpiar"
-    );
-
-
-  if (btnLimpiar) {
-
-    btnLimpiar.addEventListener(
+  document
+    .getElementById("btnLimpiar")
+    ?.addEventListener(
       "click",
       limpiarFiltros
     );
 
-  }
 
-
-  const btnActualizar =
-    document.getElementById(
-      "btnActualizar"
-    );
-
-
-  if (btnActualizar) {
-
-    btnActualizar.addEventListener(
+  document
+    .getElementById("btnActualizar")
+    ?.addEventListener(
       "click",
       cargarDatos
     );
+
+}
+
+
+/* ======================================================
+   CAMBIO DE FILTROS
+====================================================== */
+
+function manejarCambioFiltro(evento) {
+
+  const id =
+    evento.target.id;
+
+
+  if (
+    id === "filtroSala" ||
+    id === "filtroMes" ||
+    id === "filtroModelo" ||
+    id === "filtroSerie" ||
+    id === "filtroJuego"
+  ) {
+
+    aplicarFiltros();
+
+  } else {
+
+    actualizarDashboard();
 
   }
 
 }
 
 
-// ======================================================
-// 07. CARGAR DATOS
-// ======================================================
+/* ======================================================
+   CARGAR GOOGLE SHEETS
+====================================================== */
 
 async function cargarDatos() {
 
-  cambiarEstadoConexion(
+  cambiarEstado(
     "Conectando con Google Sheets...",
     "#f2b84b"
   );
@@ -206,12 +219,11 @@ async function cargarDatos() {
 
 
     if (
-      !Array.isArray(datos) ||
-      datos.length === 0
+      !datos.length
     ) {
 
       throw new Error(
-        "No se encontraron registros."
+        "No existen registros."
       );
 
     }
@@ -225,28 +237,28 @@ async function cargarDatos() {
       [...datosOriginales];
 
 
-    cambiarEstadoConexion(
+    llenarFiltros();
+
+
+    cambiarEstado(
       "Google Sheets conectado",
-      "#45a878"
+      "#12b76a"
     );
 
-
-    llenarFiltros();
 
     actualizarDashboard();
 
-
-  } catch (error) {
-
-    console.error(
-      "Error cargando Google Sheets:",
-      error
-    );
+  }
 
 
-    cambiarEstadoConexion(
+  catch (error) {
+
+    console.error(error);
+
+
+    cambiarEstado(
       "Error al conectar con Google Sheets",
-      "#e46a6a"
+      "#f04438"
     );
 
   }
@@ -254,9 +266,9 @@ async function cargarDatos() {
 }
 
 
-// ======================================================
-// 08. CONVERTIR GVIZ
-// ======================================================
+/* ======================================================
+   CONVERTIR GVIZ
+====================================================== */
 
 function convertirGViz(texto) {
 
@@ -273,7 +285,7 @@ function convertirGViz(texto) {
   ) {
 
     throw new Error(
-      "Google Sheets no devolvió JSON válido."
+      "Respuesta inválida."
     );
 
   }
@@ -288,20 +300,12 @@ function convertirGViz(texto) {
     );
 
 
-  if (
-    !json.table ||
-    !json.table.rows
-  ) {
-
-    throw new Error(
-      "No se encontró información."
-    );
-
-  }
+  const filas =
+    json.table?.rows || [];
 
 
-  return json.table.rows.map(
-    function (fila) {
+  return filas.map(
+    fila => {
 
       const c =
         fila.c || [];
@@ -312,8 +316,7 @@ function convertirGViz(texto) {
         "Marca / Tipo / Version":
           obtenerCelda(c, 0),
 
-        "Nro.":
-          obtenerCelda(c, 1),
+        // Nro. NO SE UTILIZA
 
         "Maquina":
           obtenerCelda(c, 2),
@@ -377,9 +380,9 @@ function convertirGViz(texto) {
 }
 
 
-// ======================================================
-// 09. OBTENER CELDA
-// ======================================================
+/* ======================================================
+   CELDA
+====================================================== */
 
 function obtenerCelda(
   columnas,
@@ -407,45 +410,43 @@ function obtenerCelda(
   }
 
 
-  if (
-    celda.f !== undefined &&
-    celda.f !== null
-  ) {
-
-    return celda.f;
-
-  }
-
-
-  return "";
+  return celda.f || "";
 
 }
 
 
-// ======================================================
-// 10. ESTADO CONEXIÓN
-// ======================================================
+/* ======================================================
+   ESTADO
+====================================================== */
 
-function cambiarEstadoConexion(
+function cambiarEstado(
   texto,
   color
 ) {
 
-  establecerTexto(
-    "textoConexion",
-    texto
-  );
+  const textoElemento =
+    document.getElementById(
+      "textoConexion"
+    );
 
 
-  const indicador =
+  const punto =
     document.getElementById(
       "indicadorConexion"
     );
 
 
-  if (indicador) {
+  if (textoElemento) {
 
-    indicador.style.background =
+    textoElemento.textContent =
+      texto;
+
+  }
+
+
+  if (punto) {
+
+    punto.style.background =
       color;
 
   }
@@ -453,9 +454,9 @@ function cambiarEstadoConexion(
 }
 
 
-// ======================================================
-// 11. LLENAR FILTROS
-// ======================================================
+/* ======================================================
+   FILTROS
+====================================================== */
 
 function llenarFiltros() {
 
@@ -474,9 +475,9 @@ function llenarFiltros() {
 
 
   llenarSelect(
-    "filtroNumero",
-    "Nro.",
-    "Todas las máquinas"
+    "filtroSerie",
+    "Maquina",
+    "Todas las series"
   );
 
 
@@ -492,9 +493,9 @@ function llenarFiltros() {
 }
 
 
-// ======================================================
-// 12. LLENAR SELECT
-// ======================================================
+/* ======================================================
+   SELECT
+====================================================== */
 
 function llenarSelect(
   id,
@@ -544,21 +545,15 @@ function llenarSelect(
         datosOriginales
 
           .map(
-            function (registro) {
-
-              return limpiarTexto(
+            registro =>
+              limpiarTexto(
                 registro[campo]
-              );
-
-            }
+              )
           )
 
           .filter(
-            function (valor) {
-
-              return valor !== "";
-
-            }
+            valor =>
+              valor !== ""
           )
 
       )
@@ -566,23 +561,19 @@ function llenarSelect(
 
 
   valores.sort(
-    function (a, b) {
-
-      return a.localeCompare(
+    (a, b) =>
+      a.localeCompare(
         b,
         "es",
         {
-          numeric: true,
-          sensitivity: "base"
+          numeric: true
         }
-      );
-
-    }
+      )
   );
 
 
   valores.forEach(
-    function (valor) {
+    valor => {
 
       const opcion =
         document.createElement(
@@ -592,7 +583,6 @@ function llenarSelect(
 
       opcion.value =
         valor;
-
 
       opcion.textContent =
         valor;
@@ -620,9 +610,9 @@ function llenarSelect(
 }
 
 
-// ======================================================
-// 13. FILTRO MES
-// ======================================================
+/* ======================================================
+   MESES
+====================================================== */
 
 function llenarFiltroMes() {
 
@@ -639,28 +629,17 @@ function llenarFiltroMes() {
   }
 
 
-  select.innerHTML = "";
+  select.innerHTML = `
 
+    <option value="">
+      Todos los meses
+    </option>
 
-  const inicial =
-    document.createElement(
-      "option"
-    );
-
-
-  inicial.value = "";
-
-  inicial.textContent =
-    "Todos los meses";
-
-
-  select.appendChild(
-    inicial
-  );
+  `;
 
 
   MESES.forEach(
-    function (mes) {
+    mes => {
 
       const opcion =
         document.createElement(
@@ -670,7 +649,6 @@ function llenarFiltroMes() {
 
       opcion.value =
         mes;
-
 
       opcion.textContent =
         mes;
@@ -686,9 +664,9 @@ function llenarFiltroMes() {
 }
 
 
-// ======================================================
-// 14. APLICAR FILTROS
-// ======================================================
+/* ======================================================
+   APLICAR FILTROS
+====================================================== */
 
 function aplicarFiltros() {
 
@@ -697,24 +675,20 @@ function aplicarFiltros() {
       "filtroSala"
     );
 
-
   const mes =
     obtenerValor(
       "filtroMes"
     );
-
 
   const modelo =
     obtenerValor(
       "filtroModelo"
     );
 
-
-  const numero =
+  const serie =
     obtenerValor(
-      "filtroNumero"
+      "filtroSerie"
     );
-
 
   const juego =
     obtenerValor(
@@ -724,7 +698,7 @@ function aplicarFiltros() {
 
   datosFiltrados =
     datosOriginales.filter(
-      function (registro) {
+      registro => {
 
         if (
           sala &&
@@ -766,11 +740,11 @@ function aplicarFiltros() {
 
 
         if (
-          numero &&
+          serie &&
           limpiarTexto(
-            registro["Nro."]
+            registro["Maquina"]
           ) !==
-          limpiarTexto(numero)
+          limpiarTexto(serie)
         ) {
 
           return false;
@@ -802,25 +776,21 @@ function aplicarFiltros() {
 }
 
 
-// ======================================================
-// 15. LIMPIAR FILTROS
-// ======================================================
+/* ======================================================
+   LIMPIAR
+====================================================== */
 
 function limpiarFiltros() {
 
-  const ids = [
-
+  [
     "filtroSala",
     "filtroMes",
     "filtroModelo",
-    "filtroNumero",
+    "filtroSerie",
     "filtroJuego"
-
-  ];
-
-
-  ids.forEach(
-    function (id) {
+  ]
+  .forEach(
+    id => {
 
       const elemento =
         document.getElementById(id);
@@ -836,18 +806,9 @@ function limpiarFiltros() {
   );
 
 
-  const indicador =
-    document.getElementById(
-      "filtroIndicador"
-    );
-
-
-  if (indicador) {
-
-    indicador.value =
-      "COIN";
-
-  }
+  document.getElementById(
+    "filtroIndicador"
+  ).value = "COIN";
 
 
   datosFiltrados =
@@ -859,28 +820,30 @@ function limpiarFiltros() {
 }
 
 
-// ======================================================
-// 16. ACTUALIZAR DASHBOARD
-// ======================================================
+/* ======================================================
+   DASHBOARD
+====================================================== */
 
 function actualizarDashboard() {
 
   actualizarContador();
 
+  actualizarKPIs();
+
+  construirRanking();
+
   construirGraficos();
 
-  construirGraficoPago();
+  construirTopBottom();
 
-  construirTabla();
-
-  construirTablaIndicador();
+  construirDetalle();
 
 }
 
 
-// ======================================================
-// 17. CONTADOR
-// ======================================================
+/* ======================================================
+   CONTADOR
+====================================================== */
 
 function actualizarContador() {
 
@@ -894,770 +857,185 @@ function actualizarContador() {
 }
 
 
-// ======================================================
-// 18. RESUMEN MENSUAL
-// ======================================================
-
-function construirResumenMensual() {
-
-  const grupos = {};
-
-
-  datosFiltrados.forEach(
-    function (registro) {
-
-      const año =
-        obtenerNumero(
-          registro["AÑO"]
-        );
-
-
-      if (
-        año !== null &&
-        año !== 0 &&
-        año !== 2026
-      ) {
-
-        return;
-
-      }
-
-
-      const mes =
-        normalizarMes(
-          registro["MES"]
-        );
-
-
-      if (
-        !MESES.includes(mes)
-      ) {
-
-        return;
-
-      }
-
-
-      if (
-        !grupos[mes]
-      ) {
-
-        grupos[mes] = {
-
-          coinProm: [],
-
-          ventaProm: [],
-
-          coinTotal: 0,
-
-          ventaTotal: 0,
-
-          netwin: 0,
-
-          tc: [],
-
-          pago: []
-
-        };
-
-      }
-
-
-      const grupo =
-        grupos[mes];
-
-
-      const coin =
-        obtenerNumero(
-          registro["COIN"]
-        );
-
-
-      const coinProm =
-        obtenerNumero(
-          registro["COIN PROM"]
-        );
-
-
-      const venta =
-        obtenerNumero(
-          registro["VENTA"]
-        );
-
-
-      const ventaProm =
-        obtenerNumero(
-          registro["VENTA PROM"]
-        );
-
-
-      const netwin =
-        obtenerNumero(
-          registro["NETWIN ($)"]
-        );
-
-
-      const tc =
-        obtenerNumero(
-          registro["T.C"]
-        );
-
-
-      const pago =
-        obtenerNumero(
-          registro["% PAGO"]
-        );
-
-
-      if (coinProm !== null) {
-
-        grupo.coinProm.push(
-          coinProm
-        );
-
-      }
-
-
-      if (ventaProm !== null) {
-
-        grupo.ventaProm.push(
-          ventaProm
-        );
-
-      }
-
-
-      if (coin !== null) {
-
-        grupo.coinTotal +=
-          coin;
-
-      }
-
-
-      if (venta !== null) {
-
-        grupo.ventaTotal +=
-          venta;
-
-      }
-
-
-      if (netwin !== null) {
-
-        grupo.netwin +=
-          netwin;
-
-      }
-
-
-      if (tc !== null) {
-
-        grupo.tc.push(
-          tc
-        );
-
-      }
-
-
-      if (pago !== null) {
-
-        grupo.pago.push(
-          pago
-        );
-
-      }
-
-    }
-  );
-
-
-  const meses =
-    MESES.filter(
-      function (mes) {
-
-        return (
-          grupos[mes] &&
-          (
-            grupos[mes].coinProm.length > 0 ||
-            grupos[mes].ventaProm.length > 0 ||
-            grupos[mes].coinTotal !== 0 ||
-            grupos[mes].ventaTotal !== 0 ||
-            grupos[mes].netwin !== 0 ||
-            grupos[mes].tc.length > 0 ||
-            grupos[mes].pago.length > 0
-          )
-        );
-
-      }
+/* ======================================================
+   KPIs
+====================================================== */
+
+function actualizarKPIs() {
+
+  const coin =
+    sumarCampo(
+      datosFiltrados,
+      "COIN"
     );
 
-
-  return {
-
-    labels:
-      meses,
-
-    coinProm:
-      meses.map(
-        function (mes) {
-
-          return promedioArray(
-            grupos[mes].coinProm
-          );
-
-        }
-      ),
-
-    ventaProm:
-      meses.map(
-        function (mes) {
-
-          return promedioArray(
-            grupos[mes].ventaProm
-          );
-
-        }
-      ),
-
-    coinTotal:
-      meses.map(
-        function (mes) {
-
-          return grupos[mes].coinTotal;
-
-        }
-      ),
-
-    ventaTotal:
-      meses.map(
-        function (mes) {
-
-          return grupos[mes].ventaTotal;
-
-        }
-      ),
-
-    netwin:
-      meses.map(
-        function (mes) {
-
-          return grupos[mes].netwin;
-
-        }
-      ),
-
-    tc:
-      meses.map(
-        function (mes) {
-
-          return promedioArray(
-            grupos[mes].tc
-          );
-
-        }
-      ),
-
-    pago:
-      meses.map(
-        function (mes) {
-
-          return promedioArray(
-            grupos[mes].pago
-          );
-
-        }
-      )
-
-  };
-
-}
-
-
-// ======================================================
-// 19. GRÁFICOS
-// ======================================================
-
-function construirGraficos() {
-
-  const resumen =
-    construirResumenMensual();
-
-
-  crearGraficoLinea(
-    "graficoCoinProm",
-    "COIN PROM",
-    resumen.labels,
-    resumen.coinProm,
-    COLORES.coinProm
-  );
-
-
-  crearGraficoLinea(
-    "graficoVentaProm",
-    "VENTA PROM",
-    resumen.labels,
-    resumen.ventaProm,
-    COLORES.ventaProm
-  );
-
-
-  crearGraficoLinea(
-    "graficoCoinTotal",
-    "COIN TOTAL",
-    resumen.labels,
-    resumen.coinTotal,
-    COLORES.coinTotal
-  );
-
-
-  crearGraficoLinea(
-    "graficoVentaTotal",
-    "VENTA TOTAL",
-    resumen.labels,
-    resumen.ventaTotal,
-    COLORES.ventaTotal
-  );
-
-
-  crearGraficoLinea(
-    "graficoNetwin",
-    "NETWIN ($)",
-    resumen.labels,
-    resumen.netwin,
-    COLORES.netwin
-  );
-
-
-  crearGraficoLinea(
-    "graficoTC",
-    "T.C.",
-    resumen.labels,
-    resumen.tc,
-    COLORES.tc,
-    true
-  );
-
-}
-
-
-// ======================================================
-// 20. GRÁFICO DE LÍNEA
-// ======================================================
-
-function crearGraficoLinea(
-  id,
-  etiqueta,
-  labels,
-  datos,
-  color,
-  esTC = false
-) {
-
-  const canvas =
-    document.getElementById(id);
-
-
-  if (!canvas) {
-
-    return;
-
-  }
-
-
-  if (graficos[id]) {
-
-    graficos[id].destroy();
-
-  }
-
-
-  graficos[id] =
-    new Chart(
-      canvas,
-      {
-
-        type: "line",
-
-        data: {
-
-          labels: labels,
-
-          datasets: [
-
-            {
-
-              label: etiqueta,
-
-              data: datos,
-
-              borderColor: color,
-
-              backgroundColor: color,
-
-              pointBackgroundColor: color,
-
-              pointBorderColor: "#ffffff",
-
-              pointBorderWidth: 2,
-
-              pointRadius: 4,
-
-              pointHoverRadius: 6,
-
-              borderWidth: 2,
-
-              tension: 0.25,
-
-              fill: false
-
-            }
-
-          ]
-
-        },
-
-
-        options: {
-
-          responsive: true,
-
-          maintainAspectRatio: false,
-
-
-          interaction: {
-
-            mode: "index",
-
-            intersect: false
-
-          },
-
-
-          plugins: {
-
-            legend: {
-
-              display: true,
-
-              position: "bottom",
-
-              labels: {
-
-                usePointStyle: true,
-
-                padding: 12,
-
-                color: "#667085",
-
-                font: {
-
-                  size: 11
-
-                }
-
-              }
-
-            },
-
-
-            tooltip: {
-
-              backgroundColor: "#344054",
-
-              titleColor: "#ffffff",
-
-              bodyColor: "#ffffff",
-
-              padding: 10
-
-            }
-
-          },
-
-
-          scales: {
-
-            x: {
-
-              grid: {
-
-                color: "#eef1f4"
-
-              },
-
-              ticks: {
-
-                color: "#667085"
-
-              }
-
-            },
-
-
-            y: {
-
-              beginAtZero: false,
-
-              grace: "25%",
-
-              grid: {
-
-                color: "#eef1f4"
-
-              },
-
-              ticks: {
-
-                color: "#667085",
-
-                callback:
-                  function (valor) {
-
-                    if (esTC) {
-
-                      return Number(
-                        valor
-                      ).toFixed(2);
-
-                    }
-
-
-                    return formatearNumero(
-                      valor
-                    );
-
-                  }
-
-              }
-
-            }
-
-          }
-
-        }
-
-      }
+  const venta =
+    sumarCampo(
+      datosFiltrados,
+      "VENTA"
     );
 
-}
-
-
-// ======================================================
-// 21. GRÁFICO % PAGO
-// ======================================================
-
-function construirGraficoPago() {
-
-  const canvas =
-    document.getElementById(
-      "graficoPago"
+  const netwin =
+    sumarCampo(
+      datosFiltrados,
+      "NETWIN ($)"
     );
 
-
-  if (!canvas) {
-
-    return;
-
-  }
-
-
-  if (
-    graficos.graficoPago
-  ) {
-
-    graficos.graficoPago.destroy();
-
-  }
-
-
-  const valores =
-    datosFiltrados
-
-      .map(
-        function (registro) {
-
-          return obtenerNumero(
-            registro["% PAGO"]
-          );
-
-        }
-      )
-
-      .filter(
-        function (valor) {
-
-          return valor !== null;
-
-        }
-      );
-
-
-  let pago =
-    promedioArray(
-      valores
+  const coinProm =
+    promedioCampo(
+      datosFiltrados,
+      "COIN PROM"
     );
 
-
-  pago =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        pago
-      )
+  const ventaProm =
+    promedioCampo(
+      datosFiltrados,
+      "VENTA PROM"
     );
 
-
-  const restante =
-    100 - pago;
+  const pago =
+    promedioCampo(
+      datosFiltrados,
+      "% PAGO"
+    );
 
 
   establecerTexto(
-    "valorPago",
-    pago.toFixed(2) +
-    "%"
+    "kpiCoin",
+    formatearNumero(coin)
   );
 
+  establecerTexto(
+    "kpiVenta",
+    formatearNumero(venta)
+  );
 
-  graficos.graficoPago =
-    new Chart(
-      canvas,
-      {
+  establecerTexto(
+    "kpiNetwin",
+    formatearNumero(netwin)
+  );
 
-        type: "doughnut",
+  establecerTexto(
+    "kpiCoinProm",
+    formatearNumero(coinProm)
+  );
 
-        data: {
+  establecerTexto(
+    "kpiVentaProm",
+    formatearNumero(ventaProm)
+  );
 
-          labels: [
-            "PAGO",
-            "RESTANTE"
-          ],
-
-          datasets: [
-
-            {
-
-              data: [
-                pago,
-                restante
-              ],
-
-              backgroundColor: [
-                COLORES.pago,
-                COLORES.restante
-              ],
-
-              borderColor: [
-                "#ffffff",
-                "#ffffff"
-              ],
-
-              borderWidth: 3
-
-            }
-
-          ]
-
-        },
-
-
-        plugins: [
-          ChartDataLabels
-        ],
-
-
-        options: {
-
-          responsive: true,
-
-          maintainAspectRatio: false,
-
-          cutout: "58%",
-
-
-          plugins: {
-
-            legend: {
-
-              position: "bottom",
-
-              labels: {
-
-                usePointStyle: true,
-
-                padding: 18,
-
-                color: "#667085"
-
-              }
-
-            },
-
-
-            datalabels: {
-
-              color: "#475467",
-
-              font: {
-
-                size: 14,
-
-                weight: "700"
-
-              },
-
-              formatter:
-                function (valor) {
-
-                  return valor.toFixed(1) +
-                    "%";
-
-                }
-
-            }
-
-          }
-
-        }
-
-      }
-    );
+  establecerTexto(
+    "kpiPago",
+    pago.toFixed(2) + "%"
+  );
 
 }
 
 
-// ======================================================
-// 22. PRIMERA TABLA
-// ======================================================
+/* ======================================================
+   RANKING
+====================================================== */
 
-function construirTabla() {
+function construirRanking() {
 
   const cuerpo =
     document.getElementById(
-      "tablaCuerpo"
+      "rankingCuerpo"
     );
 
 
-  if (!cuerpo) {
-
-    return;
-
-  }
+  if (!cuerpo) return;
 
 
-  const resumen =
-    construirResumenMensual();
+  const indicador =
+    obtenerValor(
+      "filtroIndicador"
+    ) || "COIN";
+
+
+  const config =
+    CONFIG_INDICADORES[indicador];
+
+
+  const grupos =
+    agruparPor(
+      datosFiltrados,
+      "Modelo Com."
+    );
+
+
+  const ranking =
+    Object.entries(grupos)
+      .map(
+        ([modelo, registros]) => {
+
+          let valor;
+
+
+          if (
+            config.tipo === "suma"
+          ) {
+
+            valor =
+              registros.reduce(
+                (total, registro) =>
+                  total +
+                  (obtenerNumero(
+                    registro[
+                      config.campo
+                    ]
+                  ) || 0),
+                0
+              );
+
+          } else {
+
+            valor =
+              promedioCampo(
+                registros,
+                config.campo
+              );
+
+          }
+
+
+          const maquinas =
+            new Set(
+              registros
+                .map(
+                  r =>
+                    limpiarTexto(
+                      r["Maquina"]
+                    )
+                )
+                .filter(Boolean)
+            ).size;
+
+
+          return {
+            modelo,
+            maquinas,
+            valor
+          };
+
+        }
+      )
+      .filter(
+        item =>
+          item.modelo
+      )
+      .sort(
+        (a, b) =>
+          b.valor - a.valor
+      );
 
 
   cuerpo.innerHTML = "";
 
 
-  resumen.labels.forEach(
-    function (
-      mes,
-      indice
-    ) {
+  ranking.forEach(
+    (item, indice) => {
 
       const fila =
         document.createElement(
@@ -1667,53 +1045,25 @@ function construirTabla() {
 
       fila.innerHTML = `
 
+        <td class="posicion">
+          ${indice + 1}
+        </td>
+
         <td>
           <strong>
-            ${mes}
+            ${escapeHTML(item.modelo)}
           </strong>
         </td>
 
         <td>
-          ${formatearNumero(
-            resumen.coinProm[indice]
+          ${item.maquinas}
+        </td>
+
+        <td>
+          ${formatearIndicador(
+            item.valor,
+            indicador
           )}
-        </td>
-
-        <td>
-          ${formatearNumero(
-            resumen.coinTotal[indice]
-          )}
-        </td>
-
-        <td>
-          ${formatearNumero(
-            resumen.ventaProm[indice]
-          )}
-        </td>
-
-        <td>
-          ${formatearNumero(
-            resumen.ventaTotal[indice]
-          )}
-        </td>
-
-        <td>
-          ${formatearNumero(
-            resumen.netwin[indice]
-          )}
-        </td>
-
-        <td>
-          ${Number(
-            resumen.tc[indice] || 0
-          ).toFixed(2)}
-        </td>
-
-        <td>
-          ${Number(
-            resumen.pago[indice] || 0
-          ).toFixed(2)}
-          %
         </td>
 
       `;
@@ -1729,30 +1079,590 @@ function construirTabla() {
 }
 
 
-// ======================================================
-// 23. SEGUNDA TABLA
-// DETALLE POR SALA / MODELO / JUEGO
-// ======================================================
+/* ======================================================
+   GRÁFICOS
+====================================================== */
 
-function construirTablaIndicador() {
+function construirGraficos() {
 
-  const cuerpo =
+  const indicador =
+    obtenerValor(
+      "filtroIndicador"
+    ) || "COIN";
+
+
+  construirGraficoRanking(
+    indicador
+  );
+
+
+  construirGraficoCoinVenta();
+
+
+  construirGraficoNetwin();
+
+
+  construirGraficoPagoModelo();
+
+
+  construirGraficoMensual();
+
+
+  establecerTexto(
+    "indicadorActual",
+    indicador === "NETWIN ($)"
+      ? "NETWIN"
+      : indicador
+  );
+
+}
+
+
+/* ======================================================
+   GRÁFICO RANKING
+====================================================== */
+
+function construirGraficoRanking(
+  indicador
+) {
+
+  const canvas =
     document.getElementById(
-      "tablaIndicadorCuerpo"
+      "graficoRanking"
     );
 
 
-  const titulo =
-    document.getElementById(
-      "tituloIndicador"
+  if (!canvas) return;
+
+
+  destruirGrafico(
+    "graficoRanking"
+  );
+
+
+  const config =
+    CONFIG_INDICADORES[indicador];
+
+
+  const grupos =
+    agruparPor(
+      datosFiltrados,
+      "Modelo Com."
     );
 
 
-  if (!cuerpo) {
+  const datos =
+    Object.entries(grupos)
+      .map(
+        ([modelo, registros]) => {
 
-    return;
+          const valor =
+            config.tipo === "suma"
 
-  }
+              ? registros.reduce(
+                  (total, registro) =>
+                    total +
+                    (
+                      obtenerNumero(
+                        registro[
+                          config.campo
+                        ]
+                      ) || 0
+                    ),
+                  0
+                )
+
+              : promedioCampo(
+                  registros,
+                  config.campo
+                );
+
+
+          return {
+            modelo,
+            valor
+          };
+
+        }
+      )
+      .sort(
+        (a, b) =>
+          b.valor - a.valor
+      )
+      .slice(0, 10);
+
+
+  establecerTexto(
+    "tituloGraficoPrincipal",
+    `Top 10 modelos - ${indicador}`
+  );
+
+
+  graficos.graficoRanking =
+    new Chart(
+      canvas,
+      {
+
+        type: "bar",
+
+        data: {
+
+          labels:
+            datos.map(
+              item =>
+                item.modelo
+            ),
+
+          datasets: [
+
+            {
+
+              label:
+                indicador,
+
+              data:
+                datos.map(
+                  item =>
+                    item.valor
+                ),
+
+              backgroundColor:
+                "#b91c1c",
+
+              borderRadius:
+                5
+
+            }
+
+          ]
+
+        },
+
+        options: {
+
+          indexAxis:
+            "y",
+
+          responsive:
+            true,
+
+          maintainAspectRatio:
+            false,
+
+          plugins: {
+
+            legend: {
+              display: false
+            }
+
+          },
+
+          scales: {
+
+            x: {
+
+              beginAtZero:
+                true,
+
+              ticks: {
+
+                color:
+                  "#667085",
+
+                callback:
+                  valor =>
+                    formatearNumero(
+                      valor
+                    )
+
+              }
+
+            },
+
+            y: {
+
+              ticks: {
+                color:
+                  "#475467"
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+    );
+
+}
+
+
+/* ======================================================
+   COIN VS VENTA
+====================================================== */
+
+function construirGraficoCoinVenta() {
+
+  const canvas =
+    document.getElementById(
+      "graficoCoinVenta"
+    );
+
+
+  if (!canvas) return;
+
+
+  destruirGrafico(
+    "graficoCoinVenta"
+  );
+
+
+  const grupos =
+    agruparPor(
+      datosFiltrados,
+      "Modelo Com."
+    );
+
+
+  const datos =
+    Object.entries(grupos)
+      .map(
+        ([modelo, registros]) => {
+
+          return {
+
+            modelo,
+
+            coin:
+              sumarCampo(
+                registros,
+                "COIN"
+              ),
+
+            venta:
+              sumarCampo(
+                registros,
+                "VENTA"
+              )
+
+          };
+
+        }
+      )
+      .sort(
+        (a, b) =>
+          b.coin - a.coin
+      )
+      .slice(0, 10);
+
+
+  graficos.graficoCoinVenta =
+    new Chart(
+      canvas,
+      {
+
+        type: "bar",
+
+        data: {
+
+          labels:
+            datos.map(
+              d =>
+                d.modelo
+            ),
+
+          datasets: [
+
+            {
+              label:
+                "COIN",
+
+              data:
+                datos.map(
+                  d =>
+                    d.coin
+                ),
+
+              backgroundColor:
+                "#8ecae6"
+
+            },
+
+            {
+              label:
+                "VENTA",
+
+              data:
+                datos.map(
+                  d =>
+                    d.venta
+                ),
+
+              backgroundColor:
+                "#95d5b2"
+
+            }
+
+          ]
+
+        },
+
+        options: opcionesBarra()
+
+      }
+    );
+
+}
+
+
+/* ======================================================
+   NETWIN
+====================================================== */
+
+function construirGraficoNetwin() {
+
+  const canvas =
+    document.getElementById(
+      "graficoNetwin"
+    );
+
+
+  if (!canvas) return;
+
+
+  destruirGrafico(
+    "graficoNetwin"
+  );
+
+
+  const grupos =
+    agruparPor(
+      datosFiltrados,
+      "Modelo Com."
+    );
+
+
+  const datos =
+    Object.entries(grupos)
+      .map(
+        ([modelo, registros]) => {
+
+          return {
+
+            modelo,
+
+            valor:
+              sumarCampo(
+                registros,
+                "NETWIN ($)"
+              )
+
+          };
+
+        }
+      )
+      .sort(
+        (a, b) =>
+          b.valor - a.valor
+      )
+      .slice(0, 10);
+
+
+  graficos.graficoNetwin =
+    new Chart(
+      canvas,
+      {
+
+        type: "bar",
+
+        data: {
+
+          labels:
+            datos.map(
+              d =>
+                d.modelo
+            ),
+
+          datasets: [
+
+            {
+
+              label:
+                "NETWIN",
+
+              data:
+                datos.map(
+                  d =>
+                    d.valor
+                ),
+
+              backgroundColor:
+                "#cdb4db",
+
+              borderRadius:
+                5
+
+            }
+
+          ]
+
+        },
+
+        options: opcionesBarra()
+
+      }
+    );
+
+}
+
+
+/* ======================================================
+   % PAGO
+====================================================== */
+
+function construirGraficoPagoModelo() {
+
+  const canvas =
+    document.getElementById(
+      "graficoPagoModelo"
+    );
+
+
+  if (!canvas) return;
+
+
+  destruirGrafico(
+    "graficoPagoModelo"
+  );
+
+
+  const grupos =
+    agruparPor(
+      datosFiltrados,
+      "Modelo Com."
+    );
+
+
+  const datos =
+    Object.entries(grupos)
+      .map(
+        ([modelo, registros]) => {
+
+          return {
+
+            modelo,
+
+            valor:
+              promedioCampo(
+                registros,
+                "% PAGO"
+              )
+
+          };
+
+        }
+      )
+      .sort(
+        (a, b) =>
+          b.valor - a.valor
+      )
+      .slice(0, 10);
+
+
+  graficos.graficoPagoModelo =
+    new Chart(
+      canvas,
+      {
+
+        type: "bar",
+
+        data: {
+
+          labels:
+            datos.map(
+              d =>
+                d.modelo
+            ),
+
+          datasets: [
+
+            {
+
+              label:
+                "% PAGO",
+
+              data:
+                datos.map(
+                  d =>
+                    d.valor
+                ),
+
+              backgroundColor:
+                "#f3a6b8",
+
+              borderRadius:
+                5
+
+            }
+
+          ]
+
+        },
+
+        options: {
+
+          ...opcionesBarra(),
+
+          scales: {
+
+            y: {
+
+              beginAtZero:
+                true,
+
+              max:
+                100,
+
+              ticks: {
+
+                callback:
+                  valor =>
+                    valor + "%"
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    );
+
+}
+
+
+/* ======================================================
+   EVOLUCIÓN MENSUAL
+====================================================== */
+
+function construirGraficoMensual() {
+
+  const canvas =
+    document.getElementById(
+      "graficoMensual"
+    );
+
+
+  if (!canvas) return;
+
+
+  destruirGrafico(
+    "graficoMensual"
+  );
 
 
   const indicador =
@@ -1761,93 +1671,49 @@ function construirTablaIndicador() {
     ) || "COIN";
 
 
-  if (titulo) {
-
-    titulo.textContent =
-      indicador;
-
-  }
+  const config =
+    CONFIG_INDICADORES[indicador];
 
 
   const grupos = {};
 
 
+  MESES.forEach(
+    mes => {
+
+      grupos[mes] = [];
+
+    }
+  );
+
+
   datosFiltrados.forEach(
-    function (registro) {
+    registro => {
 
-      const sala =
-        limpiarTexto(
-          registro["LOCAL"]
-        ) || "SIN SALA";
-
-
-      const modelo =
-        limpiarTexto(
-          registro["Modelo Com."]
-        ) || "SIN MODELO";
-
-
-      const juego =
-        limpiarTexto(
-          registro["Juego"]
-        ) || "SIN JUEGO";
-
-
-      const clave =
-        sala +
-        "||" +
-        modelo +
-        "||" +
-        juego;
-
-
-      if (!grupos[clave]) {
-
-        grupos[clave] = {
-
-          sala: sala,
-
-          modelo: modelo,
-
-          juego: juego,
-
-          maquinas: new Set(),
-
-          valores: []
-
-        };
-
-      }
-
-
-      const grupo =
-        grupos[clave];
-
-
-      const numero =
-        limpiarTexto(
-          registro["Nro."]
+      const mes =
+        normalizarMes(
+          registro["MES"]
         );
 
 
-      if (numero) {
-
-        grupo.maquinas.add(
-          numero
-        );
-
-      }
+      if (
+        !grupos[mes]
+      ) return;
 
 
       const valor =
         obtenerNumero(
-          registro[indicador]
+          registro[
+            config.campo
+          ]
         );
 
 
-      if (valor !== null) {
+      if (
+        valor !== null
+      ) {
 
-        grupo.valores.push(
+        grupos[mes].push(
           valor
         );
 
@@ -1857,83 +1723,220 @@ function construirTablaIndicador() {
   );
 
 
-  const filas =
-    Object.values(
-      grupos
+  const labels =
+    MESES.filter(
+      mes =>
+        grupos[mes].length
     );
 
 
-  filas.sort(
-    function (a, b) {
+  const valores =
+    labels.map(
+      mes =>
+        config.tipo === "suma"
 
-      const sala =
-        a.sala.localeCompare(
-          b.sala,
-          "es",
-          {
-            numeric: true
+          ? grupos[mes].reduce(
+              (a, b) =>
+                a + b,
+              0
+            )
+
+          : promedioArray(
+              grupos[mes]
+            )
+    );
+
+
+  establecerTexto(
+    "tituloMensual",
+    indicador
+  );
+
+
+  graficos.graficoMensual =
+    new Chart(
+      canvas,
+      {
+
+        type: "line",
+
+        data: {
+
+          labels,
+
+          datasets: [
+
+            {
+
+              label:
+                indicador,
+
+              data:
+                valores,
+
+              borderColor:
+                "#b91c1c",
+
+              backgroundColor:
+                "rgba(185,28,28,.08)",
+
+              pointBackgroundColor:
+                "#b91c1c",
+
+              borderWidth:
+                3,
+
+              pointRadius:
+                4,
+
+              tension:
+                .3,
+
+              fill:
+                true
+
+            }
+
+          ]
+
+        },
+
+        options: {
+
+          responsive:
+            true,
+
+          maintainAspectRatio:
+            false,
+
+          plugins: {
+
+            legend: {
+              display: false
+            }
+
           }
-        );
 
-
-      if (sala !== 0) {
-
-        return sala;
+        }
 
       }
+    );
+
+}
 
 
-      return a.modelo.localeCompare(
-        b.modelo,
-        "es",
-        {
-          numeric: true
+/* ======================================================
+   TOP / BOTTOM MÁQUINAS
+====================================================== */
+
+function construirTopBottom() {
+
+  const indicador =
+    obtenerValor(
+      "filtroIndicador"
+    ) || "COIN";
+
+
+  const config =
+    CONFIG_INDICADORES[indicador];
+
+
+  const grupos =
+    agruparPor(
+      datosFiltrados,
+      "Maquina"
+    );
+
+
+  const maquinas =
+    Object.entries(grupos)
+      .map(
+        ([serie, registros]) => {
+
+          const valor =
+            config.tipo === "suma"
+
+              ? sumarCampo(
+                  registros,
+                  config.campo
+                )
+
+              : promedioCampo(
+                  registros,
+                  config.campo
+                );
+
+
+          const primero =
+            registros[0] || {};
+
+
+          return {
+
+            serie,
+
+            modelo:
+              primero["Modelo Com."] || "",
+
+            juego:
+              primero["Juego"] || "",
+
+            valor
+
+          };
+
         }
+      )
+      .filter(
+        item =>
+          item.serie
+      )
+      .sort(
+        (a, b) =>
+          b.valor - a.valor
       );
 
-    }
+
+  construirTablaMaquinas(
+    "topMaquinasCuerpo",
+    maquinas.slice(0, 10),
+    indicador
   );
+
+
+  construirTablaMaquinas(
+    "bottomMaquinasCuerpo",
+    maquinas
+      .slice(-10)
+      .reverse(),
+    indicador
+  );
+
+}
+
+
+/* ======================================================
+   TABLA TOP/BOTTOM
+====================================================== */
+
+function construirTablaMaquinas(
+  id,
+  datos,
+  indicador
+) {
+
+  const cuerpo =
+    document.getElementById(id);
+
+
+  if (!cuerpo) return;
 
 
   cuerpo.innerHTML = "";
 
 
-  filas.forEach(
-    function (grupo) {
-
-      let valorIndicador = 0;
-
-
-      if (
-        indicador === "COIN PROM" ||
-        indicador === "VENTA PROM" ||
-        indicador === "T.C" ||
-        indicador === "% PAGO"
-      ) {
-
-        valorIndicador =
-          promedioArray(
-            grupo.valores
-          );
-
-      } else {
-
-        valorIndicador =
-          grupo.valores.reduce(
-            function (
-              total,
-              valor
-            ) {
-
-              return total +
-                valor;
-
-            },
-            0
-          );
-
-      }
-
+  datos.forEach(
+    (item, indice) => {
 
       const fila =
         document.createElement(
@@ -1941,66 +1944,29 @@ function construirTablaIndicador() {
         );
 
 
-      let valorTexto;
-
-
-      if (
-        indicador === "T.C"
-      ) {
-
-        valorTexto =
-          Number(
-            valorIndicador
-          ).toFixed(2);
-
-      } else if (
-        indicador === "% PAGO"
-      ) {
-
-        valorTexto =
-          Number(
-            valorIndicador
-          ).toFixed(2) +
-          "%";
-
-      } else {
-
-        valorTexto =
-          formatearNumero(
-            valorIndicador
-          );
-
-      }
-
-
       fila.innerHTML = `
 
-        <td>
-          <strong>
-            ${escaparHTML(
-              grupo.sala
-            )}
-          </strong>
+        <td class="posicion">
+          ${indice + 1}
         </td>
 
         <td>
-          ${escaparHTML(
-            grupo.modelo
+          ${escapeHTML(item.serie)}
+        </td>
+
+        <td>
+          ${escapeHTML(item.modelo)}
+        </td>
+
+        <td>
+          ${escapeHTML(item.juego)}
+        </td>
+
+        <td>
+          ${formatearIndicador(
+            item.valor,
+            indicador
           )}
-        </td>
-
-        <td>
-          ${grupo.maquinas.size}
-        </td>
-
-        <td>
-          ${escaparHTML(
-            grupo.juego
-          )}
-        </td>
-
-        <td>
-          ${valorTexto}
         </td>
 
       `;
@@ -2013,45 +1979,124 @@ function construirTablaIndicador() {
     }
   );
 
-
-  if (
-    filas.length === 0
-  ) {
-
-    const fila =
-      document.createElement(
-        "tr"
-      );
+}
 
 
-    fila.innerHTML = `
+/* ======================================================
+   DETALLE
+====================================================== */
 
-      <td
-        colspan="5"
-        style="
-          text-align:center;
-          padding:25px;
-          color:#98a2b3;
-        "
-      >
-        No hay datos para los filtros seleccionados.
-      </td>
+function construirDetalle() {
 
-    `;
-
-
-    cuerpo.appendChild(
-      fila
+  const cuerpo =
+    document.getElementById(
+      "detalleCuerpo"
     );
 
-  }
+
+  if (!cuerpo) return;
+
+
+  cuerpo.innerHTML = "";
+
+
+  const grupos =
+    agruparPor(
+      datosFiltrados,
+      "Maquina"
+    );
+
+
+  Object.entries(grupos)
+    .forEach(
+      ([serie, registros]) => {
+
+        const primero =
+          registros[0] || {};
+
+
+        const fila =
+          document.createElement(
+            "tr"
+          );
+
+
+        fila.innerHTML = `
+
+          <td>
+            ${escapeHTML(
+              primero["LOCAL"] || ""
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              primero["Modelo Com."] || ""
+            )}
+          </td>
+
+          <td>
+            <strong>
+              ${escapeHTML(serie)}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHTML(
+              primero["Juego"] || ""
+            )}
+          </td>
+
+          <td>
+            ${formatearNumero(
+              sumarCampo(
+                registros,
+                "COIN"
+              )
+            )}
+          </td>
+
+          <td>
+            ${formatearNumero(
+              sumarCampo(
+                registros,
+                "VENTA"
+              )
+            )}
+          </td>
+
+          <td>
+            ${formatearNumero(
+              sumarCampo(
+                registros,
+                "NETWIN ($)"
+              )
+            )}
+          </td>
+
+          <td>
+            ${promedioCampo(
+              registros,
+              "% PAGO"
+            ).toFixed(2)}%
+          </td>
+
+        `;
+
+
+        cuerpo.appendChild(
+          fila
+        );
+
+      }
+    );
 
 }
 
 
-// ======================================================
-// 24. OBTENER VALOR SELECT
-// ======================================================
+/* ======================================================
+   UTILIDADES
+====================================================== */
 
 function obtenerValor(id) {
 
@@ -2059,23 +2104,14 @@ function obtenerValor(id) {
     document.getElementById(id);
 
 
-  if (!elemento) {
-
-    return "";
-
-  }
-
-
-  return String(
-    elemento.value || ""
-  ).trim();
+  return elemento
+    ? String(
+        elemento.value || ""
+      ).trim()
+    : "";
 
 }
 
-
-// ======================================================
-// 25. LIMPIAR TEXTO
-// ======================================================
 
 function limpiarTexto(valor) {
 
@@ -2096,26 +2132,10 @@ function limpiarTexto(valor) {
 }
 
 
-// ======================================================
-// 26. NORMALIZAR MES
-// ======================================================
-
 function normalizarMes(valor) {
 
-  if (
-    valor === null ||
-    valor === undefined
-  ) {
-
-    return "";
-
-  }
-
-
   let mes =
-    String(valor)
-      .trim()
-      .toUpperCase();
+    limpiarTexto(valor);
 
 
   mes =
@@ -2147,51 +2167,26 @@ function normalizarMes(valor) {
   const equivalencias = {
 
     ENE: "ENERO",
-
     FEB: "FEBRERO",
-
     MAR: "MARZO",
-
     ABR: "ABRIL",
-
     MAY: "MAYO",
-
     JUN: "JUNIO",
-
     JUL: "JULIO",
-
     AGO: "AGOSTO",
-
     SEP: "SEPTIEMBRE",
-
     SET: "SEPTIEMBRE",
-
     OCT: "OCTUBRE",
-
     NOV: "NOVIEMBRE",
-
     DIC: "DICIEMBRE"
 
   };
 
 
-  if (
-    equivalencias[mes]
-  ) {
-
-    return equivalencias[mes];
-
-  }
-
-
-  return mes;
+  return equivalencias[mes] || mes;
 
 }
 
-
-// ======================================================
-// 27. CONVERTIR A NÚMERO
-// ======================================================
 
 function obtenerNumero(valor) {
 
@@ -2219,21 +2214,8 @@ function obtenerNumero(valor) {
 
   let texto =
     String(valor)
-      .trim();
-
-
-  if (!texto) {
-
-    return null;
-
-  }
-
-
-  texto =
-    texto.replace(
-      /%/g,
-      ""
-    );
+      .trim()
+      .replace(/%/g, "");
 
 
   if (
@@ -2248,22 +2230,13 @@ function obtenerNumero(valor) {
 
       texto =
         texto
-          .replace(
-            /\./g,
-            ""
-          )
-          .replace(
-            ",",
-            "."
-          );
+          .replace(/\./g, "")
+          .replace(",", ".");
 
     } else {
 
       texto =
-        texto.replace(
-          /,/g,
-          ""
-        );
+        texto.replace(/,/g, "");
 
     }
 
@@ -2281,18 +2254,12 @@ function obtenerNumero(valor) {
     ) {
 
       texto =
-        texto.replace(
-          ",",
-          "."
-        );
+        texto.replace(",", ".");
 
     } else {
 
       texto =
-        texto.replace(
-          /,/g,
-          ""
-        );
+        texto.replace(/,/g, "");
 
     }
 
@@ -2317,9 +2284,57 @@ function obtenerNumero(valor) {
 }
 
 
-// ======================================================
-// 28. PROMEDIO
-// ======================================================
+function sumarCampo(
+  registros,
+  campo
+) {
+
+  return registros.reduce(
+    (total, registro) => {
+
+      const valor =
+        obtenerNumero(
+          registro[campo]
+        );
+
+
+      return total +
+        (valor === null
+          ? 0
+          : valor);
+
+    },
+    0
+  );
+
+}
+
+
+function promedioCampo(
+  registros,
+  campo
+) {
+
+  const valores =
+    registros
+      .map(
+        registro =>
+          obtenerNumero(
+            registro[campo]
+          )
+      )
+      .filter(
+        valor =>
+          valor !== null
+      );
+
+
+  return promedioArray(
+    valores
+  );
+
+}
+
 
 function promedioArray(
   valores
@@ -2327,7 +2342,7 @@ function promedioArray(
 
   if (
     !valores ||
-    valores.length === 0
+    !valores.length
   ) {
 
     return 0;
@@ -2335,79 +2350,109 @@ function promedioArray(
   }
 
 
-  const validos =
-    valores.filter(
-      function (valor) {
-
-        return (
-          valor !== null &&
-          Number.isFinite(
-            Number(valor)
-          )
-        );
-
-      }
-    );
-
-
-  if (
-    validos.length === 0
-  ) {
-
-    return 0;
-
-  }
-
-
-  const suma =
-    validos.reduce(
-      function (
-        total,
-        valor
-      ) {
-
-        return total +
-          Number(valor);
-
-      },
-      0
-    );
-
-
-  return suma /
-    validos.length;
+  return valores.reduce(
+    (a, b) =>
+      a + Number(b),
+    0
+  ) /
+  valores.length;
 
 }
 
 
-// ======================================================
-// 29. FORMATEAR NÚMERO
-// ======================================================
+function agruparPor(
+  registros,
+  campo
+) {
+
+  return registros.reduce(
+    (grupos, registro) => {
+
+      const clave =
+        limpiarTexto(
+          registro[campo]
+        );
+
+
+      if (!clave) {
+
+        return grupos;
+
+      }
+
+
+      if (!grupos[clave]) {
+
+        grupos[clave] = [];
+
+      }
+
+
+      grupos[clave].push(
+        registro
+      );
+
+
+      return grupos;
+
+    },
+    {}
+  );
+
+}
+
 
 function formatearNumero(
   valor
 ) {
 
-  const numero =
-    Number(valor) || 0;
-
-
-  return numero.toLocaleString(
+  return Number(
+    valor || 0
+  ).toLocaleString(
     "es-PE",
     {
-
-      maximumFractionDigits:
-        2
-
+      maximumFractionDigits: 2
     }
   );
 
 }
 
 
-// ======================================================
-// 30. ESTABLECER TEXTO
-// ======================================================
+function formatearIndicador(
+  valor,
+  indicador
+) {
+
+  if (
+    indicador === "% PAGO"
+  ) {
+
+    return (
+      Number(valor || 0)
+        .toFixed(2) +
+      "%"
+    );
+
+  }
+
+
+  if (
+    indicador === "T.C"
+  ) {
+
+    return Number(
+      valor || 0
+    ).toFixed(2);
+
+  }
+
+
+  return formatearNumero(
+    valor
+  );
+
+}
+
 
 function establecerTexto(
   id,
@@ -2428,11 +2473,91 @@ function establecerTexto(
 }
 
 
-// ======================================================
-// 31. ESCAPAR HTML
-// ======================================================
+function destruirGrafico(
+  id
+) {
 
-function escaparHTML(valor) {
+  if (graficos[id]) {
+
+    graficos[id].destroy();
+
+    delete graficos[id];
+
+  }
+
+}
+
+
+function opcionesBarra() {
+
+  return {
+
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+
+      legend: {
+
+        position:
+          "bottom",
+
+        labels: {
+
+          color:
+            "#667085",
+
+          usePointStyle:
+            true
+
+        }
+
+      }
+
+    },
+
+    scales: {
+
+      x: {
+
+        ticks: {
+
+          color:
+            "#667085"
+
+        }
+
+      },
+
+      y: {
+
+        beginAtZero:
+          true,
+
+        ticks: {
+
+          color:
+            "#667085",
+
+          callback:
+            valor =>
+              formatearNumero(
+                valor
+              )
+
+        }
+
+      }
+
+    }
+
+  };
+
+}
+
+
+function escapeHTML(valor) {
 
   return String(valor)
     .replace(
@@ -2459,15 +2584,11 @@ function escaparHTML(valor) {
 }
 
 
-// ======================================================
-// 32. ACTUALIZACIÓN AUTOMÁTICA
-// ======================================================
+/* ======================================================
+   ACTUALIZACIÓN AUTOMÁTICA
+====================================================== */
 
 setInterval(
-  function () {
-
-    cargarDatos();
-
-  },
+  cargarDatos,
   5 * 60 * 1000
 );
