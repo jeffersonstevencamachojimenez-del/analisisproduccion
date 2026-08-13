@@ -1,216 +1,104 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Análisis de Producción</title>
+  <title>Dashboard de Producción</title>
 
   <link rel="stylesheet" href="style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
 </head>
-
 
 <body>
 
+<header class="topbar">
 
-  <!-- =====================================================
-       ENCABEZADO
-  ====================================================== -->
+  <div>
+    <h1>Dashboard de Producción</h1>
+    <p>Análisis de rendimiento de máquinas</p>
+  </div>
 
-  <header class="encabezado">
+  <div class="estado">
+    <span id="indicadorConexion" class="estado-punto"></span>
+    <span id="textoConexion">Conectando...</span>
+    <button id="btnActualizar">↻ Actualizar</button>
+  </div>
 
-    <div>
-
-      <h1>
-        Análisis de Producción
-      </h1>
-
-      <p>
-        Dashboard conectado directamente a Google Sheets
-      </p>
-
-    </div>
+</header>
 
 
-    <div class="conexion">
-
-      <span
-        id="indicadorConexion"
-        class="punto"
-      ></span>
-
-      <span id="textoConexion">
-        Conectando con Google Sheets...
-      </span>
-
-    </div>
-
-  </header>
-
+<main class="dashboard">
 
 
   <!-- =====================================================
-       CONTENEDOR PRINCIPAL
+       FILTROS
   ====================================================== -->
 
-  <main class="contenedor">
+  <section class="panel filtros-panel">
 
-
-    <!-- ===================================================
-         BARRA DE ACCIONES
-    ==================================================== -->
-
-    <section class="barra-acciones">
-
-      <div class="contador">
-
-        <strong id="contadorResultados">
-          0
-        </strong>
-
-        <span>
-          registros encontrados
-        </span>
-
+    <div class="panel-titulo">
+      <div>
+        <h2>Filtros de análisis</h2>
+        <span>Selecciona los criterios para actualizar el dashboard</span>
       </div>
 
-
-      <div class="acciones">
-
-        <button
-          id="btnActualizar"
-          type="button"
-        >
-          Actualizar datos
-        </button>
-
-      </div>
-
-    </section>
+      <button id="btnLimpiar" class="btn-secundario">
+        Limpiar filtros
+      </button>
+    </div>
 
 
-
-    <!-- ===================================================
-         FILTROS
-    ==================================================== -->
-
-    <section class="filtros">
-
+    <div class="filtros-grid">
 
       <div class="filtro">
-
-        <label for="filtroSala">
-          SALA
-        </label>
-
+        <label>SALA</label>
         <select id="filtroSala">
-
-          <option value="">
-            Todas las salas
-          </option>
-
+          <option value="">Todas las salas</option>
         </select>
-
       </div>
 
 
-
       <div class="filtro">
-
-        <label for="filtroMes">
-          MES
-        </label>
-
+        <label>MES</label>
         <select id="filtroMes">
-
-          <option value="">
-            Todos los meses
-          </option>
-
+          <option value="">Todos los meses</option>
         </select>
-
       </div>
 
 
-
       <div class="filtro">
-
-        <label for="filtroModelo">
-          MODELO DE MÁQUINA
-        </label>
-
+        <label>MODELO</label>
         <select id="filtroModelo">
-
-          <option value="">
-            Todos los modelos
-          </option>
-
+          <option value="">Todos los modelos</option>
         </select>
-
       </div>
 
 
-
       <div class="filtro">
-
-        <label for="filtroNumero">
-          NRO. MÁQUINA
-        </label>
-
-        <select id="filtroNumero">
-
-          <option value="">
-            Todas las máquinas
-          </option>
-
+        <label>SERIE</label>
+        <select id="filtroSerie">
+          <option value="">Todas las series</option>
         </select>
-
       </div>
 
 
-
       <div class="filtro">
-
-        <label for="filtroJuego">
-          JUEGO
-        </label>
-
+        <label>JUEGO</label>
         <select id="filtroJuego">
-
-          <option value="">
-            Todos los juegos
-          </option>
-
+          <option value="">Todos los juegos</option>
         </select>
-
       </div>
 
 
-
-      <!-- FILTRO INDICADOR -->
-
-      <div class="filtro">
-
-        <label for="filtroIndicador">
-          INDICADOR
-        </label>
+      <div class="filtro indicador-filtro">
+        <label>INDICADOR</label>
 
         <select id="filtroIndicador">
 
-          <option value="COIN">
-            COIN
-          </option>
+          <option value="COIN">COIN</option>
 
           <option value="COIN PROM">
             COIN PROM
@@ -240,419 +128,344 @@
 
       </div>
 
+    </div>
 
-
-      <button
-        id="btnLimpiar"
-        class="btn-limpiar"
-        type="button"
-      >
-        Limpiar filtros
-      </button>
-
-    </section>
+  </section>
 
 
 
-    <!-- ===================================================
-         TABLAS
-    ==================================================== -->
+  <!-- =====================================================
+       KPI
+  ====================================================== -->
 
-    <div class="tablas-grid">
+  <section class="kpis">
+
+    <article class="kpi">
+      <span>COIN</span>
+      <strong id="kpiCoin">0</strong>
+    </article>
+
+    <article class="kpi">
+      <span>VENTA</span>
+      <strong id="kpiVenta">0</strong>
+    </article>
+
+    <article class="kpi">
+      <span>NETWIN</span>
+      <strong id="kpiNetwin">0</strong>
+    </article>
+
+    <article class="kpi">
+      <span>COIN PROM</span>
+      <strong id="kpiCoinProm">0</strong>
+    </article>
+
+    <article class="kpi">
+      <span>VENTA PROM</span>
+      <strong id="kpiVentaProm">0</strong>
+    </article>
+
+    <article class="kpi">
+      <span>% PAGO</span>
+      <strong id="kpiPago">0%</strong>
+    </article>
+
+  </section>
 
 
-      <!-- =================================================
-           PRIMERA TABLA
-      ================================================== -->
 
-      <section class="panel">
+  <!-- =====================================================
+       RESUMEN
+  ====================================================== -->
 
-        <div class="panel-header">
+  <section class="resumen-bar">
 
-          <div>
+    <div>
+      <strong id="contadorResultados">0</strong>
+      <span>registros analizados</span>
+    </div>
 
-            <h2>
-              Resumen mensual
-            </h2>
+    <div class="indicador-actual">
+      Indicador:
+      <strong id="indicadorActual">COIN</strong>
+    </div>
 
-            <span>
-              Información correspondiente a los filtros seleccionados
-            </span>
+  </section>
 
-          </div>
 
+
+  <!-- =====================================================
+       RANKING + GRÁFICO PRINCIPAL
+  ====================================================== -->
+
+  <section class="fila-principal">
+
+
+    <article class="panel ranking-panel">
+
+      <div class="panel-titulo">
+        <div>
+          <h2>Ranking por modelo</h2>
+          <span id="textoRanking">
+            Rendimiento según indicador seleccionado
+          </span>
+        </div>
+      </div>
+
+
+      <div class="tabla-scroll">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>MODELO</th>
+              <th>MÁQUINAS</th>
+              <th>INDICADOR</th>
+            </tr>
+          </thead>
+
+          <tbody id="rankingCuerpo"></tbody>
+
+        </table>
+
+      </div>
+
+    </article>
+
+
+
+    <article class="panel grafico-principal-panel">
+
+      <div class="panel-titulo">
+
+        <div>
+          <h2 id="tituloGraficoPrincipal">
+            Rendimiento por modelo
+          </h2>
+
+          <span>
+            Comparación según indicador seleccionado
+          </span>
         </div>
 
+      </div>
 
-        <div class="tabla-contenedor">
+      <div class="grafico-grande">
+        <canvas id="graficoRanking"></canvas>
+      </div>
 
-          <table>
+    </article>
 
-            <thead>
-
-              <tr>
-
-                <th>
-                  MES
-                </th>
-
-                <th>
-                  COIN PROM
-                </th>
-
-                <th>
-                  COIN TOTAL
-                </th>
-
-                <th>
-                  VENTA PROM
-                </th>
-
-                <th>
-                  VENTA TOTAL
-                </th>
-
-                <th>
-                  NETWIN ($)
-                </th>
-
-                <th>
-                  T.C.
-                </th>
-
-                <th>
-                  % PAGO
-                </th>
-
-              </tr>
-
-            </thead>
+  </section>
 
 
-            <tbody id="tablaCuerpo">
-            </tbody>
 
-          </table>
+  <!-- =====================================================
+       GRÁFICOS
+  ====================================================== -->
 
+  <section class="graficos-grid">
+
+
+    <article class="panel grafico-card">
+
+      <div class="panel-titulo">
+        <div>
+          <h2>COIN vs VENTA</h2>
+          <span>Comparación de producción</span>
         </div>
+      </div>
 
-      </section>
+      <div class="grafico">
+        <canvas id="graficoCoinVenta"></canvas>
+      </div>
+
+    </article>
 
 
 
-      <!-- =================================================
-           SEGUNDA TABLA
-      ================================================== -->
+    <article class="panel grafico-card">
 
-      <section class="panel panel-secundario">
-
-        <div class="panel-header">
-
-          <div>
-
-            <h2>
-              Detalle por máquina
-            </h2>
-
-            <span>
-              Resumen según indicador seleccionado
-            </span>
-
-          </div>
-
+      <div class="panel-titulo">
+        <div>
+          <h2>NETWIN por modelo</h2>
+          <span>Rentabilidad acumulada</span>
         </div>
+      </div>
+
+      <div class="grafico">
+        <canvas id="graficoNetwin"></canvas>
+      </div>
+
+    </article>
 
 
-        <div class="tabla-contenedor">
 
-          <table>
+    <article class="panel grafico-card">
 
-            <thead>
-
-              <tr>
-
-                <th>
-                  SALA
-                </th>
-
-                <th>
-                  MODELO DE MÁQUINA
-                </th>
-
-                <th>
-                  N.º DE MÁQUINAS
-                </th>
-
-                <th>
-                  JUEGO
-                </th>
-
-                <th id="tituloIndicador">
-                  COIN
-                </th>
-
-              </tr>
-
-            </thead>
-
-
-            <tbody id="tablaIndicadorCuerpo">
-            </tbody>
-
-          </table>
-
+      <div class="panel-titulo">
+        <div>
+          <h2>% PAGO por modelo</h2>
+          <span>Porcentaje promedio</span>
         </div>
+      </div>
 
-      </section>
+      <div class="grafico">
+        <canvas id="graficoPagoModelo"></canvas>
+      </div>
+
+    </article>
+
+
+
+    <article class="panel grafico-card">
+
+      <div class="panel-titulo">
+        <div>
+          <h2>Evolución mensual</h2>
+          <span id="tituloMensual">Indicador seleccionado</span>
+        </div>
+      </div>
+
+      <div class="grafico">
+        <canvas id="graficoMensual"></canvas>
+      </div>
+
+    </article>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       TOP Y BOTTOM DE MÁQUINAS
+  ====================================================== -->
+
+  <section class="fila-maquinas">
+
+
+    <article class="panel">
+
+      <div class="panel-titulo">
+        <div>
+          <h2>Top 10 máquinas</h2>
+          <span>Mejor rendimiento según indicador</span>
+        </div>
+      </div>
+
+      <div class="tabla-scroll">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>SERIE</th>
+              <th>MODELO</th>
+              <th>JUEGO</th>
+              <th>VALOR</th>
+            </tr>
+          </thead>
+
+          <tbody id="topMaquinasCuerpo"></tbody>
+
+        </table>
+
+      </div>
+
+    </article>
+
+
+
+    <article class="panel">
+
+      <div class="panel-titulo">
+        <div>
+          <h2>Bottom 10 máquinas</h2>
+          <span>Menor rendimiento según indicador</span>
+        </div>
+      </div>
+
+      <div class="tabla-scroll">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>SERIE</th>
+              <th>MODELO</th>
+              <th>JUEGO</th>
+              <th>VALOR</th>
+            </tr>
+          </thead>
+
+          <tbody id="bottomMaquinasCuerpo"></tbody>
+
+        </table>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       DETALLE POR SERIE
+  ====================================================== -->
+
+  <section class="panel detalle-panel">
+
+    <div class="panel-titulo">
+
+      <div>
+        <h2>Detalle de máquinas</h2>
+        <span>
+          Información de las máquinas según los filtros seleccionados
+        </span>
+      </div>
 
     </div>
 
 
+    <div class="tabla-scroll">
 
-    <!-- ===================================================
-         GRÁFICOS
-    ==================================================== -->
+      <table>
 
-    <section class="graficos">
+        <thead>
 
+          <tr>
 
-      <!-- COIN PROM -->
+            <th>SALA</th>
+            <th>MODELO</th>
+            <th>SERIE</th>
+            <th>JUEGO</th>
+            <th>COIN</th>
+            <th>VENTA</th>
+            <th>NETWIN</th>
+            <th>% PAGO</th>
 
-      <article class="grafico">
+          </tr>
 
-        <div class="grafico-header">
+        </thead>
 
-          <div>
+        <tbody id="detalleCuerpo"></tbody>
 
-            <h2>
-              COIN PROM
-            </h2>
+      </table>
 
-            <span>
-              Promedio mensual
-            </span>
+    </div>
 
-          </div>
+  </section>
 
-        </div>
 
-        <div class="grafico-contenido">
+</main>
 
-          <canvas id="graficoCoinProm"></canvas>
 
-        </div>
-
-      </article>
-
-
-
-      <!-- VENTA PROM -->
-
-      <article class="grafico">
-
-        <div class="grafico-header">
-
-          <div>
-
-            <h2>
-              VENTA PROM
-            </h2>
-
-            <span>
-              Promedio mensual
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="grafico-contenido">
-
-          <canvas id="graficoVentaProm"></canvas>
-
-        </div>
-
-      </article>
-
-
-
-      <!-- NETWIN -->
-
-      <article class="grafico">
-
-        <div class="grafico-header">
-
-          <div>
-
-            <h2>
-              NETWIN ($)
-            </h2>
-
-            <span>
-              Total mensual
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="grafico-contenido">
-
-          <canvas id="graficoNetwin"></canvas>
-
-        </div>
-
-      </article>
-
-
-
-      <!-- COIN TOTAL -->
-
-      <article class="grafico">
-
-        <div class="grafico-header">
-
-          <div>
-
-            <h2>
-              COIN TOTAL
-            </h2>
-
-            <span>
-              Total mensual
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="grafico-contenido">
-
-          <canvas id="graficoCoinTotal"></canvas>
-
-        </div>
-
-      </article>
-
-
-
-      <!-- VENTA TOTAL -->
-
-      <article class="grafico">
-
-        <div class="grafico-header">
-
-          <div>
-
-            <h2>
-              VENTA TOTAL
-            </h2>
-
-            <span>
-              Total mensual
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="grafico-contenido">
-
-          <canvas id="graficoVentaTotal"></canvas>
-
-        </div>
-
-      </article>
-
-
-
-      <!-- T.C. -->
-
-      <article class="grafico">
-
-        <div class="grafico-header">
-
-          <div>
-
-            <h2>
-              T.C.
-            </h2>
-
-            <span>
-              Promedio mensual
-            </span>
-
-          </div>
-
-        </div>
-
-        <div class="grafico-contenido">
-
-          <canvas id="graficoTC"></canvas>
-
-        </div>
-
-      </article>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         GRÁFICO % PAGO
-    ==================================================== -->
-
-    <section class="pago-panel">
-
-      <div class="grafico-header">
-
-        <div>
-
-          <h2>
-            Porcentaje de Pago
-          </h2>
-
-          <span>
-            % PAGO vs. porcentaje restante
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <div class="pago-contenido">
-
-        <div class="grafico-pago">
-
-          <canvas id="graficoPago"></canvas>
-
-        </div>
-
-
-        <div class="pago-valor">
-
-          <strong id="valorPago">
-            0.00%
-          </strong>
-
-          <span>
-            Porcentaje de pago
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-  </main>
-
-
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
-
 </html>
