@@ -124,13 +124,14 @@ document.addEventListener(
 
 function configurarEventos() {
 
-  const filtros = [
-    "filtroSala",
-    "filtroMes",
-    "filtroModelo",
-    "filtroNumero",
-    "filtroJuego"
-  ];
+ const filtros = [
+  "filtroSala",
+  "filtroMes",
+  "filtroModelo",
+  "filtroNumero",
+  "filtroJuego",
+  "filtroIndicador"
+];
 
 
   filtros.forEach(
