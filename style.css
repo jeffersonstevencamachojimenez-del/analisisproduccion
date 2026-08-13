@@ -1,7 +1,3 @@
-/* ======================================================
-   1. CONFIGURACIÓN GENERAL
-====================================================== */
-
 * {
   box-sizing: border-box;
 }
@@ -12,399 +8,351 @@ html {
 
 body {
   margin: 0;
-  padding: 0;
-
   font-family: Arial, Helvetica, sans-serif;
-
-  background: #ffffff;
-
+  background: #f5f7fa;
   color: #344054;
 }
 
 
-/* ======================================================
-   2. ENCABEZADO
-====================================================== */
+/* =====================================================
+   TOPBAR
+===================================================== */
 
-.encabezado {
-  width: 100%;
-
-  padding: 24px 35px;
-
+.topbar {
   background: #ffffff;
-
-  border-bottom: 1px solid #eaecf0;
+  border-bottom: 1px solid #e4e7ec;
+  padding: 20px 32px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   gap: 20px;
 }
 
-.encabezado h1 {
-  margin: 0 0 6px 0;
-
-  font-size: 27px;
-
-  font-weight: 700;
-
-  color: #1d2939;
+.topbar h1 {
+  margin: 0 0 5px;
+  font-size: 25px;
+  color: #101828;
 }
 
-.encabezado p {
+.topbar p {
   margin: 0;
-
-  font-size: 14px;
-
   color: #667085;
-}
-
-
-/* ======================================================
-   3. CONEXIÓN
-====================================================== */
-
-.conexion {
-  display: flex;
-
-  align-items: center;
-
-  gap: 9px;
-
   font-size: 13px;
-
-  color: #667085;
-
-  white-space: nowrap;
 }
 
-.punto {
-  width: 10px;
+.estado {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: #667085;
+}
 
-  height: 10px;
-
-  display: inline-block;
-
+.estado-punto {
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-
   background: #f2b84b;
 }
 
-
-/* ======================================================
-   4. CONTENEDOR
-====================================================== */
-
-.contenedor {
-  width: 100%;
-
-  max-width: 1600px;
-
-  margin: 0 auto;
-
-  padding: 25px 35px 45px 35px;
-}
-
-
-/* ======================================================
-   5. BARRA DE ACCIONES
-====================================================== */
-
-.barra-acciones {
-  background: #ffffff;
-
-  border: 1px solid #eaecf0;
-
-  border-radius: 12px;
-
-  padding: 16px 20px;
-
-  margin-bottom: 18px;
-
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  gap: 15px;
-}
-
-.barra-acciones strong {
-  font-size: 20px;
-
-  color: #1d2939;
-}
-
-.barra-acciones span {
-  margin-left: 5px;
-
-  color: #667085;
-
-  font-size: 13px;
-}
-
-.acciones {
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-}
-
-.acciones button {
+.estado button {
   border: 0;
-
-  border-radius: 8px;
-
-  padding: 10px 16px;
-
-  background: #344054;
-
-  color: #ffffff;
-
-  font-size: 13px;
-
+  background: #b91c1c;
+  color: white;
+  padding: 9px 14px;
+  border-radius: 7px;
+  cursor: pointer;
   font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
 }
 
-.acciones button:hover {
-  opacity: 0.88;
-
-  transform: translateY(-1px);
+.estado button:hover {
+  background: #991b1b;
 }
 
 
-/* ======================================================
-   6. FILTROS
-====================================================== */
+/* =====================================================
+   DASHBOARD
+===================================================== */
 
-.filtros {
-  background: #ffffff;
-
-  border: 1px solid #eaecf0;
-
-  border-radius: 12px;
-
-  padding: 20px;
-
-  margin-bottom: 22px;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(5, minmax(150px, 1fr))
-    auto;
-
-  gap: 15px;
-
-  align-items: end;
-}
-
-.filtro {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 7px;
-}
-
-.filtro label {
-  font-size: 11px;
-
-  font-weight: 700;
-
-  color: #667085;
-
-  letter-spacing: 0.04em;
-}
-
-.filtro select {
-  width: 100%;
-
-  min-height: 40px;
-
-  padding: 0 11px;
-
-  border: 1px solid #d0d5dd;
-
-  border-radius: 8px;
-
-  background: #ffffff;
-
-  color: #344054;
-
-  font-size: 13px;
-
-  outline: none;
-
-  cursor: pointer;
-}
-
-.filtro select:focus {
-  border-color: #98a2b3;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(152, 162, 179, 0.12);
-}
-
-.btn-limpiar {
-  min-height: 40px;
-
-  padding: 0 15px;
-
-  border: 1px solid #d0d5dd;
-
-  border-radius: 8px;
-
-  background: #ffffff;
-
-  color: #475467;
-
-  font-size: 13px;
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  white-space: nowrap;
-}
-
-.btn-limpiar:hover {
-  background: #f9fafb;
+.dashboard {
+  max-width: 1700px;
+  margin: auto;
+  padding: 25px 30px 45px;
 }
 
 
-/* ======================================================
-   7. TABLAS AL COSTADO
-====================================================== */
-
-.tablas-grid {
-  width: 100%;
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1.15fr)
-    minmax(0, 1fr);
-
-  gap: 20px;
-
-  align-items: start;
-
-  margin-top: 0;
-}
-
-
-/* ======================================================
-   8. PANEL
-====================================================== */
+/* =====================================================
+   PANELES
+===================================================== */
 
 .panel {
-  margin: 0;
-
   background: #ffffff;
-
-  border: 1px solid #eaecf0;
-
-  border-radius: 14px;
-
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(16,24,40,.04);
   overflow: hidden;
-
-  box-shadow:
-    0 1px 2px
-    rgba(16, 24, 40, 0.03);
-
-  min-width: 0;
 }
 
-.panel-header {
-  padding: 20px;
-
+.panel-titulo {
+  padding: 17px 20px;
   border-bottom: 1px solid #eaecf0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
 }
 
-.panel-header h2 {
-  margin: 0 0 5px 0;
-
-  font-size: 17px;
-
-  color: #1d2939;
+.panel-titulo h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  color: #101828;
 }
 
-.panel-header span {
-  font-size: 12px;
-
+.panel-titulo span {
+  font-size: 11px;
   color: #98a2b3;
 }
 
 
-/* ======================================================
-   9. TABLA
-====================================================== */
+/* =====================================================
+   FILTROS
+===================================================== */
 
-.tabla-contenedor {
+.filtros-panel {
+  margin-bottom: 18px;
+}
+
+.filtros-grid {
+  padding: 18px 20px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, minmax(130px, 1fr));
+
+  gap: 14px;
+}
+
+.filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filtro label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #667085;
+}
+
+.filtro select {
   width: 100%;
+  height: 39px;
 
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+
+  padding: 0 10px;
+
+  background: #fff;
+  color: #344054;
+
+  font-size: 12px;
+  outline: none;
+}
+
+.filtro select:focus {
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 3px rgba(185,28,28,.08);
+}
+
+.indicador-filtro select {
+  border-color: #b91c1c;
+  font-weight: 700;
+}
+
+.btn-secundario {
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  color: #475467;
+
+  padding: 8px 13px;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-secundario:hover {
+  background: #f9fafb;
+}
+
+
+/* =====================================================
+   KPI
+===================================================== */
+
+.kpis {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, 1fr);
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+}
+
+.kpi {
+  background: #ffffff;
+
+  border: 1px solid #e4e7ec;
+  border-radius: 11px;
+
+  padding: 17px 18px;
+
+  box-shadow: 0 2px 5px rgba(16,24,40,.03);
+
+  position: relative;
+}
+
+.kpi::before {
+  content: "";
+  position: absolute;
+
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 4px;
+
+  background: #b91c1c;
+}
+
+.kpi span {
+  display: block;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  color: #667085;
+
+  margin-bottom: 9px;
+}
+
+.kpi strong {
+  font-size: 21px;
+  color: #101828;
+}
+
+
+/* =====================================================
+   RESUMEN
+===================================================== */
+
+.resumen-bar {
+  background: #ffffff;
+
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+
+  padding: 12px 18px;
+
+  margin-bottom: 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resumen-bar strong {
+  font-size: 17px;
+  color: #101828;
+}
+
+.resumen-bar span {
+  margin-left: 6px;
+  font-size: 12px;
+  color: #667085;
+}
+
+.indicador-actual {
+  font-size: 12px;
+  color: #667085;
+}
+
+.indicador-actual strong {
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+
+/* =====================================================
+   RANKING PRINCIPAL
+===================================================== */
+
+.fila-principal {
+  display: grid;
+
+  grid-template-columns:
+    38% 62%;
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+.ranking-panel,
+.grafico-principal-panel {
+  min-width: 0;
+}
+
+.grafico-grande {
+  position: relative;
+  height: 350px;
+  padding: 15px 20px 20px;
+}
+
+.grafico-grande canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+/* =====================================================
+   TABLAS
+===================================================== */
+
+.tabla-scroll {
+  width: 100%;
   overflow-x: auto;
-
-  overflow-y: auto;
-
-  max-height: 430px;
 }
 
 table {
   width: 100%;
-
   border-collapse: collapse;
-
-  min-width: 600px;
-}
-
-thead {
-  background: #b91c1c;
-}
-
-thead th {
-  position: sticky;
-
-  top: 0;
-
-  z-index: 2;
-
-  background: #b91c1c;
 }
 
 th {
-  padding: 13px 14px;
-
-  text-align: left;
-
-  border-top: 1px solid #991b1b;
-
-  border-right:
-    1px solid
-    rgba(255, 255, 255, 0.25);
-
-  border-bottom: 1px solid #991b1b;
+  background: #b91c1c;
 
   color: #ffffff;
 
-  font-size: 11px;
+  padding: 11px 12px;
 
+  text-align: left;
+
+  font-size: 10px;
   font-weight: 700;
 
-  white-space: nowrap;
+  border-right:
+    1px solid rgba(255,255,255,.25);
 }
 
 th:last-child {
@@ -412,15 +360,14 @@ th:last-child {
 }
 
 td {
-  padding: 13px 14px;
+  padding: 10px 12px;
 
-  border-right: 1px solid #eaecf0;
-
-  border-bottom: 1px solid #eaecf0;
+  font-size: 11px;
 
   color: #475467;
 
-  font-size: 12px;
+  border-right: 1px solid #eaecf0;
+  border-bottom: 1px solid #eaecf0;
 
   white-space: nowrap;
 }
@@ -430,178 +377,84 @@ td:last-child {
 }
 
 tbody tr:hover {
-  background: #fff5f5;
+  background: #fff7f7;
 }
 
 tbody tr:last-child td {
   border-bottom: 0;
 }
 
-td strong {
-  color: #344054;
+.posicion {
+  font-weight: 700;
+  color: #b91c1c;
 }
 
 
-/* ======================================================
-   10. GRÁFICOS
-====================================================== */
+/* =====================================================
+   GRÁFICOS
+===================================================== */
 
-.graficos {
+.graficos-grid {
   display: grid;
 
   grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+    repeat(2, minmax(0, 1fr));
 
-  gap: 20px;
+  gap: 18px;
 
-  width: 100%;
+  margin-bottom: 18px;
+}
 
-  margin-top: 22px;
+.grafico-card {
+  min-width: 0;
 }
 
 .grafico {
-  background: #ffffff;
-
-  border: 1px solid #eaecf0;
-
-  border-radius: 14px;
-
-  padding: 18px 20px 15px 20px;
-
-  min-width: 0;
-
-  box-shadow:
-    0 1px 2px
-    rgba(16, 24, 40, 0.03);
-}
-
-.grafico-header {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  gap: 10px;
-
-  margin-bottom: 10px;
-}
-
-.grafico-header h2 {
-  margin: 0;
-
-  font-size: 16px;
-
-  font-weight: 700;
-
-  color: #1d2939;
-}
-
-.grafico-header span {
-  font-size: 11px;
-
-  color: #98a2b3;
-}
-
-
-/* ======================================================
-   11. ALTURA DE GRÁFICOS
-====================================================== */
-
-.grafico-contenido {
   position: relative;
 
-  width: 100%;
+  height: 280px;
 
-  height: 210px;
+  padding: 15px 20px 20px;
 }
 
-.grafico-contenido canvas {
+.grafico canvas {
   width: 100% !important;
-
   height: 100% !important;
 }
 
 
-/* ======================================================
-   12. % PAGO
-====================================================== */
+/* =====================================================
+   TOP / BOTTOM
+===================================================== */
 
-.pago-panel {
-  margin-top: 22px;
+.fila-maquinas {
+  display: grid;
 
-  background: #ffffff;
+  grid-template-columns:
+    1fr 1fr;
 
-  border: 1px solid #eaecf0;
+  gap: 18px;
 
-  border-radius: 14px;
-
-  padding: 20px;
-
-  box-shadow:
-    0 1px 2px
-    rgba(16, 24, 40, 0.03);
-}
-
-.pago-contenido {
-  min-height: 300px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 50px;
-}
-
-.grafico-pago {
-  width: 330px;
-
-  height: 290px;
-
-  position: relative;
-}
-
-.grafico-pago canvas {
-  width: 100% !important;
-
-  height: 100% !important;
-}
-
-.pago-valor {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 6px;
-
-  align-items: flex-start;
-}
-
-.pago-valor strong {
-  font-size: 34px;
-
-  line-height: 1;
-
-  color: #1d2939;
-}
-
-.pago-valor span {
-  font-size: 13px;
-
-  color: #667085;
+  margin-bottom: 18px;
 }
 
 
-/* ======================================================
-   13. SCROLLBAR
-====================================================== */
+/* =====================================================
+   DETALLE
+===================================================== */
+
+.detalle-panel {
+  margin-bottom: 20px;
+}
+
+
+/* =====================================================
+   SCROLLBAR
+===================================================== */
 
 ::-webkit-scrollbar {
-  width: 8px;
-
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -609,158 +462,97 @@ td strong {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d0d5dd;
-
+  background: #cfd4dc;
   border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #98a2b3;
-}
 
+/* =====================================================
+   TABLET
+===================================================== */
 
-/* ======================================================
-   14. TABLET
-====================================================== */
+@media (max-width: 1250px) {
 
-@media (max-width: 1200px) {
-
-  .contenedor {
-    padding: 22px;
-  }
-
-  .filtros {
+  .filtros-grid {
     grid-template-columns:
-      repeat(3, minmax(150px, 1fr));
+      repeat(3, 1fr);
   }
 
-  .tablas-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .graficos {
+  .kpis {
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+      repeat(3, 1fr);
+  }
+
+  .fila-principal {
+    grid-template-columns:
+      1fr;
   }
 
 }
 
 
-/* ======================================================
-   15. MÓVIL
-====================================================== */
+/* =====================================================
+   MÓVIL
+===================================================== */
 
 @media (max-width: 800px) {
 
-  .encabezado {
-    padding: 20px;
-
+  .topbar {
+    padding: 18px;
     flex-direction: column;
-
     align-items: flex-start;
   }
 
-  .encabezado h1 {
-    font-size: 23px;
+  .dashboard {
+    padding: 15px;
   }
 
-  .contenedor {
-    padding: 16px;
+  .filtros-grid {
+    grid-template-columns:
+      1fr;
   }
 
-  .barra-acciones {
+  .kpis {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .graficos-grid,
+  .fila-maquinas {
+    grid-template-columns:
+      1fr;
+  }
+
+  .resumen-bar {
     flex-direction: column;
-
     align-items: flex-start;
-  }
-
-  .filtros {
-    grid-template-columns: 1fr;
-  }
-
-  .tablas-grid {
-    grid-template-columns: 1fr;
-
-    gap: 16px;
-  }
-
-  .graficos {
-    grid-template-columns: 1fr;
-  }
-
-  .grafico-contenido {
-    height: 240px;
-  }
-
-  .pago-contenido {
-    flex-direction: column;
-
-    gap: 20px;
-
-    padding: 10px 0 25px 0;
-  }
-
-  .grafico-pago {
-    width: 100%;
-
-    max-width: 350px;
-
-    height: 280px;
-  }
-
-  .pago-valor {
-    align-items: center;
+    gap: 8px;
   }
 
 }
 
 
-/* ======================================================
-   16. MÓVIL PEQUEÑO
-====================================================== */
+/* =====================================================
+   MÓVIL PEQUEÑO
+===================================================== */
 
 @media (max-width: 480px) {
 
-  .encabezado {
-    padding: 17px;
+  .kpis {
+    grid-template-columns:
+      1fr;
   }
 
-  .encabezado h1 {
+  .topbar h1 {
     font-size: 21px;
   }
 
-  .contenedor {
-    padding: 12px;
-  }
-
   .grafico {
-    padding: 15px;
+    height: 260px;
   }
 
-  .grafico-header {
-    flex-direction: column;
-
-    align-items: flex-start;
-  }
-
-  .grafico-contenido {
-    height: 230px;
-  }
-
-  .pago-panel {
-    padding: 15px;
-  }
-
-  .pago-contenido {
-    min-height: auto;
-  }
-
-  .panel-header {
-    padding: 16px;
-  }
-
-  .tabla-contenedor {
-    max-height: 380px;
+  .grafico-grande {
+    height: 300px;
   }
 
 }
