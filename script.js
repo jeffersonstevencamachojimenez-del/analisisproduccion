@@ -1408,10 +1408,7 @@ function crearGraficoLinea(
         },
 
 
-        plugins: [
-          ChartDataLabels
-        ],
-
+     
 
         options: {
 
@@ -1465,54 +1462,7 @@ function crearGraficoLinea(
 
             },
 
-
-            datalabels: {
-
-              display:
-                true,
-
-              align:
-                "top",
-
-              anchor:
-                "end",
-
-              color:
-                "#667085",
-
-              font: {
-
-                size:
-                  10,
-
-                weight:
-                  "600"
-
-              },
-
-
-              formatter:
-                function (valor) {
-
-                  if (
-                    esTC
-                  ) {
-
-                    return Number(
-                      valor
-                    ).toFixed(2);
-
-                  }
-
-
-                  return formatearNumero(
-                    valor
-                  );
-
-                }
-
-            },
-
+         
 
             tooltip: {
 
