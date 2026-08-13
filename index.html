@@ -9,18 +9,21 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Análisis Producción</title>
+  <title>Análisis de Producción</title>
 
   <link rel="stylesheet" href="style.css">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Plugin para mostrar etiquetas -->
+  <!-- Etiquetas de datos -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
 </head>
 
+
 <body>
+
 
   <!-- =====================================================
        ENCABEZADO
@@ -29,12 +32,17 @@
   <header class="encabezado">
 
     <div>
-      <h1>Análisis de Producción</h1>
+
+      <h1>
+        Análisis de Producción
+      </h1>
 
       <p>
         Dashboard conectado directamente a Google Sheets
       </p>
+
     </div>
+
 
     <div class="conexion">
 
@@ -44,7 +52,7 @@
       ></span>
 
       <span id="textoConexion">
-        Conectando...
+        Conectando con Google Sheets...
       </span>
 
     </div>
@@ -52,20 +60,22 @@
   </header>
 
 
+
   <!-- =====================================================
-       CONTENEDOR
+       CONTENEDOR PRINCIPAL
   ====================================================== -->
 
   <main class="contenedor">
 
 
+
     <!-- ===================================================
-         BARRA
+         BARRA SUPERIOR
     ==================================================== -->
 
     <section class="barra-acciones">
 
-      <div>
+      <div class="contador">
 
         <strong id="contadorResultados">
           0
@@ -76,6 +86,7 @@
         </span>
 
       </div>
+
 
       <div class="acciones">
 
@@ -91,11 +102,15 @@
     </section>
 
 
+
     <!-- ===================================================
          FILTROS
     ==================================================== -->
 
     <section class="filtros">
+
+
+      <!-- SALA -->
 
       <div class="filtro">
 
@@ -104,13 +119,18 @@
         </label>
 
         <select id="filtroSala">
+
           <option value="">
             Todas las salas
           </option>
+
         </select>
 
       </div>
 
+
+
+      <!-- MES -->
 
       <div class="filtro">
 
@@ -119,13 +139,18 @@
         </label>
 
         <select id="filtroMes">
+
           <option value="">
             Todos los meses
           </option>
+
         </select>
 
       </div>
 
+
+
+      <!-- MODELO -->
 
       <div class="filtro">
 
@@ -134,13 +159,18 @@
         </label>
 
         <select id="filtroModelo">
+
           <option value="">
             Todos los modelos
           </option>
+
         </select>
 
       </div>
 
+
+
+      <!-- NÚMERO -->
 
       <div class="filtro">
 
@@ -149,13 +179,18 @@
         </label>
 
         <select id="filtroNumero">
+
           <option value="">
             Todas las máquinas
           </option>
+
         </select>
 
       </div>
 
+
+
+      <!-- JUEGO -->
 
       <div class="filtro">
 
@@ -164,13 +199,18 @@
         </label>
 
         <select id="filtroJuego">
+
           <option value="">
             Todos los juegos
           </option>
+
         </select>
 
       </div>
 
+
+
+      <!-- LIMPIAR -->
 
       <button
         id="btnLimpiar"
@@ -183,6 +223,7 @@
     </section>
 
 
+
     <!-- ===================================================
          GRÁFICOS
     ==================================================== -->
@@ -190,150 +231,210 @@
     <section class="graficos">
 
 
-      <!-- GRÁFICO 1 -->
+
+      <!-- =================================================
+           GRÁFICO 1
+      ================================================== -->
 
       <article class="grafico">
 
         <div class="grafico-header">
 
-          <h2>
-            COIN PROM
-          </h2>
+          <div>
 
-          <span>
-            Promedio mensual
-          </span>
+            <h2>
+              COIN PROM
+            </h2>
+
+            <span>
+              Promedio mensual
+            </span>
+
+          </div>
 
         </div>
 
+
         <div class="grafico-contenido">
 
-          <canvas id="graficoCoinProm"></canvas>
+          <canvas
+            id="graficoCoinProm"
+          ></canvas>
 
         </div>
 
       </article>
 
 
-      <!-- GRÁFICO 2 -->
+
+      <!-- =================================================
+           GRÁFICO 2
+      ================================================== -->
 
       <article class="grafico">
 
         <div class="grafico-header">
 
-          <h2>
-            VENTA PROM
-          </h2>
+          <div>
 
-          <span>
-            Promedio mensual
-          </span>
+            <h2>
+              VENTA PROM
+            </h2>
+
+            <span>
+              Promedio mensual
+            </span>
+
+          </div>
 
         </div>
 
+
         <div class="grafico-contenido">
 
-          <canvas id="graficoVentaProm"></canvas>
+          <canvas
+            id="graficoVentaProm"
+          ></canvas>
 
         </div>
 
       </article>
 
 
-      <!-- GRÁFICO 3 -->
+
+      <!-- =================================================
+           GRÁFICO 3
+      ================================================== -->
 
       <article class="grafico">
 
         <div class="grafico-header">
 
-          <h2>
-            COIN TOTAL
-          </h2>
+          <div>
 
-          <span>
-            Total mensual
-          </span>
+            <h2>
+              COIN TOTAL
+            </h2>
+
+            <span>
+              Total mensual
+            </span>
+
+          </div>
 
         </div>
 
+
         <div class="grafico-contenido">
 
-          <canvas id="graficoCoinTotal"></canvas>
+          <canvas
+            id="graficoCoinTotal"
+          ></canvas>
 
         </div>
 
       </article>
 
 
-      <!-- GRÁFICO 4 -->
+
+      <!-- =================================================
+           GRÁFICO 4
+      ================================================== -->
 
       <article class="grafico">
 
         <div class="grafico-header">
 
-          <h2>
-            VENTA TOTAL
-          </h2>
+          <div>
 
-          <span>
-            Total mensual
-          </span>
+            <h2>
+              VENTA TOTAL
+            </h2>
+
+            <span>
+              Total mensual
+            </span>
+
+          </div>
 
         </div>
 
+
         <div class="grafico-contenido">
 
-          <canvas id="graficoVentaTotal"></canvas>
+          <canvas
+            id="graficoVentaTotal"
+          ></canvas>
 
         </div>
 
       </article>
 
 
-      <!-- GRÁFICO 5 -->
+
+      <!-- =================================================
+           GRÁFICO 5
+      ================================================== -->
 
       <article class="grafico">
 
         <div class="grafico-header">
 
-          <h2>
-            NETWIN ($)
-          </h2>
+          <div>
 
-          <span>
-            Total mensual
-          </span>
+            <h2>
+              NETWIN ($)
+            </h2>
+
+            <span>
+              Total mensual
+            </span>
+
+          </div>
 
         </div>
 
+
         <div class="grafico-contenido">
 
-          <canvas id="graficoNetwin"></canvas>
+          <canvas
+            id="graficoNetwin"
+          ></canvas>
 
         </div>
 
       </article>
 
 
-      <!-- GRÁFICO 6 -->
+
+      <!-- =================================================
+           GRÁFICO 6
+      ================================================== -->
 
       <article class="grafico">
 
         <div class="grafico-header">
 
-          <h2>
-            T.C.
-          </h2>
+          <div>
 
-          <span>
-            Promedio mensual
-          </span>
+            <h2>
+              T.C.
+            </h2>
+
+            <span>
+              Promedio mensual
+            </span>
+
+          </div>
 
         </div>
 
+
         <div class="grafico-contenido">
 
-          <canvas id="graficoTC"></canvas>
+          <canvas
+            id="graficoTC"
+          ></canvas>
 
         </div>
 
@@ -343,31 +444,43 @@
     </section>
 
 
+
     <!-- ===================================================
-         % PAGO
+         GRÁFICO % PAGO
     ==================================================== -->
 
     <section class="pago-panel">
 
+
       <div class="grafico-header">
 
-        <h2>
-          Porcentaje de Pago
-        </h2>
+        <div>
 
-        <span>
-          % PAGO vs. porcentaje restante
-        </span>
+          <h2>
+            Porcentaje de Pago
+          </h2>
+
+          <span>
+            % PAGO vs. porcentaje restante
+          </span>
+
+        </div>
 
       </div>
 
+
+
       <div class="pago-contenido">
+
 
         <div class="grafico-pago">
 
-          <canvas id="graficoPago"></canvas>
+          <canvas
+            id="graficoPago"
+          ></canvas>
 
         </div>
+
 
         <div class="pago-valor">
 
@@ -381,9 +494,11 @@
 
         </div>
 
+
       </div>
 
     </section>
+
 
 
     <!-- ===================================================
@@ -391,6 +506,7 @@
     ==================================================== -->
 
     <section class="panel">
+
 
       <div class="panel-header">
 
@@ -409,9 +525,12 @@
       </div>
 
 
+
       <div class="tabla-contenedor">
 
+
         <table>
+
 
           <thead>
 
@@ -453,21 +572,31 @@
 
           </thead>
 
+
           <tbody id="tablaCuerpo">
 
           </tbody>
 
+
         </table>
+
 
       </div>
 
     </section>
 
 
+
   </main>
 
 
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+
   <script src="script.js"></script>
+
 
 </body>
 
