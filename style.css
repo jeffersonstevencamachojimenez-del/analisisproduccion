@@ -1,6 +1,6 @@
-/* ======================================================
+/* =====================================================
    GENERAL
-====================================================== */
+===================================================== */
 
 * {
   box-sizing: border-box;
@@ -12,44 +12,47 @@
 
   --panel: #ffffff;
 
-  --texto: #273142;
+  --borde: #e5e9ef;
 
-  --texto-secundario: #788397;
+  --texto: #263238;
 
-  --borde: #e7ebf0;
-
-  --azul-pastel: #9ecae1;
-
-  --verde-pastel: #a8d5ba;
-
-  --amarillo-pastel: #f5d98b;
-
-  --morado-pastel: #c9b6dc;
-
-  --rosa-pastel: #e8b4c3;
-
-  --naranja-pastel: #efc39b;
-
-  --verde: #5ca77d;
-
-  --rojo: #dc7777;
+  --texto-secundario: #75808f;
 
   --sombra:
-    0 4px 18px rgba(40, 55, 75, .07);
+    0 4px 18px rgba(50, 60, 80, 0.08);
+
+  --rojo: #e9a6a6;
+
+  --azul: #a8cbe3;
+
+  --verde: #abd9c0;
+
+  --amarillo: #f3d79b;
+
+  --morado: #cbb5df;
+
+  --naranja: #e7bd9d;
+
+  --rosa: #e4b1c0;
+
 }
 
 
-/* ======================================================
+/* =====================================================
    BODY
-====================================================== */
+===================================================== */
 
 html {
+
   background: #ffffff;
+
 }
 
 body {
 
   margin: 0;
+
+  min-height: 100vh;
 
   font-family:
     Arial,
@@ -60,25 +63,22 @@ body {
 
   color: var(--texto);
 
-  min-height: 100vh;
 }
 
 
-/* ======================================================
+/* =====================================================
    ENCABEZADO
-====================================================== */
+===================================================== */
 
 .encabezado {
 
   background: #ffffff;
 
-  padding:
-    22px 4%;
+  padding: 22px 4%;
 
   display: flex;
 
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   align-items: center;
 
@@ -87,6 +87,9 @@ body {
   border-bottom:
     1px solid var(--borde);
 
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.04);
+
 }
 
 
@@ -94,31 +97,27 @@ body {
 
   margin: 0;
 
-  font-size: 27px;
+  font-size: 28px;
 
-  font-weight: 700;
-
-  color: #273142;
+  color: #344054;
 
 }
 
 
 .encabezado p {
 
-  margin:
-    6px 0 0;
+  margin: 6px 0 0;
 
-  color:
-    var(--texto-secundario);
+  color: var(--texto-secundario);
 
   font-size: 14px;
 
 }
 
 
-/* ======================================================
+/* =====================================================
    CONEXIÓN
-====================================================== */
+===================================================== */
 
 .conexion {
 
@@ -128,40 +127,38 @@ body {
 
   gap: 8px;
 
-  background: #f7f9fb;
+  padding: 9px 14px;
 
   border:
     1px solid var(--borde);
 
-  padding:
-    8px 13px;
-
   border-radius: 20px;
+
+  background: #fafbfc;
 
   font-size: 13px;
 
-  color: #5f6b7d;
+  color: #5d6878;
 
 }
 
 
 .punto {
 
-  width: 9px;
+  width: 10px;
 
-  height: 9px;
+  height: 10px;
 
   border-radius: 50%;
 
-  background:
-    #f2b84b;
+  background: #f2b84b;
 
 }
 
 
-/* ======================================================
+/* =====================================================
    CONTENEDOR
-====================================================== */
+===================================================== */
 
 .contenedor {
 
@@ -169,67 +166,69 @@ body {
 
   max-width: 1500px;
 
-  margin:
-    24px auto;
+  margin: 24px auto;
 
 }
 
 
-/* ======================================================
-   BARRA ACCIONES
-====================================================== */
+/* =====================================================
+   BARRA
+===================================================== */
 
 .barra-acciones {
 
-  background:
-    #ffffff;
+  background: #ffffff;
 
   border:
     1px solid var(--borde);
 
   border-radius: 12px;
 
-  padding:
-    14px 18px;
+  padding: 14px 18px;
 
   margin-bottom: 18px;
 
   display: flex;
 
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   align-items: center;
 
-  box-shadow:
-    var(--sombra);
+  box-shadow: var(--sombra);
 
 }
 
 
 .barra-acciones strong {
 
-  font-size: 24px;
+  font-size: 25px;
 
-  color:
-    #526b82;
+  color: #526779;
 
 }
 
 
 .barra-acciones span {
 
-  color:
-    var(--texto-secundario);
+  color: var(--texto-secundario);
 
   font-size: 13px;
 
 }
 
 
-/* ======================================================
+.acciones {
+
+  display: flex;
+
+  gap: 10px;
+
+}
+
+
+/* =====================================================
    BOTONES
-====================================================== */
+===================================================== */
 
 button {
 
@@ -239,21 +238,18 @@ button {
 
   font-family: inherit;
 
-  transition:
-    .2s;
+  transition: 0.2s;
 
 }
 
 
 #btnActualizar {
 
-  background:
-    #e8a1ad;
+  background: #b7cfe0;
 
-  color: #ffffff;
+  color: #314554;
 
-  padding:
-    10px 18px;
+  padding: 10px 18px;
 
   border-radius: 8px;
 
@@ -264,82 +260,222 @@ button {
 
 #btnActualizar:hover {
 
-  background:
-    #d88f9d;
+  background: #a5c3d8;
 
-  transform:
-    translateY(-1px);
+  transform: translateY(-1px);
 
 }
 
 
-/* ======================================================
-   KPI
-====================================================== */
+/* =====================================================
+   FILTROS
+===================================================== */
 
-.tarjetas {
+.filtros {
+
+  background: #ffffff;
+
+  padding: 17px;
+
+  border:
+    1px solid var(--borde);
+
+  border-radius: 12px;
 
   display: grid;
 
   grid-template-columns:
-    repeat(6, 1fr);
+    1.5fr
+    1fr
+    1fr
+    1fr
+    1fr
+    auto;
 
-  gap: 15px;
+  gap: 12px;
+
+  align-items: end;
+
+  margin-bottom: 20px;
+
+  box-shadow: var(--sombra);
+
+}
+
+
+.filtro label {
+
+  display: block;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  color: #697586;
+
+  margin-bottom: 6px;
+
+}
+
+
+.filtro select {
+
+  width: 100%;
+
+  height: 38px;
+
+  padding: 0 10px;
+
+  border:
+    1px solid #dce2e9;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #344054;
+
+  outline: none;
+
+}
+
+
+.filtro select:focus {
+
+  border-color: #a8cbe3;
+
+  box-shadow:
+    0 0 0 2px rgba(168, 203, 227, 0.18);
+
+}
+
+
+.btn-limpiar {
+
+  height: 38px;
+
+  padding: 0 15px;
+
+  border-radius: 7px;
+
+  background: #f3f5f7;
+
+  border:
+    1px solid #dce2e9;
+
+  color: #596579;
+
+  font-weight: 600;
+
+}
+
+
+.btn-limpiar:hover {
+
+  background: #e9edf1;
+
+}
+
+
+/* =====================================================
+   GRÁFICOS
+===================================================== */
+
+.graficos {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 18px;
 
   margin-bottom: 20px;
 
 }
 
 
-.tarjeta {
+.grafico {
 
-  background:
-    #ffffff;
-
-  border-radius:
-    12px;
-
-  padding:
-    18px;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 14px;
-
-  min-height:
-    105px;
+  background: #ffffff;
 
   border:
     1px solid var(--borde);
 
-  box-shadow:
-    var(--sombra);
+  border-radius: 12px;
 
-  transition:
-    .2s;
+  padding: 18px;
 
-}
+  min-height: 350px;
 
-
-.tarjeta:hover {
-
-  transform:
-    translateY(-2px);
-
-  box-shadow:
-    0 7px 22px
-    rgba(40, 55, 75, .10);
+  box-shadow: var(--sombra);
 
 }
 
 
-.icono {
+.grafico-header {
 
-  width: 44px;
+  margin-bottom: 12px;
 
-  height: 44px;
+}
+
+
+.grafico-header h2 {
+
+  margin: 0;
+
+  font-size: 17px;
+
+  color: #344054;
+
+}
+
+
+.grafico-header span {
+
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 12px;
+
+  color: var(--texto-secundario);
+
+}
+
+
+.grafico-contenido {
+
+  height: 280px;
+
+  position: relative;
+
+}
+
+
+/* =====================================================
+   PANEL % PAGO
+===================================================== */
+
+.pago-panel {
+
+  background: #ffffff;
+
+  border:
+    1px solid var(--borde);
+
+  border-radius: 12px;
+
+  padding: 20px;
+
+  margin-bottom: 20px;
+
+  box-shadow: var(--sombra);
+
+}
+
+
+.pago-contenido {
 
   display: flex;
 
@@ -347,318 +483,74 @@ button {
 
   justify-content: center;
 
-  background:
-    #f3f7fa;
-
-  border:
-    1px solid #e4eaf0;
-
-  border-radius:
-    10px;
-
-  font-size:
-    19px;
-
-  color:
-    #6d8398;
+  gap: 50px;
 
 }
 
 
-.titulo {
+.grafico-pago {
 
-  display: block;
+  width: 340px;
 
-  color:
-    var(--texto-secundario);
+  height: 340px;
 
-  font-size:
-    10px;
-
-  font-weight:
-    700;
-
-  margin-bottom:
-    5px;
+  position: relative;
 
 }
 
 
-.tarjeta strong {
+.pago-valor {
 
-  display: block;
+  display: flex;
 
-  font-size:
-    23px;
+  flex-direction: column;
 
-  color:
-    #303b4b;
+  gap: 6px;
 
 }
 
 
-/* ======================================================
-   FILTROS
-====================================================== */
+.pago-valor strong {
 
-.filtros {
+  font-size: 34px;
 
-  background:
-    #ffffff;
-
-  padding:
-    17px;
-
-  border:
-    1px solid var(--borde);
-
-  border-radius:
-    12px;
-
-  display: grid;
-
-  grid-template-columns:
-    1.3fr
-    1fr
-    1.3fr
-    1fr
-    1.2fr
-    auto;
-
-  gap:
-    12px;
-
-  align-items:
-    end;
-
-  margin-bottom:
-    20px;
-
-  box-shadow:
-    var(--sombra);
+  color: #526779;
 
 }
 
 
-.filtro label {
+.pago-valor span {
 
-  display:
-    block;
+  color: var(--texto-secundario);
 
-  font-size:
-    10px;
-
-  font-weight:
-    700;
-
-  color:
-    #7c8797;
-
-  margin-bottom:
-    6px;
+  font-size: 13px;
 
 }
 
 
-.filtro select {
-
-  width:
-    100%;
-
-  height:
-    38px;
-
-  padding:
-    0 10px;
-
-  border:
-    1px solid #dfe5eb;
-
-  border-radius:
-    7px;
-
-  background:
-    #ffffff;
-
-  color:
-    #465366;
-
-  outline:
-    none;
-
-}
-
-
-.filtro select:focus {
-
-  border-color:
-    #a9c4d8;
-
-  box-shadow:
-    0 0 0 2px
-    rgba(169, 196, 216, .18);
-
-}
-
-
-.filtro select option {
-
-  background:
-    #ffffff;
-
-  color:
-    #465366;
-
-}
-
-
-.btn-limpiar {
-
-  height:
-    38px;
-
-  padding:
-    0 15px;
-
-  border-radius:
-    7px;
-
-  background:
-    #f3f5f7;
-
-  border:
-    1px solid #dfe5eb;
-
-  color:
-    #657184;
-
-  font-weight:
-    600;
-
-}
-
-
-.btn-limpiar:hover {
-
-  background:
-    #e9edf1;
-
-}
-
-
-/* ======================================================
-   GRÁFICO
-====================================================== */
-
-.grafico {
-
-  background:
-    #ffffff;
-
-  border:
-    1px solid var(--borde);
-
-  border-radius:
-    12px;
-
-  padding:
-    18px;
-
-  min-height:
-    320px;
-
-  box-shadow:
-    var(--sombra);
-
-  margin-bottom:
-    20px;
-
-}
-
-
-.grafico-grande {
-
-  min-height:
-    500px;
-
-}
-
-
-.grafico-header {
-
-  margin-bottom:
-    10px;
-
-}
-
-
-.grafico-header h2 {
-
-  margin:
-    0;
-
-  font-size:
-    17px;
-
-  color:
-    #303b4b;
-
-}
-
-
-.grafico-header p {
-
-  margin:
-    5px 0 0;
-
-  font-size:
-    12px;
-
-  color:
-    var(--texto-secundario);
-
-}
-
-
-.grafico-contenido {
-
-  height:
-    400px;
-
-  position:
-    relative;
-
-}
-
-
-/* ======================================================
+/* =====================================================
    TABLA
-====================================================== */
+===================================================== */
 
 .panel {
 
-  background:
-    #ffffff;
+  background: #ffffff;
 
   border:
     1px solid var(--borde);
 
-  border-radius:
-    12px;
+  border-radius: 12px;
 
-  overflow:
-    hidden;
+  overflow: hidden;
 
-  box-shadow:
-    var(--sombra);
+  box-shadow: var(--sombra);
 
 }
 
 
 .panel-header {
 
-  padding:
-    18px 20px;
+  padding: 18px 20px;
 
   border-bottom:
     1px solid var(--borde);
@@ -668,335 +560,222 @@ button {
 
 .panel-header h2 {
 
-  margin:
-    0;
+  margin: 0;
 
-  font-size:
-    18px;
+  font-size: 18px;
 
-  color:
-    #303b4b;
+  color: #344054;
 
 }
 
 
 .panel-header span {
 
-  display:
-    block;
+  display: block;
 
-  margin-top:
-    4px;
+  margin-top: 4px;
 
-  color:
-    var(--texto-secundario);
+  color: var(--texto-secundario);
 
-  font-size:
-    12px;
+  font-size: 12px;
 
 }
 
 
 .tabla-contenedor {
 
-  width:
-    100%;
+  width: 100%;
 
-  overflow-x:
-    auto;
-
-  max-height:
-    600px;
-
-  overflow-y:
-    auto;
+  overflow-x: auto;
 
 }
 
 
 table {
 
-  width:
-    100%;
+  width: 100%;
 
-  border-collapse:
-    collapse;
+  border-collapse: collapse;
 
-  min-width:
-    900px;
+  min-width: 900px;
 
 }
 
 
 thead th {
 
-  position:
-    sticky;
+  background: #f7f9fb;
 
-  top:
-    0;
+  color: #667085;
 
-  z-index:
-    2;
+  padding: 12px 10px;
 
-  background:
-    #f7f9fb;
+  font-size: 11px;
 
-  color:
-    #65768a;
+  text-align: left;
 
-  padding:
-    12px 10px;
-
-  font-size:
-    11px;
-
-  text-align:
-    left;
-
-  white-space:
-    nowrap;
+  white-space: nowrap;
 
   border-bottom:
-    1px solid #e5e9ee;
+    1px solid var(--borde);
 
 }
 
 
 tbody td {
 
-  padding:
-    11px 10px;
+  padding: 11px 10px;
 
-  font-size:
-    12px;
+  font-size: 12px;
 
   border-bottom:
-    1px solid #edf0f3;
+    1px solid #eef1f4;
 
-  white-space:
-    nowrap;
+  white-space: nowrap;
 
-  color:
-    #4c596b;
-
-}
-
-
-tbody tr {
-
-  transition:
-    .15s;
+  color: #475467;
 
 }
 
 
 tbody tr:hover {
 
-  background:
-    #fafbfd;
+  background: #fafbfd;
 
 }
 
 
-/* ======================================================
+/* =====================================================
    SCROLL
-====================================================== */
+===================================================== */
 
 ::-webkit-scrollbar {
 
-  width:
-    8px;
+  width: 8px;
 
-  height:
-    8px;
+  height: 8px;
 
 }
 
 
 ::-webkit-scrollbar-track {
 
-  background:
-    #f5f6f8;
+  background: #f4f6f8;
 
 }
 
 
 ::-webkit-scrollbar-thumb {
 
-  background:
-    #cbd3dc;
+  background: #c9d1da;
 
-  border-radius:
-    10px;
+  border-radius: 10px;
 
 }
 
 
-/* ======================================================
+/* =====================================================
    RESPONSIVE
-====================================================== */
+===================================================== */
 
-@media (max-width: 1200px) {
-
-  .tarjetas {
-
-    grid-template-columns:
-      repeat(3, 1fr);
-
-  }
-
+@media (max-width: 1100px) {
 
   .filtros {
 
     grid-template-columns:
-      repeat(3, 1fr);
+      1fr 1fr 1fr;
 
   }
 
 }
 
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
+
+  .graficos {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .pago-contenido {
+
+    flex-direction: column;
+
+    gap: 20px;
+
+  }
+
+}
+
+
+@media (max-width: 600px) {
 
   .encabezado {
 
-    flex-direction:
-      column;
+    flex-direction: column;
 
-    align-items:
-      flex-start;
+    align-items: flex-start;
 
-    padding:
-      18px;
+    padding: 18px;
 
   }
-
-
-  .encabezado h1 {
-
-    font-size:
-      22px;
-
-  }
-
 
   .conexion {
 
-    width:
-      100%;
+    width: 100%;
 
-    justify-content:
-      center;
+    justify-content: center;
 
   }
-
 
   .contenedor {
 
-    width:
-      96%;
+    width: 96%;
 
-    margin:
-      15px auto;
+    margin: 15px auto;
 
   }
-
 
   .barra-acciones {
 
-    flex-direction:
-      column;
+    flex-direction: column;
 
-    align-items:
-      stretch;
+    align-items: stretch;
 
-    gap:
-      12px;
+    gap: 12px;
 
   }
-
 
   #btnActualizar {
 
-    width:
-      100%;
+    width: 100%;
 
   }
-
-
-  .tarjetas {
-
-    grid-template-columns:
-      1fr 1fr;
-
-    gap:
-      10px;
-
-  }
-
-
-  .tarjeta {
-
-    padding:
-      13px;
-
-    min-height:
-      90px;
-
-  }
-
-
-  .tarjeta .icono {
-
-    width:
-      36px;
-
-    height:
-      36px;
-
-    font-size:
-      16px;
-
-  }
-
-
-  .tarjeta strong {
-
-    font-size:
-      19px;
-
-  }
-
 
   .filtros {
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
 
   }
 
+  .grafico {
 
-  .btn-limpiar {
-
-    width:
-      100%;
+    min-height: 330px;
 
   }
-
-
-  .grafico-grande {
-
-    min-height:
-      430px;
-
-  }
-
 
   .grafico-contenido {
 
-    height:
-      340px;
+    height: 270px;
+
+  }
+
+  .grafico-pago {
+
+    width: 280px;
+
+    height: 280px;
 
   }
 
