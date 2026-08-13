@@ -320,6 +320,30 @@ body {
 }
 
 
+/* FILTRO INDICADOR */
+
+#filtroIndicador {
+
+  font-weight: 600;
+
+  border-color:
+    #d0d5dd;
+
+}
+
+
+#filtroIndicador:focus {
+
+  border-color:
+    #b91c1c;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(185, 28, 28, 0.10);
+
+}
+
+
 .btn-limpiar {
 
   min-height: 40px;
@@ -385,7 +409,8 @@ body {
 
   border-radius: 14px;
 
-  padding: 18px 20px 15px 20px;
+  padding:
+    18px 20px 15px 20px;
 
   min-width: 0;
 
@@ -555,12 +580,33 @@ body {
 
 
 /* ======================================================
-   12. PANEL TABLA
+   12. CONTENEDOR DE LAS DOS TABLAS
+====================================================== */
+
+.tablas-lado {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 20px;
+
+  width: 100%;
+
+  margin-top: 22px;
+
+  align-items: start;
+
+}
+
+
+/* ======================================================
+   13. PANEL TABLA
 ====================================================== */
 
 .panel {
-
-  margin-top: 22px;
 
   background: #ffffff;
 
@@ -591,7 +637,8 @@ body {
 
 .panel-header h2 {
 
-  margin: 0 0 5px 0;
+  margin:
+    0 0 5px 0;
 
   font-size: 17px;
 
@@ -610,7 +657,7 @@ body {
 
 
 /* ======================================================
-   13. TABLA
+   14. TABLA
 ====================================================== */
 
 .tabla-contenedor {
@@ -628,16 +675,19 @@ table {
 
   border-collapse: collapse;
 
-  min-width: 850px;
+  min-width: 600px;
 
 }
 
 
-/* ENCABEZADO ROJO */
+/* ======================================================
+   ENCABEZADO ROJO
+====================================================== */
 
 thead {
 
-  background: #b91c1c;
+  background:
+    #b91c1c;
 
 }
 
@@ -653,30 +703,38 @@ th {
     1px solid #991b1b;
 
   border-right:
-    1px solid rgba(255, 255, 255, 0.25);
+    1px solid
+    rgba(255, 255, 255, 0.25);
 
   border-bottom:
     1px solid #991b1b;
 
-  color: #ffffff;
+  color:
+    #ffffff;
 
-  font-size: 11px;
+  font-size:
+    11px;
 
-  font-weight: 700;
+  font-weight:
+    700;
 
-  white-space: nowrap;
+  white-space:
+    nowrap;
 
 }
 
 
 th:last-child {
 
-  border-right: 0;
+  border-right:
+    0;
 
 }
 
 
-/* CELDAS */
+/* ======================================================
+   CELDAS
+====================================================== */
 
 td {
 
@@ -689,85 +747,166 @@ td {
   border-bottom:
     1px solid #eaecf0;
 
-  color: #475467;
+  color:
+    #475467;
 
-  font-size: 12px;
+  font-size:
+    12px;
 
-  white-space: nowrap;
+  white-space:
+    nowrap;
 
 }
 
 
 td:last-child {
 
-  border-right: 0;
+  border-right:
+    0;
 
 }
 
 
-/* EFECTO AL PASAR EL MOUSE */
+/* ======================================================
+   EFECTO FILA
+====================================================== */
 
 tbody tr:hover {
 
-  background: #fff5f5;
+  background:
+    #fff5f5;
 
 }
 
 
-/* ÚLTIMA FILA */
-
 tbody tr:last-child td {
 
-  border-bottom: 0;
+  border-bottom:
+    0;
 
 }
 
 
 td strong {
 
-  color: #344054;
+  color:
+    #344054;
 
 }
 
 
 /* ======================================================
-   14. SCROLLBAR
+   15. TABLA DE DETALLE POR MÁQUINA
+====================================================== */
+
+.panel-secundario {
+
+  min-width:
+    0;
+
+}
+
+
+.panel-secundario table {
+
+  min-width:
+    650px;
+
+}
+
+
+.panel-secundario th {
+
+  text-align:
+    left;
+
+}
+
+
+.panel-secundario td {
+
+  vertical-align:
+    middle;
+
+}
+
+
+/* NÚMERO DE MÁQUINAS */
+
+.panel-secundario td:nth-child(3) {
+
+  text-align:
+    center;
+
+  font-weight:
+    700;
+
+  color:
+    #344054;
+
+}
+
+
+/* INDICADOR */
+
+.panel-secundario td:nth-child(5) {
+
+  text-align:
+    right;
+
+  font-weight:
+    700;
+
+  color:
+    #344054;
+
+}
+
+
+/* ======================================================
+   16. SCROLLBAR
 ====================================================== */
 
 ::-webkit-scrollbar {
 
-  width: 8px;
+  width:
+    8px;
 
-  height: 8px;
+  height:
+    8px;
 
 }
 
 
 ::-webkit-scrollbar-track {
 
-  background: #f2f4f7;
+  background:
+    #f2f4f7;
 
 }
 
 
 ::-webkit-scrollbar-thumb {
 
-  background: #d0d5dd;
+  background:
+    #d0d5dd;
 
-  border-radius: 10px;
+  border-radius:
+    10px;
 
 }
 
 
 ::-webkit-scrollbar-thumb:hover {
 
-  background: #98a2b3;
+  background:
+    #98a2b3;
 
 }
 
 
 /* ======================================================
-   15. RESPONSIVE - TABLET
+   17. RESPONSIVE - TABLET
 ====================================================== */
 
 @media (
@@ -797,11 +936,19 @@ td strong {
 
   }
 
+
+  .tablas-lado {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
 }
 
 
 /* ======================================================
-   16. RESPONSIVE - MÓVIL
+   18. RESPONSIVE - MÓVIL
 ====================================================== */
 
 @media (
@@ -813,16 +960,19 @@ td strong {
     padding:
       20px;
 
-    flex-direction: column;
+    flex-direction:
+      column;
 
-    align-items: flex-start;
+    align-items:
+      flex-start;
 
   }
 
 
   .encabezado h1 {
 
-    font-size: 23px;
+    font-size:
+      23px;
 
   }
 
@@ -837,9 +987,11 @@ td strong {
 
   .barra-acciones {
 
-    flex-direction: column;
+    flex-direction:
+      column;
 
-    align-items: flex-start;
+    align-items:
+      flex-start;
 
   }
 
@@ -862,16 +1014,19 @@ td strong {
 
   .grafico-contenido {
 
-    height: 300px;
+    height:
+      300px;
 
   }
 
 
   .pago-contenido {
 
-    flex-direction: column;
+    flex-direction:
+      column;
 
-    gap: 20px;
+    gap:
+      20px;
 
     padding:
       10px 0 25px 0;
@@ -881,18 +1036,38 @@ td strong {
 
   .grafico-pago {
 
-    width: 100%;
+    width:
+      100%;
 
-    max-width: 350px;
+    max-width:
+      350px;
 
-    height: 300px;
+    height:
+      300px;
 
   }
 
 
   .pago-valor {
 
-    align-items: center;
+    align-items:
+      center;
+
+  }
+
+
+  .tablas-lado {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .panel-secundario {
+
+    width:
+      100%;
 
   }
 
@@ -900,7 +1075,7 @@ td strong {
 
 
 /* ======================================================
-   17. MÓVIL PEQUEÑO
+   19. MÓVIL PEQUEÑO
 ====================================================== */
 
 @media (
@@ -917,7 +1092,8 @@ td strong {
 
   .encabezado h1 {
 
-    font-size: 21px;
+    font-size:
+      21px;
 
   }
 
@@ -940,16 +1116,19 @@ td strong {
 
   .grafico-header {
 
-    flex-direction: column;
+    flex-direction:
+      column;
 
-    align-items: flex-start;
+    align-items:
+      flex-start;
 
   }
 
 
   .grafico-contenido {
 
-    height: 270px;
+    height:
+      270px;
 
   }
 
@@ -966,6 +1145,30 @@ td strong {
 
     min-height:
       auto;
+
+  }
+
+
+  .panel-header {
+
+    padding:
+      16px;
+
+  }
+
+
+  th {
+
+    padding:
+      11px 12px;
+
+  }
+
+
+  td {
+
+    padding:
+      11px 12px;
 
   }
 
