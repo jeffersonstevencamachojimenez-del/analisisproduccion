@@ -1,1 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Dashboard DATA 2026
+  </title>
+
+
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+
+  <!-- CHART.JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+  </script>
+
+</head>
+
+
+<body>
+
+
+  <!-- ==================================================
+       ENCABEZADO
+  =================================================== -->
+
+  <header class="encabezado">
+
+    <div>
+
+      <h1>
+        Dashboard DATA
+      </h1>
+
+      <p>
+        Análisis de rendimiento de máquinas · 2026
+      </p>
+
+    </div>
+
+
+    <div class="conexion">
+
+      <span
+        id="indicadorConexion"
+        class="punto">
+      </span>
+
+      <span id="textoConexion">
+        Conectando...
+      </span>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- ==================================================
+       CONTENEDOR PRINCIPAL
+  =================================================== -->
+
+  <main class="contenedor">
+
+
+    <!-- ==================================================
+         BARRA SUPERIOR
+    =================================================== -->
+
+    <section class="barra-superior">
+
+      <div>
+
+        <strong id="contadorResultados">
+          0
+        </strong>
+
+        <span>
+          registros encontrados
+        </span>
+
+      </div>
+
+
+      <button
+        id="btnActualizar"
+        type="button"
+      >
+
+        ↻ Actualizar
+
+      </button>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         FILTROS
+    =================================================== -->
+
+    <section class="filtros">
+
+
+      <!-- SALA -->
+
+      <div class="filtro">
+
+        <label for="filtroSala">
+          SALA / LOCAL
+        </label>
+
+        <select id="filtroSala">
+
+          <option value="">
+            Todas las salas
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <!-- MES -->
+
+      <div class="filtro">
+
+        <label for="filtroMes">
+          MES
+        </label>
+
+        <select id="filtroMes">
+
+          <option value="">
+            Todos los meses
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <!-- MODELO -->
+
+      <div class="filtro">
+
+        <label for="filtroModelo">
+          MODELO DE MÁQUINA
+        </label>
+
+        <select id="filtroModelo">
+
+          <option value="">
+            Todos los modelos
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <!-- NUMERO -->
+
+      <div class="filtro">
+
+        <label for="filtroNumero">
+          NÚMERO DE MÁQUINA
+        </label>
+
+        <select id="filtroNumero">
+
+          <option value="">
+            Todas las máquinas
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <!-- JUEGO -->
+
+      <div class="filtro">
+
+        <label for="filtroJuego">
+          JUEGO
+        </label>
+
+        <select id="filtroJuego">
+
+          <option value="">
+            Todos los juegos
+          </option>
+
+        </select>
+
+      </div>
+
+
+
+      <!-- LIMPIAR -->
+
+      <div class="filtro filtro-boton">
+
+        <button
+          id="btnLimpiar"
+          class="btn-limpiar"
+          type="button"
+        >
+
+          Limpiar filtros
+
+        </button>
+
+      </div>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         KPIs
+    =================================================== -->
+
+    <section class="tarjetas">
+
+
+      <article class="tarjeta">
+
+        <span class="kpi-icono coin">
+          ◉
+        </span>
+
+        <div>
+
+          <span class="kpi-titulo">
+            COIN TOTAL
+          </span>
+
+          <strong id="kpiCoin">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+
+      <article class="tarjeta">
+
+        <span class="kpi-icono venta">
+          ◉
+        </span>
+
+        <div>
+
+          <span class="kpi-titulo">
+            VENTA TOTAL
+          </span>
+
+          <strong id="kpiVenta">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+
+      <article class="tarjeta">
+
+        <span class="kpi-icono netwin">
+          $
+        </span>
+
+        <div>
+
+          <span class="kpi-titulo">
+            NETWIN
+          </span>
+
+          <strong id="kpiNetwin">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+
+      <article class="tarjeta">
+
+        <span class="kpi-icono pago">
+          %
+        </span>
+
+        <div>
+
+          <span class="kpi-titulo">
+            % PAGO PROM.
+          </span>
+
+          <strong id="kpiPago">
+            0 %
+          </strong>
+
+        </div>
+
+      </article>
+
+
+
+      <article class="tarjeta">
+
+        <span class="kpi-icono maquinas">
+          M
+        </span>
+
+        <div>
+
+          <span class="kpi-titulo">
+            MÁQUINAS
+          </span>
+
+          <strong id="kpiMaquinas">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+
+      <article class="tarjeta">
+
+        <span class="kpi-icono locales">
+          L
+        </span>
+
+        <div>
+
+          <span class="kpi-titulo">
+            LOCALES
+          </span>
+
+          <strong id="kpiLocales">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         GRÁFICO PRINCIPAL
+    =================================================== -->
+
+    <section class="panel grafico-panel">
+
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>
+            Rendimiento mensual 2026
+          </h2>
+
+          <p>
+            COIN PROM · COIN TOTAL · VENTA PROM ·
+            VENTA TOTAL · NETWIN · T.C · % PAGO
+          </p>
+
+        </div>
+
+
+        <span class="etiqueta">
+          2026
+        </span>
+
+      </div>
+
+
+      <div class="grafico-contenedor">
+
+        <canvas id="graficoMensual"></canvas>
+
+      </div>
+
+
+    </section>
+
+
+
+    <!-- ==================================================
+         TABLA RESUMEN
+    =================================================== -->
+
+    <section class="panel tabla-panel">
+
+
+      <div class="panel-header">
+
+        <div>
+
+          <h2>
+            Resumen mensual
+          </h2>
+
+          <p>
+            Valores utilizados en el gráfico
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="tabla-contenedor">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                MES
+              </th>
+
+              <th>
+                COIN PROM
+              </th>
+
+              <th>
+                COIN TOTAL
+              </th>
+
+              <th>
+                VENTA PROM
+              </th>
+
+              <th>
+                VENTA TOTAL
+              </th>
+
+              <th>
+                NETWIN
+              </th>
+
+              <th>
+                T.C
+              </th>
+
+              <th>
+                % PAGO
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="tablaCuerpo">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+
+  <!-- ==================================================
+       JAVASCRIPT
+  =================================================== -->
+
+  <script
+    src="script.js">
+  </script>
+
+
+</body>
+
+</html>
