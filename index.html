@@ -1,15 +1,5 @@
-<!-- =========================================================
-     ARCHIVO: INDEX.HTML
-     FUNCIÓN: ESTRUCTURA PRINCIPAL DEL DASHBOARD
-========================================================= -->
-
 <!DOCTYPE html>
 <html lang="es">
-
-
-<!-- =========================================================
-     1. CONFIGURACIÓN DEL DOCUMENTO
-========================================================= -->
 
 <head>
 
@@ -24,33 +14,19 @@
 
   <link rel="stylesheet" href="style.css">
 
-
-  <!-- =======================================================
-       1.1 LIBRERÍAS DE GRÁFICOS
-  ======================================================== -->
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Etiquetas de datos -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 </head>
 
 
-
-<!-- =========================================================
-     2. CUERPO PRINCIPAL
-========================================================= -->
-
 <body>
 
 
-
-  <!-- =======================================================
-       3. ENCABEZADO
-       Título y estado de conexión con Google Sheets
-  ======================================================== -->
+  <!-- =====================================================
+       ENCABEZADO
+  ====================================================== -->
 
   <header class="encabezado">
 
@@ -66,10 +42,6 @@
 
     </div>
 
-
-    <!-- =====================================================
-         3.1 ESTADO DE CONEXIÓN
-    ====================================================== -->
 
     <div class="conexion">
 
@@ -88,25 +60,18 @@
 
 
 
-  <!-- =======================================================
-       4. CONTENEDOR PRINCIPAL
-  ======================================================== -->
+  <!-- =====================================================
+       CONTENEDOR PRINCIPAL
+  ====================================================== -->
 
   <main class="contenedor">
 
 
-
-    <!-- =====================================================
-         5. BARRA SUPERIOR
-         Contador y botón de actualización
-    ====================================================== -->
+    <!-- ===================================================
+         BARRA DE ACCIONES
+    ==================================================== -->
 
     <section class="barra-acciones">
-
-
-      <!-- ===================================================
-           5.1 CONTADOR DE REGISTROS
-      ==================================================== -->
 
       <div class="contador">
 
@@ -120,10 +85,6 @@
 
       </div>
 
-
-      <!-- ===================================================
-           5.2 BOTÓN ACTUALIZAR
-      ==================================================== -->
 
       <div class="acciones">
 
@@ -140,18 +101,12 @@
 
 
 
-    <!-- =====================================================
-         6. FILTROS
-         Sala, mes, modelo, máquina y juego
-    ====================================================== -->
+    <!-- ===================================================
+         FILTROS
+    ==================================================== -->
 
     <section class="filtros">
 
-
-
-      <!-- ===================================================
-           6.1 FILTRO SALA
-      ==================================================== -->
 
       <div class="filtro">
 
@@ -171,10 +126,6 @@
 
 
 
-      <!-- ===================================================
-           6.2 FILTRO MES
-      ==================================================== -->
-
       <div class="filtro">
 
         <label for="filtroMes">
@@ -192,10 +143,6 @@
       </div>
 
 
-
-      <!-- ===================================================
-           6.3 FILTRO MODELO DE MÁQUINA
-      ==================================================== -->
 
       <div class="filtro">
 
@@ -215,10 +162,6 @@
 
 
 
-      <!-- ===================================================
-           6.4 FILTRO NÚMERO DE MÁQUINA
-      ==================================================== -->
-
       <div class="filtro">
 
         <label for="filtroNumero">
@@ -237,10 +180,6 @@
 
 
 
-      <!-- ===================================================
-           6.5 FILTRO JUEGO
-      ==================================================== -->
-
       <div class="filtro">
 
         <label for="filtroJuego">
@@ -257,50 +196,51 @@
 
       </div>
 
- <!-- ===================================================
-           6.6 FILTRO INDICADOR
-      ==================================================== -->
-
-         <div class="filtro">
-  <label>INDICADOR</label>
-
-  <select id="filtroIndicador">
-
-    <option value="COIN">COIN</option>
-
-    <option value="COIN PROM">
-      COIN PROM
-    </option>
-
-    <option value="VENTA">
-      VENTA
-    </option>
-
-    <option value="VENTA PROM">
-      VENTA PROM
-    </option>
-
-    <option value="NETWIN ($)">
-      NETWIN
-    </option>
-
-    <option value="T.C">
-      T.C.
-    </option>
-
-    <option value="% PAGO">
-      % PAGO
-    </option>
-
-  </select>
-
-</div>
 
 
+      <!-- FILTRO INDICADOR -->
 
-      <!-- ===================================================
-           6.7 BOTÓN LIMPIAR FILTROS
-      ==================================================== -->
+      <div class="filtro">
+
+        <label for="filtroIndicador">
+          INDICADOR
+        </label>
+
+        <select id="filtroIndicador">
+
+          <option value="COIN">
+            COIN
+          </option>
+
+          <option value="COIN PROM">
+            COIN PROM
+          </option>
+
+          <option value="VENTA">
+            VENTA
+          </option>
+
+          <option value="VENTA PROM">
+            VENTA PROM
+          </option>
+
+          <option value="NETWIN ($)">
+            NETWIN
+          </option>
+
+          <option value="T.C">
+            T.C.
+          </option>
+
+          <option value="% PAGO">
+            % PAGO
+          </option>
+
+        </select>
+
+      </div>
+
+
 
       <button
         id="btnLimpiar"
@@ -313,385 +253,356 @@
     </section>
 
 
-    <!-- =====================================================
-         9. TABLA RESUMEN MENSUAL
-    ====================================================== -->
 
-    <section class="panel">
+    <!-- ===================================================
+         TABLAS
+    ==================================================== -->
+
+    <div class="tablas-grid">
 
 
+      <!-- =================================================
+           PRIMERA TABLA
+      ================================================== -->
 
-      <!-- ===================================================
-           9.1 ENCABEZADO DE LA TABLA
-      ==================================================== -->
+      <section class="panel">
 
-      <div class="panel-header">
+        <div class="panel-header">
 
-        <div>
+          <div>
 
-          <h2>
-            Resumen mensual
-          </h2>
+            <h2>
+              Resumen mensual
+            </h2>
 
-          <span>
-            Información correspondiente a los filtros seleccionados
-          </span>
+            <span>
+              Información correspondiente a los filtros seleccionados
+            </span>
+
+          </div>
 
         </div>
 
-      </div>
+
+        <div class="tabla-contenedor">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  MES
+                </th>
+
+                <th>
+                  COIN PROM
+                </th>
+
+                <th>
+                  COIN TOTAL
+                </th>
+
+                <th>
+                  VENTA PROM
+                </th>
+
+                <th>
+                  VENTA TOTAL
+                </th>
+
+                <th>
+                  NETWIN ($)
+                </th>
+
+                <th>
+                  T.C.
+                </th>
+
+                <th>
+                  % PAGO
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody id="tablaCuerpo">
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
 
 
 
-      <!-- ===================================================
-           9.2 CONTENEDOR DE LA TABLA
-      ==================================================== -->
+      <!-- =================================================
+           SEGUNDA TABLA
+      ================================================== -->
 
-      <div class="tabla-contenedor">
+      <section class="panel panel-secundario">
 
+        <div class="panel-header">
 
-        <table>
+          <div>
 
+            <h2>
+              Detalle por máquina
+            </h2>
 
-          <!-- =================================================
-               9.3 ENCABEZADOS DE COLUMNAS
-          ================================================== -->
+            <span>
+              Resumen según indicador seleccionado
+            </span>
 
-          <thead>
+          </div>
 
-            <tr>
-
-              <th>
-                MES
-              </th>
-
-              <th>
-                COIN PROM
-              </th>
-
-              <th>
-                COIN TOTAL
-              </th>
-
-              <th>
-                VENTA PROM
-              </th>
-
-              <th>
-                VENTA TOTAL
-              </th>
-
-              <th>
-                NETWIN ($)
-              </th>
-
-              <th>
-                T.C.
-              </th>
-
-              <th>
-                % PAGO
-              </th>
-
-            </tr>
-
-          </thead>
+        </div>
 
 
-          <!-- =================================================
-               9.4 CUERPO DE LA TABLA
-               Los datos son generados por script.js
-          ================================================== -->
+        <div class="tabla-contenedor">
 
-          <tbody id="tablaCuerpo">
+          <table>
 
-          </tbody>
+            <thead>
+
+              <tr>
+
+                <th>
+                  SALA
+                </th>
+
+                <th>
+                  MODELO DE MÁQUINA
+                </th>
+
+                <th>
+                  N.º DE MÁQUINAS
+                </th>
+
+                <th>
+                  JUEGO
+                </th>
+
+                <th id="tituloIndicador">
+                  COIN
+                </th>
+
+              </tr>
+
+            </thead>
 
 
-        </table>
+            <tbody id="tablaIndicadorCuerpo">
+            </tbody>
 
+          </table>
 
-      </div>
+        </div>
 
-    </section>
+      </section>
+
+    </div>
 
 
 
-  </main>
-
- <!-- =====================================================
-         9.5. SEGUNDA TABLA
-    ====================================================== -->
-
-
-<div class="panel panel-secundario">
-
-  <div class="panel-header">
-
-    <h2>
-      Detalle por máquina
-    </h2>
-
-    <span>
-      Resumen según indicador seleccionado
-    </span>
-
-  </div>
-
-  <div class="tabla-contenedor">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>SALA</th>
-
-          <th>MODELO DE MÁQUINA</th>
-
-          <th>N.º DE MÁQUINAS</th>
-
-          <th>JUEGO</th>
-
-          <th id="tituloIndicador">
-            COIN
-          </th>
-
-        </tr>
-
-      </thead>
-
-      <tbody id="tablaIndicadorCuerpo">
-      </tbody>
-
-    </table>
-
-  </div>
-
-</div>
-
-
-     
-       
-
-    <!-- =====================================================
-         7. GRÁFICOS PRINCIPALES
-    ====================================================== -->
+    <!-- ===================================================
+         GRÁFICOS
+    ==================================================== -->
 
     <section class="graficos">
 
-  <!-- =================================================
-       GRÁFICO 1 - COIN PROM
-  ================================================== -->
 
-  <article class="grafico">
+      <!-- COIN PROM -->
 
-    <div class="grafico-header">
+      <article class="grafico">
 
-      <div>
+        <div class="grafico-header">
 
-        <h2>
-          COIN PROM
-        </h2>
+          <div>
 
-        <span>
-          Promedio mensual
-        </span>
+            <h2>
+              COIN PROM
+            </h2>
 
-      </div>
+            <span>
+              Promedio mensual
+            </span>
 
-    </div>
+          </div>
 
-    <div class="grafico-contenido">
+        </div>
 
-      <canvas
-        id="graficoCoinProm"
-      ></canvas>
+        <div class="grafico-contenido">
 
-    </div>
+          <canvas id="graficoCoinProm"></canvas>
 
-  </article>
+        </div>
 
+      </article>
 
-  <!-- =================================================
-       GRÁFICO 2 - VENTA PROM
-  ================================================== -->
 
-  <article class="grafico">
 
-    <div class="grafico-header">
+      <!-- VENTA PROM -->
 
-      <div>
+      <article class="grafico">
 
-        <h2>
-          VENTA PROM
-        </h2>
+        <div class="grafico-header">
 
-        <span>
-          Promedio mensual
-        </span>
+          <div>
 
-      </div>
+            <h2>
+              VENTA PROM
+            </h2>
 
-    </div>
+            <span>
+              Promedio mensual
+            </span>
 
-    <div class="grafico-contenido">
+          </div>
 
-      <canvas
-        id="graficoVentaProm"
-      ></canvas>
+        </div>
 
-    </div>
+        <div class="grafico-contenido">
 
-  </article>
+          <canvas id="graficoVentaProm"></canvas>
 
+        </div>
 
-  <!-- =================================================
-       GRÁFICO 3 - NETWIN
-  ================================================== -->
+      </article>
 
-  <article class="grafico">
 
-    <div class="grafico-header">
 
-      <div>
+      <!-- NETWIN -->
 
-        <h2>
-          NETWIN ($)
-        </h2>
+      <article class="grafico">
 
-        <span>
-          Total mensual
-        </span>
+        <div class="grafico-header">
 
-      </div>
+          <div>
 
-    </div>
+            <h2>
+              NETWIN ($)
+            </h2>
 
-    <div class="grafico-contenido">
+            <span>
+              Total mensual
+            </span>
 
-      <canvas
-        id="graficoNetwin"
-      ></canvas>
+          </div>
 
-    </div>
+        </div>
 
-  </article>
+        <div class="grafico-contenido">
 
+          <canvas id="graficoNetwin"></canvas>
 
-  <!-- =================================================
-       GRÁFICO 4 - COIN TOTAL
-  ================================================== -->
+        </div>
 
-  <article class="grafico">
+      </article>
 
-    <div class="grafico-header">
 
-      <div>
 
-        <h2>
-          COIN TOTAL
-        </h2>
+      <!-- COIN TOTAL -->
 
-        <span>
-          Total mensual
-        </span>
+      <article class="grafico">
 
-      </div>
+        <div class="grafico-header">
 
-    </div>
+          <div>
 
-    <div class="grafico-contenido">
+            <h2>
+              COIN TOTAL
+            </h2>
 
-      <canvas
-        id="graficoCoinTotal"
-      ></canvas>
+            <span>
+              Total mensual
+            </span>
 
-    </div>
+          </div>
 
-  </article>
+        </div>
 
+        <div class="grafico-contenido">
 
-  <!-- =================================================
-       GRÁFICO 5 - VENTA TOTAL
-  ================================================== -->
+          <canvas id="graficoCoinTotal"></canvas>
 
-  <article class="grafico">
+        </div>
 
-    <div class="grafico-header">
+      </article>
 
-      <div>
 
-        <h2>
-          VENTA TOTAL
-        </h2>
 
-        <span>
-          Total mensual
-        </span>
+      <!-- VENTA TOTAL -->
 
-      </div>
+      <article class="grafico">
 
-    </div>
+        <div class="grafico-header">
 
-    <div class="grafico-contenido">
+          <div>
 
-      <canvas
-        id="graficoVentaTotal"
-      ></canvas>
+            <h2>
+              VENTA TOTAL
+            </h2>
 
-    </div>
+            <span>
+              Total mensual
+            </span>
 
-  </article>
+          </div>
 
+        </div>
 
-  <!-- =================================================
-       GRÁFICO 6 - T.C.
-  ================================================== -->
+        <div class="grafico-contenido">
 
-  <article class="grafico">
+          <canvas id="graficoVentaTotal"></canvas>
 
-    <div class="grafico-header">
+        </div>
 
-      <div>
+      </article>
 
-        <h2>
-          T.C.
-        </h2>
 
-        <span>
-          Promedio mensual
-        </span>
 
-      </div>
+      <!-- T.C. -->
 
-    </div>
+      <article class="grafico">
 
-    <div class="grafico-contenido">
+        <div class="grafico-header">
 
-      <canvas
-        id="graficoTC"
-      ></canvas>
+          <div>
 
-    </div>
+            <h2>
+              T.C.
+            </h2>
 
-  </article>
+            <span>
+              Promedio mensual
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="grafico-contenido">
+
+          <canvas id="graficoTC"></canvas>
+
+        </div>
+
+      </article>
 
     </section>
 
 
 
-    <!-- =====================================================
-         8. GRÁFICO PORCENTAJE DE PAGO
-    ====================================================== -->
+    <!-- ===================================================
+         GRÁFICO % PAGO
+    ==================================================== -->
 
     <section class="pago-panel">
-
-
-      <!-- ===================================================
-           8.1 ENCABEZADO % PAGO
-      ==================================================== -->
 
       <div class="grafico-header">
 
@@ -710,30 +621,14 @@
       </div>
 
 
-
-      <!-- ===================================================
-           8.2 CONTENIDO % PAGO
-      ==================================================== -->
-
       <div class="pago-contenido">
-
-
-        <!-- =================================================
-             8.2.1 GRÁFICO CIRCULAR
-        ================================================== -->
 
         <div class="grafico-pago">
 
-          <canvas
-            id="graficoPago"
-          ></canvas>
+          <canvas id="graficoPago"></canvas>
 
         </div>
 
-
-        <!-- =================================================
-             8.2.2 VALOR DEL PORCENTAJE
-        ================================================== -->
 
         <div class="pago-valor">
 
@@ -747,23 +642,16 @@
 
         </div>
 
-
       </div>
 
     </section>
 
 
+  </main>
 
 
-
-
-  <!-- =======================================================
-       10. JAVASCRIPT
-       Conecta el HTML con Google Sheets y los gráficos
-  ======================================================== -->
 
   <script src="script.js"></script>
-
 
 </body>
 
