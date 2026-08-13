@@ -8,9 +8,6 @@ const SHEET_ID =
 const SHEET_GID =
   "683959855";
 
-
-// URL DIRECTA DE GOOGLE VISUALIZATION
-
 const URL_DATOS =
   `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 
@@ -20,9 +17,7 @@ const URL_DATOS =
 // ======================================================
 
 let datosOriginales = [];
-
 let datosFiltrados = [];
-
 let graficos = {};
 
 
@@ -31,7 +26,6 @@ let graficos = {};
 // ======================================================
 
 const ORDEN_MESES = [
-
   "ENERO",
   "FEBRERO",
   "MARZO",
@@ -44,7 +38,6 @@ const ORDEN_MESES = [
   "OCTUBRE",
   "NOVIEMBRE",
   "DICIEMBRE"
-
 ];
 
 
@@ -79,7 +72,7 @@ const COLORES = {
 
 document.addEventListener(
   "DOMContentLoaded",
-  () => {
+  function () {
 
     configurarEventos();
 
@@ -95,28 +88,19 @@ document.addEventListener(
 
 function configurarEventos() {
 
-
   const filtros = [
-
     "filtroSala",
-
     "filtroMes",
-
     "filtroModelo",
-
     "filtroNumero",
-
     "filtroJuego"
-
   ];
 
-
   filtros.forEach(
-    id => {
+    function (id) {
 
       const elemento =
         document.getElementById(id);
-
 
       if (elemento) {
 
@@ -136,7 +120,6 @@ function configurarEventos() {
       "btnLimpiar"
     );
 
-
   if (btnLimpiar) {
 
     btnLimpiar.addEventListener(
@@ -152,7 +135,6 @@ function configurarEventos() {
       "btnActualizar"
     );
 
-
   if (btnActualizar) {
 
     btnActualizar.addEventListener(
@@ -166,27 +148,38 @@ function configurarEventos() {
 
 
 // ======================================================
-// CARGAR GOOGLE SHEETS
+// CARGAR DATOS DE GOOGLE SHEETS
 // ======================================================
 
 async function cargarDatos() {
-
 
   cambiarEstadoConexion(
     "Conectando con Google Sheets...",
     "#f2b84b"
   );
 
-
   try {
+
+    const url =
+      URL_DATOS +
+      "&t=" +
+      Date.now();
+
+
+    console.log(
+      "URL GOOGLE SHEETS:",
+      url
+    );
 
 
     const respuesta =
-      await fetch(
-        URL_DATOS +
-        "&t=" +
-        Date.now()
-      );
+      await fetch(url);
+
+
+    console.log(
+      "STATUS GOOGLE:",
+      respuesta.status
+    );
 
 
     if (!respuesta.ok) {
@@ -203,19 +196,134 @@ async function cargarDatos() {
       await respuesta.text();
 
 
-    const datos =
-      convertirRespuestaGViz(
-        texto
-      );
+    console.log(
+      "RESPUESTA GOOGLE:",
+      texto.substring(0, 500)
+    );
+
+
+    const inicio =
+      texto.indexOf("{");
+
+
+    const fin =
+      texto.lastIndexOf("}");
 
 
     if (
-      !Array.isArray(datos) ||
+      inicio === -1 ||
+      fin === -1
+    ) {
+
+      throw new Error(
+        "Google Sheets no devolvió JSON válido."
+      );
+
+    }
+
+
+    const json =
+      JSON.parse(
+        texto.substring(
+          inicio,
+          fin + 1
+        )
+      );
+
+
+    console.log(
+      "JSON GOOGLE:",
+      json
+    );
+
+
+    if (
+      !json.table ||
+      !json.table.cols
+    ) {
+
+      throw new Error(
+        "No se encontró la tabla Google Sheets."
+      );
+
+    }
+
+
+    const columnas =
+      json.table.cols.map(
+        function (columna) {
+
+          return (
+            columna.label ||
+            columna.id
+          );
+
+        }
+      );
+
+
+    console.log(
+      "COLUMNAS DETECTADAS:",
+      columnas
+    );
+
+
+    const datos =
+      json.table.rows.map(
+        function (fila) {
+
+          const registro = {};
+
+
+          columnas.forEach(
+            function (
+              columna,
+              indice
+            ) {
+
+              const celda =
+                fila.c
+                  ? fila.c[indice]
+                  : null;
+
+
+              registro[columna] =
+                celda
+                  ? (
+                      celda.v ??
+                      celda.f ??
+                      ""
+                    )
+                  : "";
+
+            }
+          );
+
+
+          return registro;
+
+        }
+      );
+
+
+    console.log(
+      "TOTAL REGISTROS:",
+      datos.length
+    );
+
+
+    console.log(
+      "PRIMER REGISTRO:",
+      datos[0]
+    );
+
+
+    if (
       datos.length === 0
     ) {
 
       throw new Error(
-        "Google Sheets no devolvió registros."
+        "El Sheet no devolvió registros."
       );
 
     }
@@ -240,11 +348,12 @@ async function cargarDatos() {
     actualizarDashboard();
 
 
-  } catch (error) {
+  }
 
+  catch (error) {
 
     console.error(
-      "Error:",
+      "ERROR GOOGLE SHEETS:",
       error
     );
 
@@ -260,112 +369,13 @@ async function cargarDatos() {
 
 
 // ======================================================
-// CONVERTIR RESPUESTA GVIZ
-// ======================================================
-
-function convertirRespuestaGViz(
-  texto
-) {
-
-
-  const inicio =
-    texto.indexOf("{");
-
-
-  const fin =
-    texto.lastIndexOf("}");
-
-
-  if (
-    inicio === -1 ||
-    fin === -1
-  ) {
-
-    throw new Error(
-      "Respuesta GViz inválida."
-    );
-
-  }
-
-
-  const json =
-    JSON.parse(
-      texto.substring(
-        inicio,
-        fin + 1
-      )
-    );
-
-
-  const tabla =
-    json.table;
-
-
-  if (!tabla) {
-
-    throw new Error(
-      "No se encontró la tabla de Google Sheets."
-    );
-
-  }
-
-
-  const columnas =
-    tabla.cols.map(
-      columna =>
-        columna.label ||
-        columna.id
-    );
-
-
-  return tabla.rows.map(
-    fila => {
-
-      const registro = {};
-
-
-      columnas.forEach(
-        (
-          columna,
-          indice
-        ) => {
-
-          const celda =
-            fila.c[
-              indice
-            ];
-
-
-          registro[columna] =
-            celda
-              ? (
-                  celda.f ??
-                  celda.v ??
-                  ""
-                )
-              : "";
-
-        }
-      );
-
-
-      return registro;
-
-    }
-  );
-
-}
-
-
-// ======================================================
-// ESTADO CONEXIÓN
+// ESTADO DE CONEXIÓN
 // ======================================================
 
 function cambiarEstadoConexion(
   texto,
   color
 ) {
-
 
   const textoConexion =
     document.getElementById(
@@ -403,7 +413,6 @@ function cambiarEstadoConexion(
 
 function llenarFiltros() {
 
-
   llenarSelect(
     "filtroSala",
     "LOCAL",
@@ -438,7 +447,7 @@ function llenarFiltros() {
 
 
 // ======================================================
-// SELECT
+// CREAR SELECT
 // ======================================================
 
 function llenarSelect(
@@ -447,7 +456,6 @@ function llenarSelect(
   textoInicial
 ) {
 
-
   const select =
     document.getElementById(id);
 
@@ -455,27 +463,28 @@ function llenarSelect(
   if (!select) return;
 
 
-  const valorActual =
+  const valorAnterior =
     select.value;
 
 
   select.innerHTML = "";
 
 
-  const inicial =
+  const opcionInicial =
     document.createElement(
       "option"
     );
 
 
-  inicial.value = "";
+  opcionInicial.value = "";
 
-  inicial.textContent =
+
+  opcionInicial.textContent =
     textoInicial;
 
 
   select.appendChild(
-    inicial
+    opcionInicial
   );
 
 
@@ -484,13 +493,17 @@ function llenarSelect(
       ...new Set(
 
         datosOriginales
+
           .map(
-            registro =>
-              String(
-                registro[campo] ??
-                ""
-              ).trim()
+            function (registro) {
+
+              return String(
+                registro[campo] ?? ""
+              ).trim();
+
+            }
           )
+
           .filter(Boolean)
 
       )
@@ -498,20 +511,23 @@ function llenarSelect(
 
 
   valores.sort(
-    (a, b) =>
-      a.localeCompare(
+    function (a, b) {
+
+      return a.localeCompare(
         b,
         "es",
         {
           numeric: true,
           sensitivity: "base"
         }
-      )
+      );
+
+    }
   );
 
 
   valores.forEach(
-    valor => {
+    function (valor) {
 
       const opcion =
         document.createElement(
@@ -537,12 +553,12 @@ function llenarSelect(
 
   if (
     valores.includes(
-      valorActual
+      valorAnterior
     )
   ) {
 
     select.value =
-      valorActual;
+      valorAnterior;
 
   }
 
@@ -555,7 +571,6 @@ function llenarSelect(
 
 function llenarFiltroMes() {
 
-
   const select =
     document.getElementById(
       "filtroMes"
@@ -563,6 +578,10 @@ function llenarFiltroMes() {
 
 
   if (!select) return;
+
+
+  const valorAnterior =
+    select.value;
 
 
   select.innerHTML = "";
@@ -576,6 +595,7 @@ function llenarFiltroMes() {
 
   inicial.value = "";
 
+
   inicial.textContent =
     "Todos los meses";
 
@@ -586,7 +606,7 @@ function llenarFiltroMes() {
 
 
   ORDEN_MESES.forEach(
-    mes => {
+    function (mes) {
 
       const opcion =
         document.createElement(
@@ -596,6 +616,7 @@ function llenarFiltroMes() {
 
       opcion.value =
         mes;
+
 
       opcion.textContent =
         mes;
@@ -608,6 +629,18 @@ function llenarFiltroMes() {
     }
   );
 
+
+  if (
+    ORDEN_MESES.includes(
+      valorAnterior
+    )
+  ) {
+
+    select.value =
+      valorAnterior;
+
+  }
+
 }
 
 
@@ -616,7 +649,6 @@ function llenarFiltroMes() {
 // ======================================================
 
 function aplicarFiltros() {
-
 
   const sala =
     obtenerValor(
@@ -650,7 +682,7 @@ function aplicarFiltros() {
 
   datosFiltrados =
     datosOriginales.filter(
-      registro => {
+      function (registro) {
 
 
         if (
@@ -730,26 +762,19 @@ function aplicarFiltros() {
 
 
 // ======================================================
-// LIMPIAR
+// LIMPIAR FILTROS
 // ======================================================
 
 function limpiarFiltros() {
 
-
   [
-
     "filtroSala",
-
     "filtroMes",
-
     "filtroModelo",
-
     "filtroNumero",
-
     "filtroJuego"
-
   ].forEach(
-    id => {
+    function (id) {
 
       const elemento =
         document.getElementById(id);
@@ -775,19 +800,18 @@ function limpiarFiltros() {
 
 
 // ======================================================
-// DASHBOARD
+// ACTUALIZAR DASHBOARD
 // ======================================================
 
 function actualizarDashboard() {
-
 
   actualizarContador();
 
   construirGraficos();
 
-  construirTabla();
-
   construirGraficoPago();
+
+  construirTabla();
 
 }
 
@@ -797,7 +821,6 @@ function actualizarDashboard() {
 // ======================================================
 
 function actualizarContador() {
-
 
   establecerTexto(
     "contadorResultados",
@@ -815,12 +838,11 @@ function actualizarContador() {
 
 function construirResumenMensual() {
 
-
   const grupos = {};
 
 
   datosFiltrados.forEach(
-    registro => {
+    function (registro) {
 
 
       const año =
@@ -1005,16 +1027,18 @@ function construirResumenMensual() {
 
 
   /*
-    IMPORTANTE:
-
-    Solo se incluyen meses que
-    realmente tienen registros.
-  */
+   * IMPORTANTE:
+   * Solo aparecen meses que
+   * realmente tienen información.
+   */
 
   const meses =
     ORDEN_MESES.filter(
-      mes =>
-        grupos[mes]
+      function (mes) {
+
+        return grupos[mes];
+
+      }
     );
 
 
@@ -1022,54 +1046,82 @@ function construirResumenMensual() {
 
     labels: meses,
 
+
     coinProm:
       meses.map(
-        mes =>
-          promedioArray(
+        function (mes) {
+
+          return promedioArray(
             grupos[mes].coinProm
-          )
+          );
+
+        }
       ),
+
 
     ventaProm:
       meses.map(
-        mes =>
-          promedioArray(
+        function (mes) {
+
+          return promedioArray(
             grupos[mes].ventaProm
-          )
+          );
+
+        }
       ),
+
 
     coinTotal:
       meses.map(
-        mes =>
-          grupos[mes].coinTotal
+        function (mes) {
+
+          return grupos[mes].coinTotal;
+
+        }
       ),
+
 
     ventaTotal:
       meses.map(
-        mes =>
-          grupos[mes].ventaTotal
+        function (mes) {
+
+          return grupos[mes].ventaTotal;
+
+        }
       ),
+
 
     netwin:
       meses.map(
-        mes =>
-          grupos[mes].netwin
+        function (mes) {
+
+          return grupos[mes].netwin;
+
+        }
       ),
+
 
     tc:
       meses.map(
-        mes =>
-          promedioArray(
+        function (mes) {
+
+          return promedioArray(
             grupos[mes].tc
-          )
+          );
+
+        }
       ),
+
 
     pago:
       meses.map(
-        mes =>
-          promedioArray(
+        function (mes) {
+
+          return promedioArray(
             grupos[mes].pago
-          )
+          );
+
+        }
       )
 
   };
@@ -1078,11 +1130,10 @@ function construirResumenMensual() {
 
 
 // ======================================================
-// CREAR GRÁFICOS
+// CREAR TODOS LOS GRÁFICOS
 // ======================================================
 
 function construirGraficos() {
-
 
   const resumen =
     construirResumenMensual();
@@ -1158,12 +1209,20 @@ function crearGraficoLinea(
   esTC = false
 ) {
 
-
   const canvas =
     document.getElementById(id);
 
 
-  if (!canvas) return;
+  if (!canvas) {
+
+    console.warn(
+      "No existe canvas:",
+      id
+    );
+
+    return;
+
+  }
 
 
   if (graficos[id]) {
@@ -1232,11 +1291,6 @@ function crearGraficoLinea(
         },
 
 
-        plugins: [
-          ChartDataLabels
-        ],
-
-
         options: {
 
           responsive: true,
@@ -1246,9 +1300,11 @@ function crearGraficoLinea(
 
           interaction: {
 
-            mode: "index",
+            mode:
+              "index",
 
-            intersect: false
+            intersect:
+              false
 
           },
 
@@ -1257,65 +1313,31 @@ function crearGraficoLinea(
 
             legend: {
 
-              display: true,
+              display:
+                true,
 
-              position: "bottom",
+              position:
+                "bottom",
 
               labels: {
 
-                usePointStyle: true,
+                usePointStyle:
+                  true,
 
-                padding: 16,
+                padding:
+                  16,
 
-                color: "#667085",
+                color:
+                  "#667085",
 
                 font: {
 
-                  size: 11
+                  size:
+                    11
 
                 }
 
               }
-
-            },
-
-
-            datalabels: {
-
-              display: true,
-
-              align: "top",
-
-              anchor: "end",
-
-              color: "#667085",
-
-              font: {
-
-                size: 10,
-
-                weight: "600"
-
-              },
-
-              formatter:
-                valor => {
-
-                  if (
-                    esTC
-                  ) {
-
-                    return Number(
-                      valor
-                    ).toFixed(2);
-
-                  }
-
-                  return formatearNumero(
-                    valor
-                  );
-
-                }
 
             },
 
@@ -1331,7 +1353,8 @@ function crearGraficoLinea(
               bodyColor:
                 "#ffffff",
 
-              padding: 10
+              padding:
+                10
 
             }
 
@@ -1361,7 +1384,8 @@ function crearGraficoLinea(
 
             y: {
 
-              beginAtZero: true,
+              beginAtZero:
+                true,
 
               grid: {
 
@@ -1376,7 +1400,7 @@ function crearGraficoLinea(
                   "#667085",
 
                 callback:
-                  valor => {
+                  function (valor) {
 
                     if (
                       esTC
@@ -1414,7 +1438,6 @@ function crearGraficoLinea(
 
 function construirGraficoPago() {
 
-
   const canvas =
     document.getElementById(
       "graficoPago"
@@ -1424,7 +1447,9 @@ function construirGraficoPago() {
   if (!canvas) return;
 
 
-  if (graficos.graficoPago) {
+  if (
+    graficos.graficoPago
+  ) {
 
     graficos.graficoPago.destroy();
 
@@ -1433,15 +1458,23 @@ function construirGraficoPago() {
 
   const valores =
     datosFiltrados
+
       .map(
-        registro =>
-          obtenerNumero(
+        function (registro) {
+
+          return obtenerNumero(
             registro["% PAGO"]
-          )
+          );
+
+        }
       )
+
       .filter(
-        valor =>
-          valor !== null
+        function (valor) {
+
+          return valor !== null;
+
+        }
       );
 
 
@@ -1450,11 +1483,6 @@ function construirGraficoPago() {
       valores
     );
 
-
-  /*
-    Por seguridad mantenemos
-    el porcentaje entre 0 y 100.
-  */
 
   pago =
     Math.max(
@@ -1472,7 +1500,8 @@ function construirGraficoPago() {
 
   establecerTexto(
     "valorPago",
-    pago.toFixed(2) + "%"
+    pago.toFixed(2) +
+    "%"
   );
 
 
@@ -1481,7 +1510,8 @@ function construirGraficoPago() {
       canvas,
       {
 
-        type: "doughnut",
+        type:
+          "doughnut",
 
 
         data: {
@@ -1526,7 +1556,8 @@ function construirGraficoPago() {
               ],
 
 
-              borderWidth: 3
+              borderWidth:
+                3
 
             }
 
@@ -1535,56 +1566,37 @@ function construirGraficoPago() {
         },
 
 
-        plugins: [
-          ChartDataLabels
-        ],
-
-
         options: {
 
-          responsive: true,
+          responsive:
+            true,
 
-          maintainAspectRatio: false,
+          maintainAspectRatio:
+            false,
 
-
-          cutout: "58%",
+          cutout:
+            "58%",
 
 
           plugins: {
 
             legend: {
 
-              position: "bottom",
+              position:
+                "bottom",
 
               labels: {
 
-                usePointStyle: true,
+                usePointStyle:
+                  true,
 
-                padding: 18,
+                padding:
+                  18,
 
-                color: "#667085"
+                color:
+                  "#667085"
 
               }
-
-            },
-
-
-            datalabels: {
-
-              color: "#475467",
-
-              font: {
-
-                size: 14,
-
-                weight: "700"
-
-              },
-
-              formatter:
-                valor =>
-                  valor.toFixed(1) +
-                  "%"
 
             }
 
@@ -1604,7 +1616,6 @@ function construirGraficoPago() {
 
 function construirTabla() {
 
-
   const cuerpo =
     document.getElementById(
       "tablaCuerpo"
@@ -1622,10 +1633,10 @@ function construirTabla() {
 
 
   resumen.labels.forEach(
-    (
+    function (
       mes,
       indice
-    ) => {
+    ) {
 
 
       const fila =
@@ -1637,9 +1648,7 @@ function construirTabla() {
       fila.innerHTML = `
 
         <td>
-          <strong>
-            ${mes}
-          </strong>
+          <strong>${mes}</strong>
         </td>
 
         <td>
@@ -1681,8 +1690,7 @@ function construirTabla() {
         <td>
           ${Number(
             resumen.pago[indice] || 0
-          ).toFixed(2)}
-          %
+          ).toFixed(2)} %
         </td>
 
       `;
@@ -1704,7 +1712,6 @@ function construirTabla() {
 
 function obtenerValor(id) {
 
-
   const elemento =
     document.getElementById(id);
 
@@ -1724,11 +1731,10 @@ function obtenerValor(id) {
 
 
 // ======================================================
-// NORMALIZAR TEXTO
+// LIMPIAR TEXTO
 // ======================================================
 
 function limpiarTexto(valor) {
-
 
   if (
     valor === null ||
@@ -1752,7 +1758,6 @@ function limpiarTexto(valor) {
 // ======================================================
 
 function normalizarMes(valor) {
-
 
   if (
     valor === null ||
@@ -1807,7 +1812,6 @@ function normalizarMes(valor) {
 
 function obtenerNumero(valor) {
 
-
   if (
     valor === null ||
     valor === undefined ||
@@ -1850,12 +1854,10 @@ function obtenerNumero(valor) {
 
 
   /*
-    Manejo de números:
-
-    1,234.56
-    1234.56
-    1.234,56
-  */
+   * 1,234.56
+   * 1234.56
+   * 1.234,56
+   */
 
   if (
     texto.includes(",") &&
@@ -1878,7 +1880,9 @@ function obtenerNumero(valor) {
             "."
           );
 
-    } else {
+    }
+
+    else {
 
       texto =
         texto.replace(
@@ -1888,7 +1892,9 @@ function obtenerNumero(valor) {
 
     }
 
-  } else if (
+  }
+
+  else if (
     texto.includes(",")
   ) {
 
@@ -1907,7 +1913,9 @@ function obtenerNumero(valor) {
           "."
         );
 
-    } else {
+    }
+
+    else {
 
       texto =
         texto.replace(
@@ -1946,7 +1954,6 @@ function promedioArray(
   valores
 ) {
 
-
   if (
     !valores ||
     valores.length === 0
@@ -1959,11 +1966,16 @@ function promedioArray(
 
   const validos =
     valores.filter(
-      valor =>
-        valor !== null &&
-        Number.isFinite(
-          Number(valor)
-        )
+      function (valor) {
+
+        return (
+          valor !== null &&
+          Number.isFinite(
+            Number(valor)
+          )
+        );
+
+      }
     );
 
 
@@ -1978,12 +1990,15 @@ function promedioArray(
 
   const suma =
     validos.reduce(
-      (
+      function (
         total,
         valor
-      ) =>
-        total +
-        Number(valor),
+      ) {
+
+        return total +
+          Number(valor);
+
+      },
       0
     );
 
@@ -2002,7 +2017,6 @@ function formatearNumero(
   valor
 ) {
 
-
   const numero =
     Number(valor) || 0;
 
@@ -2010,9 +2024,7 @@ function formatearNumero(
   return numero.toLocaleString(
     "es-PE",
     {
-
       maximumFractionDigits: 2
-
     }
   );
 
@@ -2027,7 +2039,6 @@ function establecerTexto(
   id,
   texto
 ) {
-
 
   const elemento =
     document.getElementById(id);
@@ -2048,6 +2059,10 @@ function establecerTexto(
 // ======================================================
 
 setInterval(
-  cargarDatos,
+  function () {
+
+    cargarDatos();
+
+  },
   5 * 60 * 1000
 );
