@@ -35,6 +35,7 @@ let cargando = false;
 // ======================================================
 
 const MESES = [
+
   "ENERO",
   "FEBRERO",
   "MARZO",
@@ -47,25 +48,52 @@ const MESES = [
   "OCTUBRE",
   "NOVIEMBRE",
   "DICIEMBRE"
+
 ];
 
 
 // ======================================================
-// 04. COLORES
+// 04. CONFIGURACIÓN INDICADORES
 // ======================================================
 
-const COLORES = [
-  "#2563eb",
-  "#16a34a",
-  "#f59e0b",
-  "#dc2626",
-  "#7c3aed",
-  "#0891b2",
-  "#db2777",
-  "#65a30d",
-  "#ea580c",
-  "#4f46e5"
-];
+const INDICADORES = {
+
+  "COIN": {
+    campo: "COIN",
+    tipo: "total"
+  },
+
+  "COIN PROM": {
+    campo: "COIN PROM",
+    tipo: "promedio"
+  },
+
+  "VENTA": {
+    campo: "VENTA",
+    tipo: "total"
+  },
+
+  "VENTA PROM": {
+    campo: "VENTA PROM",
+    tipo: "promedio"
+  },
+
+  "NETWIN ($)": {
+    campo: "NETWIN ($)",
+    tipo: "total"
+  },
+
+  "T.C": {
+    campo: "T.C",
+    tipo: "promedio"
+  },
+
+  "% PAGO": {
+    campo: "% PAGO",
+    tipo: "promedio"
+  }
+
+};
 
 
 // ======================================================
@@ -91,46 +119,50 @@ document.addEventListener(
 function configurarEventos() {
 
   const filtros = [
+
     "filtroSala",
-    "filtroMarca",
-    "filtroMaquina",
+    "filtroModelo",
+    "filtroNumero",
     "filtroJuego",
     "filtroMes",
-    "filtroAnio",
     "filtroIndicador"
+
   ];
 
 
-  filtros.forEach(id => {
+  filtros.forEach(
+    id => {
 
-    const elemento =
-      document.getElementById(id);
-
-    if (!elemento) return;
-
-
-    elemento.addEventListener(
-      "change",
-      manejarCambioFiltro
-    );
-
-  });
+      const elemento =
+        document.getElementById(id);
 
 
-  const limpiar =
-    document.getElementById(
-      "btnLimpiar"
-    );
+      if (!elemento) return;
 
 
-  if (limpiar) {
+      elemento.addEventListener(
+        "change",
+        manejarCambioFiltro
+      );
 
-    limpiar.addEventListener(
+    }
+  );
+
+
+  document
+    .getElementById("btnLimpiar")
+    ?.addEventListener(
       "click",
       limpiarFiltros
     );
 
-  }
+
+  document
+    .getElementById("btnActualizar")
+    ?.addEventListener(
+      "click",
+      cargarDatos
+    );
 
 }
 
@@ -145,36 +177,13 @@ function manejarCambioFiltro(evento) {
     evento.target.id;
 
 
-  /*
-   * Los filtros principales son dependientes.
-   *
-   * SALA
-   *   ↓
-   * MARCA
-   *   ↓
-   * SERIE
-   *   ↓
-   * JUEGO
-   */
+  if (
+    id === "filtroIndicador"
+  ) {
 
+    aplicarFiltros();
 
-  if (id === "filtroSala") {
-
-    actualizarFiltrosDependientes();
-
-  }
-
-
-  if (id === "filtroMarca") {
-
-    actualizarFiltrosDependientes();
-
-  }
-
-
-  if (id === "filtroMaquina") {
-
-    actualizarFiltrosDependientes();
+    return;
 
   }
 
@@ -195,7 +204,7 @@ async function cargarDatos() {
   cargando = true;
 
 
-  cambiarConexion(
+  cambiarEstadoConexion(
     "Conectando con Google Sheets...",
     "#f59e0b"
   );
@@ -207,17 +216,14 @@ async function cargarDatos() {
       await fetch(
         URL_DATOS +
         "&t=" +
-        Date.now(),
-        {
-          cache: "no-store"
-        }
+        Date.now()
       );
 
 
     if (!respuesta.ok) {
 
       throw new Error(
-        "Error HTTP " +
+        "HTTP " +
         respuesta.status
       );
 
@@ -234,7 +240,7 @@ async function cargarDatos() {
 
     if (
       !Array.isArray(datos) ||
-      !datos.length
+      datos.length === 0
     ) {
 
       throw new Error(
@@ -249,16 +255,17 @@ async function cargarDatos() {
 
 
     datosFiltrados =
-      [...datos];
+      [...datosOriginales];
 
 
-    cambiarConexion(
+    cambiarEstadoConexion(
       "Google Sheets conectado",
       "#16a34a"
     );
 
 
-    cargarFiltrosIniciales();
+    llenarTodosLosFiltros();
+
 
     actualizarDashboard();
 
@@ -268,7 +275,7 @@ async function cargarDatos() {
     console.error(error);
 
 
-    cambiarConexion(
+    cambiarEstadoConexion(
       "Error al conectar con Google Sheets",
       "#dc2626"
     );
@@ -301,7 +308,7 @@ function convertirGViz(texto) {
   ) {
 
     throw new Error(
-      "Respuesta inválida de Google Sheets."
+      "Respuesta GViz inválida."
     );
 
   }
@@ -322,7 +329,7 @@ function convertirGViz(texto) {
   ) {
 
     throw new Error(
-      "No existe información en la hoja."
+      "No se encontraron filas."
     );
 
   }
@@ -337,43 +344,46 @@ function convertirGViz(texto) {
 
       return {
 
-        marca:
+        "Marca / Tipo / Version":
           obtenerCelda(c, 0),
 
-        maquina:
+        "Maquina":
           obtenerCelda(c, 2),
 
-        juego:
+        "Juego":
           obtenerCelda(c, 5),
 
-        coin:
+        "COIN":
           obtenerCelda(c, 7),
 
-        coinProm:
+        "COIN PROM":
           obtenerCelda(c, 8),
 
-        venta:
+        "VENTA":
           obtenerCelda(c, 9),
 
-        ventaProm:
+        "VENTA PROM":
           obtenerCelda(c, 10),
 
-        netwin:
+        "NETWIN ($)":
           obtenerCelda(c, 11),
 
-        pago:
+        "G.PLAYED":
+          obtenerCelda(c, 12),
+
+        "% PAGO":
           obtenerCelda(c, 13),
 
-        local:
+        "LOCAL":
           obtenerCelda(c, 15),
 
-        mes:
+        "MES":
           obtenerCelda(c, 16),
 
-        anio:
+        "AÑO":
           obtenerCelda(c, 17),
 
-        tc:
+        "T.C":
           obtenerCelda(c, 19)
 
       };
@@ -397,7 +407,11 @@ function obtenerCelda(
     columnas[indice];
 
 
-  if (!celda) return "";
+  if (!celda) {
+
+    return "";
+
+  }
 
 
   if (
@@ -426,10 +440,10 @@ function obtenerCelda(
 
 
 // ======================================================
-// 11. CONEXIÓN
+// 11. ESTADO
 // ======================================================
 
-function cambiarConexion(
+function cambiarEstadoConexion(
   texto,
   color
 ) {
@@ -438,6 +452,7 @@ function cambiarConexion(
     document.getElementById(
       "textoConexion"
     );
+
 
   const punto =
     document.getElementById(
@@ -467,57 +482,11 @@ function cambiarConexion(
 // 12. FILTROS INICIALES
 // ======================================================
 
-function cargarFiltrosIniciales() {
+function llenarTodosLosFiltros() {
 
-  llenarSelect(
-    "filtroSala",
-    datosOriginales,
-    "local",
-    "Todas las salas"
-  );
+  actualizarFiltrosDependientes();
 
-
-  llenarSelect(
-    "filtroMarca",
-    datosOriginales,
-    "marca",
-    "Todas las marcas"
-  );
-
-
-  llenarSelect(
-    "filtroMaquina",
-    datosOriginales,
-    "maquina",
-    "Todas las series"
-  );
-
-
-  llenarSelect(
-    "filtroJuego",
-    datosOriginales,
-    "juego",
-    "Todos los juegos"
-  );
-
-
-  llenarSelect(
-    "filtroMes",
-    datosOriginales,
-    "mes",
-    "Todos los meses",
-    true
-  );
-
-
-  llenarSelect(
-    "filtroAnio",
-    datosOriginales,
-    "anio",
-    "Todos los años",
-    false,
-    true
-  );
+  llenarFiltroMes();
 
 }
 
@@ -531,133 +500,104 @@ function actualizarFiltrosDependientes() {
   const sala =
     obtenerValor("filtroSala");
 
-  const marca =
-    obtenerValor("filtroMarca");
 
-  const maquina =
-    obtenerValor("filtroMaquina");
+  const modelo =
+    obtenerValor("filtroModelo");
 
 
-  let datos =
-    [...datosOriginales];
+  const serie =
+    obtenerValor("filtroNumero");
 
 
-  /*
-   * SALA
-   */
-
-  if (sala) {
-
-    datos =
-      datos.filter(
-        r =>
-          normalizar(r.local) ===
-          normalizar(sala)
-      );
-
-  }
+  const juego =
+    obtenerValor("filtroJuego");
 
 
-  /*
-   * MARCA
-   */
+  const baseSala =
+    datosOriginales.filter(
+      r =>
+        !sala ||
+        limpiarTexto(r["LOCAL"]) ===
+        limpiarTexto(sala)
+    );
 
-  llenarSelect(
-    "filtroMarca",
-    datos,
-    "marca",
+
+  llenarSelectDesdeDatos(
+    "filtroSala",
+    baseSala,
+    "LOCAL",
+    "Todas las salas"
+  );
+
+
+  const baseModelo =
+    datosOriginales.filter(
+      r =>
+        (!sala ||
+          limpiarTexto(r["LOCAL"]) ===
+          limpiarTexto(sala))
+    );
+
+
+  llenarSelectDesdeDatos(
+    "filtroModelo",
+    baseModelo,
+    "Marca / Tipo / Version",
     "Todas las marcas"
   );
 
 
-  /*
-   * Recuperamos marca seleccionada.
-   */
+  const baseSerie =
+    datosOriginales.filter(
+      r =>
+        (!sala ||
+          limpiarTexto(r["LOCAL"]) ===
+          limpiarTexto(sala)) &&
 
-  const marcaActual =
-    valorExiste(
-      "filtroMarca",
-      marca
-    )
-      ? marca
-      : "";
-
-
-  document.getElementById(
-    "filtroMarca"
-  ).value =
-    marcaActual;
+        (!modelo ||
+          limpiarTexto(
+            r["Marca / Tipo / Version"]
+          ) ===
+          limpiarTexto(modelo))
+    );
 
 
-  /*
-   * FILTRAR POR MARCA
-   */
-
-  if (marcaActual) {
-
-    datos =
-      datos.filter(
-        r =>
-          normalizar(r.marca) ===
-          normalizar(marcaActual)
-      );
-
-  }
-
-
-  /*
-   * SERIES DISPONIBLES
-   */
-
-  llenarSelect(
-    "filtroMaquina",
-    datos,
-    "maquina",
+  llenarSelectDesdeDatos(
+    "filtroNumero",
+    baseSerie,
+    "Maquina",
     "Todas las series"
   );
 
 
-  const maquinaActual =
-    valorExiste(
-      "filtroMaquina",
-      maquina
-    )
-      ? maquina
-      : "";
+  const baseJuego =
+    datosOriginales.filter(
+      r =>
+        (!sala ||
+          limpiarTexto(r["LOCAL"]) ===
+          limpiarTexto(sala)) &&
+
+        (!modelo ||
+          limpiarTexto(
+            r["Marca / Tipo / Version"]
+          ) ===
+          limpiarTexto(modelo)) &&
+
+        (!serie ||
+          limpiarTexto(r["Maquina"]) ===
+          limpiarTexto(serie))
+    );
 
 
-  document.getElementById(
-    "filtroMaquina"
-  ).value =
-    maquinaActual;
-
-
-  /*
-   * FILTRAR POR SERIE
-   */
-
-  if (maquinaActual) {
-
-    datos =
-      datos.filter(
-        r =>
-          normalizar(r.maquina) ===
-          normalizar(maquinaActual)
-      );
-
-  }
-
-
-  /*
-   * JUEGOS DISPONIBLES
-   */
-
-  llenarSelect(
+  llenarSelectDesdeDatos(
     "filtroJuego",
-    datos,
-    "juego",
+    baseJuego,
+    "Juego",
     "Todos los juegos"
   );
+
+
+  restaurarValoresFiltros();
 
 }
 
@@ -666,13 +606,11 @@ function actualizarFiltrosDependientes() {
 // 14. LLENAR SELECT
 // ======================================================
 
-function llenarSelect(
+function llenarSelectDesdeDatos(
   id,
   datos,
   campo,
-  textoInicial,
-  ordenarMes = false,
-  ordenarNumerico = false
+  textoInicial
 ) {
 
   const select =
@@ -682,8 +620,38 @@ function llenarSelect(
   if (!select) return;
 
 
-  const valorAnterior =
+  const valorActual =
     select.value;
+
+
+  const valores =
+    [
+      ...new Set(
+
+        datos
+          .map(
+            r =>
+              limpiarTexto(
+                r[campo]
+              )
+          )
+          .filter(Boolean)
+
+      )
+    ];
+
+
+  valores.sort(
+    (a, b) =>
+      a.localeCompare(
+        b,
+        "es",
+        {
+          numeric: true,
+          sensitivity: "base"
+        }
+      )
+  );
 
 
   select.innerHTML = "";
@@ -706,87 +674,38 @@ function llenarSelect(
   );
 
 
-  let valores =
-    [
-      ...new Set(
-        datos
-          .map(
-            r =>
-              limpiarTexto(
-                r[campo]
-              )
-          )
-          .filter(Boolean)
-      )
-    ];
+  valores.forEach(
+    valor => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
 
 
-  if (ordenarMes) {
+      option.value =
+        valor;
 
-    valores.sort(
-      (a, b) =>
-        MESES.indexOf(
-          normalizarMes(a)
-        ) -
-        MESES.indexOf(
-          normalizarMes(b)
-        )
-    );
-
-  } else if (ordenarNumerico) {
-
-    valores.sort(
-      (a, b) =>
-        Number(a) - Number(b)
-    );
-
-  } else {
-
-    valores.sort(
-      (a, b) =>
-        a.localeCompare(
-          b,
-          "es",
-          {
-            numeric: true,
-            sensitivity: "base"
-          }
-        )
-    );
-
-  }
+      option.textContent =
+        valor;
 
 
-  valores.forEach(valor => {
-
-    const option =
-      document.createElement(
-        "option"
+      select.appendChild(
+        option
       );
 
-
-    option.value =
-      valor;
-
-    option.textContent =
-      valor;
-
-
-    select.appendChild(
-      option
-    );
-
-  });
+    }
+  );
 
 
   if (
     valores.includes(
-      valorAnterior
+      limpiarTexto(valorActual)
     )
   ) {
 
     select.value =
-      valorAnterior;
+      limpiarTexto(valorActual);
 
   }
 
@@ -794,28 +713,154 @@ function llenarSelect(
 
 
 // ======================================================
-// 15. APLICAR FILTROS
+// 15. RESTAURAR FILTROS
+// ======================================================
+
+function restaurarValoresFiltros() {
+
+  [
+    "filtroSala",
+    "filtroModelo",
+    "filtroNumero",
+    "filtroJuego"
+  ].forEach(
+    id => {
+
+      const elemento =
+        document.getElementById(id);
+
+
+      if (!elemento) return;
+
+
+      const valor =
+        elemento.dataset.valor;
+
+
+      if (valor) {
+
+        elemento.value =
+          valor;
+
+      }
+
+    }
+  );
+
+}
+
+
+// ======================================================
+// 16. MES
+// ======================================================
+
+function llenarFiltroMes() {
+
+  const select =
+    document.getElementById(
+      "filtroMes"
+    );
+
+
+  if (!select) return;
+
+
+  const valorActual =
+    select.value;
+
+
+  select.innerHTML = "";
+
+
+  const inicial =
+    document.createElement(
+      "option"
+    );
+
+
+  inicial.value = "";
+
+  inicial.textContent =
+    "Todos los meses";
+
+
+  select.appendChild(
+    inicial
+  );
+
+
+  MESES.forEach(
+    mes => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        mes;
+
+      option.textContent =
+        mes;
+
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  if (
+    MESES.includes(
+      valorActual
+    )
+  ) {
+
+    select.value =
+      valorActual;
+
+  }
+
+}
+
+
+// ======================================================
+// 17. APLICAR FILTROS
 // ======================================================
 
 function aplicarFiltros() {
 
   const sala =
-    obtenerValor("filtroSala");
+    obtenerValor(
+      "filtroSala"
+    );
 
-  const marca =
-    obtenerValor("filtroMarca");
 
-  const maquina =
-    obtenerValor("filtroMaquina");
+  const modelo =
+    obtenerValor(
+      "filtroModelo"
+    );
+
+
+  const serie =
+    obtenerValor(
+      "filtroNumero"
+    );
+
 
   const juego =
-    obtenerValor("filtroJuego");
+    obtenerValor(
+      "filtroJuego"
+    );
+
 
   const mes =
-    obtenerValor("filtroMes");
-
-  const anio =
-    obtenerValor("filtroAnio");
+    obtenerValor(
+      "filtroMes"
+    );
 
 
   datosFiltrados =
@@ -824,8 +869,10 @@ function aplicarFiltros() {
 
         if (
           sala &&
-          normalizar(registro.local) !==
-          normalizar(sala)
+          limpiarTexto(
+            registro["LOCAL"]
+          ) !==
+          limpiarTexto(sala)
         ) {
 
           return false;
@@ -834,9 +881,13 @@ function aplicarFiltros() {
 
 
         if (
-          marca &&
-          normalizar(registro.marca) !==
-          normalizar(marca)
+          modelo &&
+          limpiarTexto(
+            registro[
+              "Marca / Tipo / Version"
+            ]
+          ) !==
+          limpiarTexto(modelo)
         ) {
 
           return false;
@@ -845,9 +896,11 @@ function aplicarFiltros() {
 
 
         if (
-          maquina &&
-          normalizar(registro.maquina) !==
-          normalizar(maquina)
+          serie &&
+          limpiarTexto(
+            registro["Maquina"]
+          ) !==
+          limpiarTexto(serie)
         ) {
 
           return false;
@@ -857,8 +910,10 @@ function aplicarFiltros() {
 
         if (
           juego &&
-          normalizar(registro.juego) !==
-          normalizar(juego)
+          limpiarTexto(
+            registro["Juego"]
+          ) !==
+          limpiarTexto(juego)
         ) {
 
           return false;
@@ -868,19 +923,10 @@ function aplicarFiltros() {
 
         if (
           mes &&
-          normalizarMes(registro.mes) !==
+          normalizarMes(
+            registro["MES"]
+          ) !==
           normalizarMes(mes)
-        ) {
-
-          return false;
-
-        }
-
-
-        if (
-          anio &&
-          normalizar(registro.anio) !==
-          normalizar(anio)
         ) {
 
           return false;
@@ -894,43 +940,47 @@ function aplicarFiltros() {
     );
 
 
+  actualizarFiltrosDependientes();
+
   actualizarDashboard();
 
 }
 
 
 // ======================================================
-// 16. LIMPIAR
+// 18. LIMPIAR
 // ======================================================
 
 function limpiarFiltros() {
 
   [
     "filtroSala",
-    "filtroMarca",
-    "filtroMaquina",
+    "filtroModelo",
+    "filtroNumero",
     "filtroJuego",
-    "filtroMes",
-    "filtroAnio"
-  ].forEach(id => {
+    "filtroMes"
+  ].forEach(
+    id => {
 
-    const elemento =
-      document.getElementById(id);
+      const elemento =
+        document.getElementById(id);
 
-    if (elemento) {
 
-      elemento.value = "";
+      if (elemento) {
+
+        elemento.value = "";
+
+      }
 
     }
-
-  });
+  );
 
 
   datosFiltrados =
     [...datosOriginales];
 
 
-  cargarFiltrosIniciales();
+  actualizarFiltrosDependientes();
 
   actualizarDashboard();
 
@@ -938,12 +988,14 @@ function limpiarFiltros() {
 
 
 // ======================================================
-// 17. DASHBOARD
+// 19. DASHBOARD
 // ======================================================
 
 function actualizarDashboard() {
 
-  actualizarKPIs();
+  actualizarResumen();
+
+  actualizarTextoSeleccion();
 
   construirGraficos();
 
@@ -953,111 +1005,146 @@ function actualizarDashboard() {
 
 
 // ======================================================
-// 18. KPIs
+// 20. RESUMEN
 // ======================================================
 
-function actualizarKPIs() {
+function actualizarResumen() {
 
   establecerTexto(
-    "kpiRegistros",
-    formatearEntero(
-      datosFiltrados.length
+    "contadorResultados",
+    formatearNumero(
+      datosFiltrados.length,
+      0
     )
   );
 
 
   establecerTexto(
-    "kpiSalas",
-    cantidadUnica(
+    "resumenSalas",
+    contarUnicos(
       datosFiltrados,
-      "local"
+      "LOCAL"
     )
   );
 
 
   establecerTexto(
-    "kpiMarcas",
-    cantidadUnica(
+    "resumenMarcas",
+    contarUnicos(
       datosFiltrados,
-      "marca"
+      "Marca / Tipo / Version"
     )
   );
 
 
   establecerTexto(
-    "kpiMaquinas",
-    cantidadUnica(
+    "resumenJuegos",
+    contarUnicos(
       datosFiltrados,
-      "maquina"
+      "Juego"
     )
   );
 
 
+  const indicador =
+    obtenerIndicador();
+
+
   establecerTexto(
-    "kpiJuegos",
-    cantidadUnica(
-      datosFiltrados,
-      "juego"
-    )
+    "resumenIndicador",
+    indicador
   );
 
 
   establecerTexto(
-    "contadorTabla",
-    formatearEntero(
-      datosFiltrados.length
-    )
+    "indicadorSeleccionado",
+    indicador
   );
 
 }
 
 
 // ======================================================
-// 19. INDICADOR
+// 21. TEXTO DE SELECCIÓN
 // ======================================================
 
-function obtenerIndicador() {
+function actualizarTextoSeleccion() {
 
-  const valor =
-    obtenerValor(
-      "filtroIndicador"
+  const indicador =
+    obtenerIndicador();
+
+
+  const partes = [];
+
+
+  const sala =
+    obtenerValor("filtroSala");
+
+
+  const modelo =
+    obtenerValor("filtroModelo");
+
+
+  const serie =
+    obtenerValor("filtroNumero");
+
+
+  const juego =
+    obtenerValor("filtroJuego");
+
+
+  const mes =
+    obtenerValor("filtroMes");
+
+
+  if (sala)
+    partes.push(
+      "Sala: " + sala
     );
 
 
-  const mapa = {
-
-    "COIN":
-      "coin",
-
-    "COIN PROM":
-      "coinProm",
-
-    "VENTA":
-      "venta",
-
-    "VENTA PROM":
-      "ventaProm",
-
-    "NETWIN ($)":
-      "netwin",
-
-    "T.C":
-      "tc",
-
-    "% PAGO":
-      "pago"
-
-  };
+  if (modelo)
+    partes.push(
+      "Marca: " + modelo
+    );
 
 
-  return mapa[valor] ||
-    "coin";
+  if (serie)
+    partes.push(
+      "Serie: " + serie
+    );
+
+
+  if (juego)
+    partes.push(
+      "Juego: " + juego
+    );
+
+
+  if (mes)
+    partes.push(
+      "Mes: " + mes
+    );
+
+
+  establecerTexto(
+    "tituloAnalisis",
+    indicador
+  );
+
+
+  establecerTexto(
+    "detalleSeleccion",
+    partes.length
+      ? partes.join("  •  ")
+      : "Todos los registros"
+  );
 
 }
 
 
 // ======================================================
-// 20. CONSTRUIR GRÁFICOS
+// 22. GRÁFICOS
 // ======================================================
 
 function construirGraficos() {
@@ -1066,958 +1153,228 @@ function construirGraficos() {
     obtenerIndicador();
 
 
-  crearRankingSalaMarca(
+  construirEvolutivo(
     indicador
   );
 
 
-  crearRankingSalaJuego(
-    indicador
+  construirRanking(
+    "graficoSalas",
+    "LOCAL",
+    indicador,
+    "#2563eb"
   );
 
 
-  crearRankingJuegoMarca(
-    indicador
+  construirRanking(
+    "graficoJuegos",
+    "Juego",
+    indicador,
+    "#7c3aed"
   );
 
 
-  crearRankingMarcaJuego(
-    indicador
-  );
-
-
-  crearEvolucion(
-    indicador
-  );
-
-
-  crearRankingMarca(
-    indicador
+  construirRanking(
+    "graficoMarcas",
+    "Marca / Tipo / Version",
+    indicador,
+    "#059669"
   );
 
 }
 
 
 // ======================================================
-// 21. SALA SEGÚN MARCA
+// 23. EVOLUTIVO
 // ======================================================
 
-function crearRankingSalaMarca(
+function construirEvolutivo(
   indicador
 ) {
 
-  const grupos = {};
-
-
-  datosFiltrados.forEach(r => {
-
-    const marca =
-      texto(r.marca);
-
-    const sala =
-      texto(r.local);
-
-    const valor =
-      obtenerNumero(
-        r[indicador]
-      );
-
-
-    if (
-      !marca ||
-      !sala ||
-      valor === null
-    ) return;
-
-
-    if (!grupos[marca]) {
-
-      grupos[marca] = {};
-
-    }
-
-
-    grupos[marca][sala] =
-      (grupos[marca][sala] || 0) +
-      valor;
-
-  });
-
-
-  const labels = [];
-
-  const valores = [];
-
-  const detalles = [];
-
-
-  Object.keys(grupos).forEach(
-    marca => {
-
-      let mejorSala = "";
-
-      let mejorValor = -Infinity;
-
-
-      Object.entries(
-        grupos[marca]
-      ).forEach(
-        ([sala, valor]) => {
-
-          if (
-            valor > mejorValor
-          ) {
-
-            mejorValor = valor;
-
-            mejorSala = sala;
-
-          }
-
-        }
-      );
-
-
-      if (mejorSala) {
-
-        labels.push(
-          marca
-        );
-
-        valores.push(
-          mejorValor
-        );
-
-        detalles.push(
-          mejorSala
-        );
-
-      }
-
-    }
-  );
-
-
-  crearGraficoBarras(
-    "graficoSalaMarca",
-    labels,
-    valores,
-    "Mejor sala",
-    COLORES[0],
-    detalles,
-    true
-  );
-
-}
-
-
-// ======================================================
-// 22. SALA SEGÚN JUEGO
-// ======================================================
-
-function crearRankingSalaJuego(
-  indicador
-) {
-
-  const grupos = {};
-
-
-  datosFiltrados.forEach(r => {
-
-    const juego =
-      texto(r.juego);
-
-    const sala =
-      texto(r.local);
-
-    const valor =
-      obtenerNumero(
-        r[indicador]
-      );
-
-
-    if (
-      !juego ||
-      !sala ||
-      valor === null
-    ) return;
-
-
-    if (!grupos[juego]) {
-
-      grupos[juego] = {};
-
-    }
-
-
-    grupos[juego][sala] =
-      (grupos[juego][sala] || 0) +
-      valor;
-
-  });
-
-
-  const labels = [];
-
-  const valores = [];
-
-  const detalles = [];
-
-
-  Object.entries(
-    grupos
-  ).forEach(
-    ([juego, salas]) => {
-
-      let mejorSala = "";
-
-      let mejorValor = -Infinity;
-
-
-      Object.entries(
-        salas
-      ).forEach(
-        ([sala, valor]) => {
-
-          if (
-            valor > mejorValor
-          ) {
-
-            mejorValor = valor;
-
-            mejorSala = sala;
-
-          }
-
-        }
-      );
-
-
-      if (mejorSala) {
-
-        labels.push(juego);
-
-        valores.push(
-          mejorValor
-        );
-
-        detalles.push(
-          mejorSala
-        );
-
-      }
-
-    }
-  );
-
-
-  ordenarRanking(
-    labels,
-    valores,
-    detalles
-  );
-
-
-  limitarRanking(
-    labels,
-    valores,
-    detalles,
-    15
-  );
-
-
-  crearGraficoBarras(
-    "graficoSalaJuego",
-    labels,
-    valores,
-    "Mejor sala",
-    COLORES[1],
-    detalles,
-    true
-  );
-
-}
-
-
-// ======================================================
-// 23. JUEGO SEGÚN MARCA
-// ======================================================
-
-function crearRankingJuegoMarca(
-  indicador
-) {
-
-  const grupos = {};
-
-
-  datosFiltrados.forEach(r => {
-
-    const marca =
-      texto(r.marca);
-
-    const juego =
-      texto(r.juego);
-
-    const valor =
-      obtenerNumero(
-        r[indicador]
-      );
-
-
-    if (
-      !marca ||
-      !juego ||
-      valor === null
-    ) return;
-
-
-    if (!grupos[marca]) {
-
-      grupos[marca] = {};
-
-    }
-
-
-    grupos[marca][juego] =
-      (grupos[marca][juego] || 0) +
-      valor;
-
-  });
-
-
-  const labels = [];
-
-  const valores = [];
-
-  const detalles = [];
-
-
-  Object.entries(
-    grupos
-  ).forEach(
-    ([marca, juegos]) => {
-
-      let mejorJuego = "";
-
-      let mejorValor = -Infinity;
-
-
-      Object.entries(
-        juegos
-      ).forEach(
-        ([juego, valor]) => {
-
-          if (
-            valor > mejorValor
-          ) {
-
-            mejorValor = valor;
-
-            mejorJuego = juego;
-
-          }
-
-        }
-      );
-
-
-      if (mejorJuego) {
-
-        labels.push(marca);
-
-        valores.push(
-          mejorValor
-        );
-
-        detalles.push(
-          mejorJuego
-        );
-
-      }
-
-    }
-  );
-
-
-  crearGraficoBarras(
-    "graficoJuegoMarca",
-    labels,
-    valores,
-    "Mejor juego",
-    COLORES[2],
-    detalles,
-    true
-  );
-
-}
-
-
-// ======================================================
-// 24. MARCA SEGÚN JUEGO
-// ======================================================
-
-function crearRankingMarcaJuego(
-  indicador
-) {
-
-  const grupos = {};
-
-
-  datosFiltrados.forEach(r => {
-
-    const juego =
-      texto(r.juego);
-
-    const marca =
-      texto(r.marca);
-
-    const valor =
-      obtenerNumero(
-        r[indicador]
-      );
-
-
-    if (
-      !juego ||
-      !marca ||
-      valor === null
-    ) return;
-
-
-    if (!grupos[juego]) {
-
-      grupos[juego] = {};
-
-    }
-
-
-    grupos[juego][marca] =
-      (grupos[juego][marca] || 0) +
-      valor;
-
-  });
-
-
-  const labels = [];
-
-  const valores = [];
-
-  const detalles = [];
-
-
-  Object.entries(
-    grupos
-  ).forEach(
-    ([juego, marcas]) => {
-
-      let mejorMarca = "";
-
-      let mejorValor = -Infinity;
-
-
-      Object.entries(
-        marcas
-      ).forEach(
-        ([marca, valor]) => {
-
-          if (
-            valor > mejorValor
-          ) {
-
-            mejorValor = valor;
-
-            mejorMarca = marca;
-
-          }
-
-        }
-      );
-
-
-      if (mejorMarca) {
-
-        labels.push(juego);
-
-        valores.push(
-          mejorValor
-        );
-
-        detalles.push(
-          mejorMarca
-        );
-
-      }
-
-    }
-  );
-
-
-  ordenarRanking(
-    labels,
-    valores,
-    detalles
-  );
-
-
-  limitarRanking(
-    labels,
-    valores,
-    detalles,
-    15
-  );
-
-
-  crearGraficoBarras(
-    "graficoMarcaJuego",
-    labels,
-    valores,
-    "Mejor marca",
-    COLORES[3],
-    detalles,
-    true
-  );
-
-}
-
-
-// ======================================================
-// 25. RANKING GENERAL POR MARCA
-// ======================================================
-
-function crearRankingMarca(
-  indicador
-) {
-
-  const grupos = {};
-
-
-  datosFiltrados.forEach(r => {
-
-    const marca =
-      texto(r.marca);
-
-    const valor =
-      obtenerNumero(
-        r[indicador]
-      );
-
-
-    if (
-      !marca ||
-      valor === null
-    ) return;
-
-
-    grupos[marca] =
-      (grupos[marca] || 0) +
-      valor;
-
-  });
-
-
-  const datos =
-    Object.entries(
-      grupos
-    )
-    .sort(
-      (a, b) =>
-        b[1] - a[1]
-    )
-    .slice(0, 15);
-
-
-  crearGraficoBarras(
-    "graficoRankingMarca",
-    datos.map(
-      x => x[0]
-    ),
-    datos.map(
-      x => x[1]
-    ),
-    "Rendimiento",
-    COLORES[4],
-    [],
-    false
-  );
-
-}
-
-
-// ======================================================
-// 26. EVOLUCIÓN
-// ======================================================
-
-function crearEvolucion(
-  indicador
-) {
-
-  const grupos = {};
-
-
-  datosFiltrados.forEach(r => {
-
-    const mes =
-      normalizarMes(
-        r.mes
-      );
-
-    const valor =
-      obtenerNumero(
-        r[indicador]
-      );
-
-
-    if (
-      !MESES.includes(mes) ||
-      valor === null
-    ) return;
-
-
-    if (!grupos[mes]) {
-
-      grupos[mes] = [];
-
-    }
-
-
-    grupos[mes].push(
-      valor
+  const resumen =
+    agruparPorMes(
+      datosFiltrados,
+      indicador
     );
-
-  });
 
 
   const labels =
-    MESES.filter(
-      mes =>
-        grupos[mes] &&
-        grupos[mes].length
+    resumen.map(
+      x => x.nombre
     );
 
 
   const valores =
-    labels.map(
-      mes =>
-        promedio(
-          grupos[mes]
-        )
+    resumen.map(
+      x => x.valor
     );
 
 
-  crearGraficoLinea(
-    "graficoEvolucion",
+  crearOActualizarGrafico(
+    "graficoEvolutivo",
+    "line",
     labels,
     valores,
+    "#2563eb",
     indicador,
-    COLORES[5]
+    true
   );
 
 }
 
 
 // ======================================================
-// 27. GRÁFICO DE BARRAS
+// 24. RANKING
 // ======================================================
 
-function crearGraficoBarras(
+function construirRanking(
   id,
-  labels,
-  valores,
-  etiqueta,
-  color,
-  detalles = [],
-  mostrarDetalle = false
+  campo,
+  indicador,
+  color
 ) {
 
-  destruirGrafico(id);
+  const grupos =
+    {};
 
 
-  const canvas =
-    document.getElementById(id);
+  datosFiltrados.forEach(
+    registro => {
 
+      const nombre =
+        limpiarTexto(
+          registro[campo]
+        );
 
-  if (!canvas) return;
 
+      if (!nombre) return;
 
-  if (!labels.length) {
 
-    mostrarSinDatos(
-      canvas
-    );
+      if (!grupos[nombre]) {
 
-    return;
-
-  }
-
-
-  graficos[id] =
-    new Chart(
-      canvas,
-      {
-
-        type: "bar",
-
-        data: {
-
-          labels,
-
-          datasets: [
-
-            {
-
-              label:
-                etiqueta,
-
-              data:
-                valores,
-
-              backgroundColor:
-                labels.map(
-                  (_, i) =>
-                    COLORES[
-                      i %
-                      COLORES.length
-                    ]
-                ),
-
-              borderRadius:
-                5,
-
-              borderSkipped:
-                false,
-
-              maxBarThickness:
-                34
-
-            }
-
-          ]
-
-        },
-
-
-        options: {
-
-          responsive: true,
-
-          maintainAspectRatio: false,
-
-          animation: {
-            duration: 350
-          },
-
-
-          interaction: {
-
-            mode: "nearest",
-
-            intersect: true
-
-          },
-
-
-          onClick: (
-            evento,
-            elementos
-          ) => {
-
-            if (
-              !elementos.length
-            ) return;
-
-
-            const indice =
-              elementos[0].index;
-
-
-            if (
-              mostrarDetalle &&
-              detalles[indice]
-            ) {
-
-              seleccionarDesdeGrafico(
-                detalles[indice]
-              );
-
-            }
-
-          },
-
-
-          plugins: {
-
-            legend: {
-              display: false
-            },
-
-
-            tooltip: {
-
-              callbacks: {
-
-                title: items => {
-
-                  return items[0]
-                    .label;
-
-                },
-
-
-                label: item => {
-
-                  return
-                    " " +
-                    formatearNumero(
-                      item.raw
-                    );
-
-                },
-
-
-                afterTitle: items => {
-
-                  const indice =
-                    items[0].dataIndex;
-
-
-                  if (
-                    mostrarDetalle &&
-                    detalles[indice]
-                  ) {
-
-                    return
-                      "Mejor: " +
-                      detalles[indice];
-
-                  }
-
-                  return "";
-
-                }
-
-              }
-
-            },
-
-
-            datalabels: {
-
-              display: true,
-
-              anchor: "end",
-
-              align: "top",
-
-              offset: 3,
-
-              color: "#344054",
-
-              font: {
-
-                size: 9,
-
-                weight: "700"
-
-              },
-
-              formatter:
-                valor =>
-                  formatearNumero(
-                    valor
-                  )
-
-            }
-
-          },
-
-
-          scales: {
-
-            x: {
-
-              grid: {
-                display: false
-              },
-
-              ticks: {
-
-                color:
-                  "#667085",
-
-                font: {
-                  size: 9
-                },
-
-                autoSkip: false,
-
-                maxRotation: 35,
-
-                minRotation: 0
-
-              }
-
-            },
-
-
-            y: {
-
-              beginAtZero: true,
-
-              grid: {
-
-                color:
-                  "#edf0f4"
-
-              },
-
-              ticks: {
-
-                color:
-                  "#667085",
-
-                font: {
-                  size: 9
-                },
-
-                callback:
-                  valor =>
-                    formatearNumero(
-                      valor
-                    )
-
-              }
-
-            }
-
-          }
-
-        },
-
-
-        plugins: [
-          ChartDataLabels
-        ]
+        grupos[nombre] = [];
 
       }
+
+
+      const valor =
+        obtenerNumero(
+          registro[
+            INDICADORES[indicador].campo
+          ]
+        );
+
+
+      if (
+        valor !== null
+      ) {
+
+        grupos[nombre].push(
+          valor
+        );
+
+      }
+
+    }
+  );
+
+
+  const datos =
+    Object.keys(grupos)
+      .map(
+        nombre => {
+
+          return {
+
+            nombre,
+
+            valor:
+              INDICADORES[indicador].tipo ===
+              "promedio"
+
+                ? promedioArray(
+                    grupos[nombre]
+                  )
+
+                : grupos[nombre].reduce(
+                    (
+                      a,
+                      b
+                    ) =>
+                      a + b,
+                    0
+                  )
+
+          };
+
+        }
+      )
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          b.valor -
+          a.valor
+      );
+
+
+  const maximo =
+    30;
+
+
+  const visibles =
+    datos.slice(
+      0,
+      maximo
     );
+
+
+  const labels =
+    visibles.map(
+      x =>
+        abreviarEtiqueta(
+          x.nombre
+        )
+    );
+
+
+  const valores =
+    visibles.map(
+      x =>
+        x.valor
+    );
+
+
+  crearOActualizarGrafico(
+    id,
+    "bar",
+    labels,
+    valores,
+    color,
+    indicador,
+    false,
+    visibles
+  );
 
 }
 
 
 // ======================================================
-// 28. GRÁFICO DE LÍNEA
+// 25. CREAR / ACTUALIZAR GRÁFICO
 // ======================================================
 
-function crearGraficoLinea(
+function crearOActualizarGrafico(
   id,
+  tipo,
   labels,
   valores,
-  etiqueta,
-  color
+  color,
+  indicador,
+  mostrarPuntos,
+  metadata = []
 ) {
-
-  destruirGrafico(id);
-
 
   const canvas =
     document.getElementById(id);
@@ -2026,13 +1383,11 @@ function crearGraficoLinea(
   if (!canvas) return;
 
 
-  if (!labels.length) {
+  if (
+    graficos[id]
+  ) {
 
-    mostrarSinDatos(
-      canvas
-    );
-
-    return;
+    graficos[id].destroy();
 
   }
 
@@ -2042,7 +1397,8 @@ function crearGraficoLinea(
       canvas,
       {
 
-        type: "line",
+        type: tipo,
+
 
         data: {
 
@@ -2053,7 +1409,7 @@ function crearGraficoLinea(
             {
 
               label:
-                etiqueta,
+                indicador,
 
               data:
                 valores,
@@ -2062,28 +1418,28 @@ function crearGraficoLinea(
                 color,
 
               backgroundColor:
-                color,
+                tipo === "bar"
+                  ? color
+                  : color,
 
-              pointBackgroundColor:
-                "#ffffff",
+              borderWidth:
+                2,
 
-              pointBorderColor:
-                color,
-
-              pointBorderWidth:
-                3,
+              borderRadius:
+                tipo === "bar"
+                  ? 5
+                  : 0,
 
               pointRadius:
-                5,
+                mostrarPuntos
+                  ? 4
+                  : 0,
 
               pointHoverRadius:
                 7,
 
-              borderWidth:
-                3,
-
               tension:
-                .3,
+                0.28,
 
               fill:
                 false
@@ -2102,7 +1458,20 @@ function crearGraficoLinea(
           maintainAspectRatio: false,
 
           animation: {
-            duration: 400
+
+            duration: 350
+
+          },
+
+
+          interaction: {
+
+            mode:
+              "nearest",
+
+            intersect:
+              true
+
           },
 
 
@@ -2110,65 +1479,65 @@ function crearGraficoLinea(
 
             legend: {
 
-              display: true,
-
-              labels: {
-
-                usePointStyle: true,
-
-                color:
-                  "#667085",
-
-                font: {
-                  size: 10
-                }
-
-              }
+              display: false
 
             },
 
 
             tooltip: {
 
+              displayColors:
+                false,
+
               callbacks: {
 
+                title:
+                  function (
+                    elementos
+                  ) {
+
+                    if (
+                      !elementos.length
+                    ) return "";
+
+
+                    const indice =
+                      elementos[0].dataIndex;
+
+
+                    if (
+                      metadata[indice]
+                    ) {
+
+                      return metadata[
+                        indice
+                      ].nombre;
+
+                    }
+
+
+                    return labels[indice];
+
+                  },
+
+
                 label:
-                  item =>
-                    " " +
-                    formatearNumero(
-                      item.raw
-                    )
+                  function (
+                    contexto
+                  ) {
+
+                    return (
+                      indicador +
+                      ": " +
+                      formatearIndicador(
+                        contexto.parsed.y,
+                        indicador
+                      )
+                    );
+
+                  }
 
               }
-
-            },
-
-
-            datalabels: {
-
-              display: true,
-
-              color:
-                "#344054",
-
-              align:
-                "top",
-
-              offset: 4,
-
-              font: {
-
-                size: 9,
-
-                weight: "700"
-
-              },
-
-              formatter:
-                valor =>
-                  formatearNumero(
-                    valor
-                  )
 
             }
 
@@ -2180,7 +1549,9 @@ function crearGraficoLinea(
             x: {
 
               grid: {
+
                 display: false
+
               },
 
               ticks: {
@@ -2188,8 +1559,22 @@ function crearGraficoLinea(
                 color:
                   "#667085",
 
+                maxRotation:
+                  45,
+
+                minRotation:
+                  0,
+
+                autoSkip:
+                  true,
+
+                maxTicksLimit:
+                  15,
+
                 font: {
+
                   size: 10
+
                 }
 
               }
@@ -2199,9 +1584,8 @@ function crearGraficoLinea(
 
             y: {
 
-              beginAtZero: false,
-
-              grace: "15%",
+              beginAtZero:
+                true,
 
               grid: {
 
@@ -2216,27 +1600,63 @@ function crearGraficoLinea(
                   "#667085",
 
                 font: {
-                  size: 9
+
+                  size: 10
+
                 },
 
                 callback:
-                  valor =>
-                    formatearNumero(
+                  function (
+                    valor
+                  ) {
+
+                    return formatearNumero(
                       valor
-                    )
+                    );
+
+                  }
 
               }
 
             }
 
-          }
-
-        },
+          },
 
 
-        plugins: [
-          ChartDataLabels
-        ]
+          onClick:
+            function (
+              evento,
+              elementos
+            ) {
+
+              if (
+                !elementos.length
+              ) return;
+
+
+              const indice =
+                elementos[0].index;
+
+
+              const elemento =
+                metadata[indice]
+                ? metadata[indice].nombre
+                : labels[indice];
+
+
+              const valor =
+                valores[indice];
+
+
+              mostrarDetalleClick(
+                elemento,
+                valor,
+                indicador
+              );
+
+            }
+
+        }
 
       }
     );
@@ -2245,140 +1665,119 @@ function crearGraficoLinea(
 
 
 // ======================================================
-// 29. CLICK EN GRÁFICOS
+// 26. AGRUPAR POR MES
 // ======================================================
 
-function seleccionarDesdeGrafico(
-  valor
+function agruparPorMes(
+  datos,
+  indicador
 ) {
 
-  const filtros = [
-    "filtroSala",
-    "filtroMarca",
-    "filtroMaquina",
-    "filtroJuego"
-  ];
+  const grupos =
+    {};
 
 
-  /*
-   * Buscamos automáticamente
-   * dónde existe el valor.
-   */
+  datos.forEach(
+    registro => {
 
-  for (
-    const id of filtros
-  ) {
-
-    const select =
-      document.getElementById(id);
-
-
-    if (!select) continue;
-
-
-    const existe =
-      Array.from(
-        select.options
-      ).some(
-        option =>
-          normalizar(
-            option.value
-          ) ===
-          normalizar(
-            valor
-          )
-      );
-
-
-    if (existe) {
-
-      select.value =
-        valor;
+      const mes =
+        normalizarMes(
+          registro["MES"]
+        );
 
 
       if (
-        id ===
-        "filtroSala"
-      ) {
+        !MESES.includes(mes)
+      ) return;
 
-        actualizarFiltrosDependientes();
+
+      if (!grupos[mes]) {
+
+        grupos[mes] = [];
 
       }
 
 
+      const valor =
+        obtenerNumero(
+          registro[
+            INDICADORES[indicador].campo
+          ]
+        );
+
+
       if (
-        id ===
-        "filtroMarca"
+        valor !== null
       ) {
 
-        actualizarFiltrosDependientes();
+        grupos[mes].push(
+          valor
+        );
 
       }
-
-
-      aplicarFiltros();
-
-      break;
 
     }
+  );
 
-  }
+
+  return MESES
+
+    .filter(
+      mes =>
+        grupos[mes] &&
+        grupos[mes].length
+    )
+
+    .map(
+      mes => {
+
+        return {
+
+          nombre: mes,
+
+          valor:
+            INDICADORES[indicador].tipo ===
+            "promedio"
+
+              ? promedioArray(
+                  grupos[mes]
+                )
+
+              : grupos[mes].reduce(
+                  (
+                    a,
+                    b
+                  ) =>
+                    a + b,
+                  0
+                )
+
+        };
+
+      }
+    );
 
 }
 
 
 // ======================================================
-// 30. DESTRUIR GRÁFICO
-// ======================================================
-
-function destruirGrafico(
-  id
-) {
-
-  if (graficos[id]) {
-
-    graficos[id].destroy();
-
-    graficos[id] =
-      null;
-
-  }
-
-}
-
-
-// ======================================================
-// 31. TABLA
+// 27. TABLA COMPLETA
 // ======================================================
 
 function construirTabla() {
 
   const cuerpo =
     document.getElementById(
-      "tablaCuerpo"
+      "tablaCompletaCuerpo"
     );
 
 
   if (!cuerpo) return;
 
 
-  cuerpo.innerHTML = "";
-
-
-  /*
-   * Fragment evita crear
-   * repaints innecesarios.
-   */
-
-  const fragment =
+  const fragmento =
     document.createDocumentFragment();
 
-
-  /*
-   * Mostramos como máximo
-   * todos los registros,
-   * pero de manera ligera.
-   */
 
   datosFiltrados.forEach(
     registro => {
@@ -2389,66 +1788,127 @@ function construirTabla() {
         );
 
 
-      fila.innerHTML = `
+      const columnas = [
 
-        <td>${escapar(
-          registro.marca
-        )}</td>
+        registro[
+          "Marca / Tipo / Version"
+        ],
 
-        <td>${escapar(
-          registro.maquina
-        )}</td>
+        registro[
+          "Maquina"
+        ],
 
-        <td>${escapar(
-          registro.juego
-        )}</td>
+        registro[
+          "Juego"
+        ],
 
-        <td>${formatearCelda(
-          registro.coin
-        )}</td>
+        registro[
+          "COIN"
+        ],
 
-        <td>${formatearCelda(
-          registro.coinProm
-        )}</td>
+        registro[
+          "COIN PROM"
+        ],
 
-        <td>${formatearCelda(
-          registro.venta
-        )}</td>
+        registro[
+          "VENTA"
+        ],
 
-        <td>${formatearCelda(
-          registro.ventaProm
-        )}</td>
+        registro[
+          "VENTA PROM"
+        ],
 
-        <td>${formatearCelda(
-          registro.netwin
-        )}</td>
+        registro[
+          "NETWIN ($)"
+        ],
 
-        <td>${formatearCelda(
-          registro.pago
-        )}%</td>
+        registro[
+          "G.PLAYED"
+        ],
 
-        <td>${escapar(
-          registro.local
-        )}</td>
+        registro[
+          "% PAGO"
+        ],
 
-        <td>${escapar(
-          normalizarMes(
-            registro.mes
-          )
-        )}</td>
+        registro[
+          "LOCAL"
+        ],
 
-        <td>${escapar(
-          registro.anio
-        )}</td>
+        registro[
+          "MES"
+        ],
 
-        <td>${formatearTC(
-          registro.tc
-        )}</td>
+        registro[
+          "AÑO"
+        ],
 
-      `;
+        registro[
+          "T.C"
+        ]
+
+      ];
 
 
-      fragment.appendChild(
+      columnas.forEach(
+        (
+          valor,
+          indice
+        ) => {
+
+          const td =
+            document.createElement(
+              "td"
+            );
+
+
+          if (
+            indice >= 3 &&
+            indice <= 9 ||
+            indice === 13
+          ) {
+
+            const numero =
+              obtenerNumero(
+                valor
+              );
+
+
+            td.textContent =
+              numero === null
+                ? ""
+                : formatearIndicador(
+                    numero,
+                    [
+                      "COIN",
+                      "COIN PROM",
+                      "VENTA",
+                      "VENTA PROM",
+                      "NETWIN ($)",
+                      "G.PLAYED",
+                      "% PAGO",
+                      "T.C"
+                    ][
+                      indice - 3
+                    ] || ""
+                  );
+
+          } else {
+
+            td.textContent =
+              valor ?? "";
+
+          }
+
+
+          fila.appendChild(
+            td
+          );
+
+        }
+      );
+
+
+      fragmento.appendChild(
         fila
       );
 
@@ -2456,117 +1916,139 @@ function construirTabla() {
   );
 
 
+  cuerpo.innerHTML = "";
+
   cuerpo.appendChild(
-    fragment
+    fragmento
   );
 
 }
 
 
 // ======================================================
-// 32. MOSTRAR SIN DATOS
+// 28. CLICK EN GRÁFICO
 // ======================================================
 
-function mostrarSinDatos(
-  canvas
+function mostrarDetalleClick(
+  elemento,
+  valor,
+  indicador
 ) {
 
-  const contexto =
-    canvas.getContext(
-      "2d"
+  establecerTexto(
+    "elementoSeleccionado",
+    elemento
+  );
+
+
+  establecerTexto(
+    "valorSeleccionado",
+    formatearIndicador(
+      valor,
+      indicador
+    )
+  );
+
+
+  establecerTexto(
+    "indicadorSeleccionado",
+    indicador
+  );
+
+}
+
+
+// ======================================================
+// 29. INDICADOR
+// ======================================================
+
+function obtenerIndicador() {
+
+  const select =
+    document.getElementById(
+      "filtroIndicador"
     );
 
 
-  contexto.clearRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-
-  contexto.font =
-    "13px Arial";
-
-
-  contexto.fillStyle =
-    "#98a2b3";
-
-
-  contexto.textAlign =
-    "center";
-
-
-  contexto.fillText(
-    "No hay datos para los filtros seleccionados",
-    canvas.width / 2,
-    canvas.height / 2
+  return (
+    select?.value ||
+    "COIN"
   );
 
 }
 
 
 // ======================================================
-// 33. UTILIDADES
+// 30. VALOR SELECT
 // ======================================================
 
 function obtenerValor(id) {
 
-  const elemento =
-    document.getElementById(id);
-
-
-  return elemento
-    ? String(
-        elemento.value || ""
-      ).trim()
-    : "";
-
-}
-
-
-function normalizar(valor) {
-
   return String(
-    valor ?? ""
-  )
-  .trim()
-  .toUpperCase()
-  .normalize("NFD")
-  .replace(
-    /[\u0300-\u036f]/g,
-    ""
-  );
-
-}
-
-
-function limpiarTexto(valor) {
-
-  return String(
-    valor ?? ""
+    document.getElementById(
+      id
+    )?.value || ""
   ).trim();
 
 }
 
 
-function texto(valor) {
+// ======================================================
+// 31. TEXTO
+// ======================================================
 
-  return limpiarTexto(
-    valor
-  );
+function limpiarTexto(valor) {
+
+  if (
+    valor === null ||
+    valor === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(valor)
+    .trim()
+    .toUpperCase();
 
 }
 
 
+// ======================================================
+// 32. MES
+// ======================================================
+
 function normalizarMes(valor) {
 
-  const limpio =
-    normalizar(valor);
+  if (
+    valor === null ||
+    valor === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  let texto =
+    String(valor)
+      .trim()
+      .toUpperCase();
+
+
+  texto =
+    texto
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      );
 
 
   const numero =
-    Number(limpio);
+    Number(texto);
 
 
   if (
@@ -2585,44 +2067,32 @@ function normalizarMes(valor) {
   const equivalencias = {
 
     ENE: "ENERO",
-
     FEB: "FEBRERO",
-
     MAR: "MARZO",
-
     ABR: "ABRIL",
-
     MAY: "MAYO",
-
     JUN: "JUNIO",
-
     JUL: "JULIO",
-
     AGO: "AGOSTO",
-
     SEP: "SEPTIEMBRE",
-
     SET: "SEPTIEMBRE",
-
     OCT: "OCTUBRE",
-
     NOV: "NOVIEMBRE",
-
     DIC: "DICIEMBRE"
 
   };
 
 
   return (
-    equivalencias[limpio] ||
-    limpio
+    equivalencias[texto] ||
+    texto
   );
 
 }
 
 
 // ======================================================
-// 34. NÚMEROS
+// 33. NÚMERO
 // ======================================================
 
 function obtenerNumero(valor) {
@@ -2744,30 +2214,24 @@ function obtenerNumero(valor) {
 
 
 // ======================================================
-// 35. PROMEDIO
+// 34. PROMEDIO
 // ======================================================
 
-function promedio(
+function promedioArray(
   valores
 ) {
 
-  const validos =
-    valores.filter(
-      valor =>
-        Number.isFinite(
-          Number(valor)
-        )
-    );
-
-
-  if (!validos.length) {
+  if (
+    !valores ||
+    !valores.length
+  ) {
 
     return 0;
 
   }
 
 
-  return validos.reduce(
+  return valores.reduce(
     (
       total,
       valor
@@ -2776,44 +2240,82 @@ function promedio(
       Number(valor),
     0
   ) /
-  validos.length;
+  valores.length;
 
 }
 
 
 // ======================================================
-// 36. FORMATEO
+// 35. FORMATO
 // ======================================================
 
 function formatearNumero(
-  valor
+  valor,
+  decimales = 2
 ) {
 
-  return Number(
-    valor || 0
-  ).toLocaleString(
+  const numero =
+    Number(valor) || 0;
+
+
+  return numero.toLocaleString(
     "es-PE",
     {
-      maximumFractionDigits: 2
+
+      minimumFractionDigits:
+        decimales,
+
+      maximumFractionDigits:
+        decimales
+
     }
   );
 
 }
 
 
-function formatearCelda(
-  valor
+// ======================================================
+// 36. FORMATO INDICADOR
+// ======================================================
+
+function formatearIndicador(
+  valor,
+  indicador
 ) {
 
   const numero =
-    obtenerNumero(
-      valor
+    Number(valor) || 0;
+
+
+  if (
+    indicador === "% PAGO"
+  ) {
+
+    return (
+      numero.toLocaleString(
+        "es-PE",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      ) +
+      "%"
     );
 
+  }
 
-  if (numero === null) {
 
-    return "-";
+  if (
+    indicador === "T.C"
+  ) {
+
+    return numero.toLocaleString(
+      "es-PE",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    );
 
   }
 
@@ -2825,241 +2327,85 @@ function formatearCelda(
 }
 
 
-function formatearTC(
-  valor
-) {
-
-  const numero =
-    obtenerNumero(
-      valor
-    );
-
-
-  if (numero === null) {
-
-    return "-";
-
-  }
-
-
-  return numero.toFixed(
-    2
-  );
-
-}
-
-
-function formatearEntero(
-  valor
-) {
-
-  return Number(
-    valor || 0
-  ).toLocaleString(
-    "es-PE"
-  );
-
-}
-
-
 // ======================================================
-// 37. CANTIDAD ÚNICA
+// 37. CONTAR ÚNICOS
 // ======================================================
 
-function cantidadUnica(
+function contarUnicos(
   datos,
   campo
 ) {
 
   return new Set(
+
     datos
+
       .map(
-        r =>
-          normalizar(
-            r[campo]
+        registro =>
+          limpiarTexto(
+            registro[campo]
           )
       )
+
       .filter(Boolean)
+
   ).size;
 
 }
 
 
 // ======================================================
-// 38. COMPROBAR VALOR DE SELECT
+// 38. ABREVIAR EJE X
 // ======================================================
 
-function valorExiste(
-  id,
-  valor
+function abreviarEtiqueta(
+  texto
 ) {
 
-  if (!valor) return false;
+  const valor =
+    String(texto || "")
+      .trim();
 
 
-  const select =
-    document.getElementById(id);
+  if (
+    valor.length <= 16
+  ) {
+
+    return valor;
+
+  }
 
 
-  if (!select) return false;
-
-
-  return Array.from(
-    select.options
-  ).some(
-    option =>
-      normalizar(
-        option.value
-      ) ===
-      normalizar(
-        valor
-      )
+  return (
+    valor.substring(
+      0,
+      14
+    ) +
+    "…"
   );
 
 }
 
 
 // ======================================================
-// 39. ORDENAR RANKING
-// ======================================================
-
-function ordenarRanking(
-  labels,
-  valores,
-  detalles
-) {
-
-  const combinado =
-    labels.map(
-      (
-        label,
-        indice
-      ) => ({
-
-        label,
-
-        valor:
-          valores[indice],
-
-        detalle:
-          detalles[indice]
-
-      })
-    );
-
-
-  combinado.sort(
-    (a, b) =>
-      b.valor - a.valor
-  );
-
-
-  labels.length = 0;
-
-  valores.length = 0;
-
-  detalles.length = 0;
-
-
-  combinado.forEach(
-    elemento => {
-
-      labels.push(
-        elemento.label
-      );
-
-      valores.push(
-        elemento.valor
-      );
-
-      detalles.push(
-        elemento.detalle
-      );
-
-    }
-  );
-
-}
-
-
-// ======================================================
-// 40. LIMITAR RANKING
-// ======================================================
-
-function limitarRanking(
-  labels,
-  valores,
-  detalles,
-  limite
-) {
-
-  labels.splice(
-    limite
-  );
-
-  valores.splice(
-    limite
-  );
-
-  detalles.splice(
-    limite
-  );
-
-}
-
-
-// ======================================================
-// 41. ESCAPAR HTML
-// ======================================================
-
-function escapar(
-  valor
-) {
-
-  return String(
-    valor ?? ""
-  )
-  .replace(
-    /&/g,
-    "&amp;"
-  )
-  .replace(
-    /</g,
-    "&lt;"
-  )
-  .replace(
-    />/g,
-    "&gt;"
-  )
-  .replace(
-    /"/g,
-    "&quot;"
-  )
-  .replace(
-    /'/g,
-    "&#039;"
-  );
-
-}
-
-
-// ======================================================
-// 42. ESTABLECER TEXTO
+// 39. ESTABLECER TEXTO
 // ======================================================
 
 function establecerTexto(
   id,
-  valor
+  texto
 ) {
 
   const elemento =
-    document.getElementById(id);
+    document.getElementById(
+      id
+    );
 
 
   if (elemento) {
 
     elemento.textContent =
-      valor;
+      texto;
 
   }
 
@@ -3067,11 +2413,11 @@ function establecerTexto(
 
 
 // ======================================================
-// 43. ACTUALIZACIÓN AUTOMÁTICA
+// 40. ACTUALIZACIÓN AUTOMÁTICA
 // ======================================================
 
 setInterval(
-  () => {
+  function () {
 
     cargarDatos();
 
