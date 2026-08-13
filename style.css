@@ -1,125 +1,104 @@
-/* =====================================================
-   VARIABLES
-===================================================== */
+/* ======================================================
+   GENERAL
+====================================================== */
+
+* {
+  box-sizing: border-box;
+}
 
 :root {
 
-  --fondo: #f5f7fb;
+  --fondo: #ffffff;
 
-  --blanco: #ffffff;
+  --panel: #ffffff;
 
-  --texto: #253047;
+  --texto: #273142;
 
-  --texto-secundario: #7b8498;
+  --texto-secundario: #788397;
 
-  --borde: #e5e9f0;
+  --borde: #e7ebf0;
 
-  --azul-pastel: #8ecae6;
+  --azul-pastel: #9ecae1;
 
-  --celeste-pastel: #a8dadc;
+  --verde-pastel: #a8d5ba;
 
-  --verde-pastel: #95d5b2;
+  --amarillo-pastel: #f5d98b;
 
-  --amarillo-pastel: #f9d88c;
+  --morado-pastel: #c9b6dc;
 
-  --rosa-pastel: #f3a6b8;
+  --rosa-pastel: #e8b4c3;
 
-  --morado-pastel: #cdb4db;
+  --naranja-pastel: #efc39b;
 
-  --naranja-pastel: #f4b183;
+  --verde: #5ca77d;
 
-  --verde: #45a878;
-
-  --rojo: #e46a6a;
+  --rojo: #dc7777;
 
   --sombra:
-    0 4px 16px rgba(45,55,72,.07);
-
+    0 4px 18px rgba(40, 55, 75, .07);
 }
 
 
-/* =====================================================
-   GENERAL
-===================================================== */
-
-* {
-
-  box-sizing:
-    border-box;
-
-}
-
+/* ======================================================
+   BODY
+====================================================== */
 
 html {
-
-  background:
-    var(--fondo);
-
+  background: #ffffff;
 }
-
 
 body {
 
-  margin:
-    0;
+  margin: 0;
 
   font-family:
     Arial,
     Helvetica,
     sans-serif;
 
-  background:
-    var(--fondo);
+  background: #ffffff;
 
-  color:
-    var(--texto);
+  color: var(--texto);
 
-  min-height:
-    100vh;
-
+  min-height: 100vh;
 }
 
 
-/* =====================================================
+/* ======================================================
    ENCABEZADO
-===================================================== */
+====================================================== */
 
 .encabezado {
 
-  background:
-    var(--blanco);
-
-  border-bottom:
-    1px solid var(--borde);
+  background: #ffffff;
 
   padding:
     22px 4%;
 
-  display:
-    flex;
+  display: flex;
 
   justify-content:
     space-between;
 
-  align-items:
-    center;
+  align-items: center;
 
-  gap:
-    20px;
+  gap: 20px;
+
+  border-bottom:
+    1px solid var(--borde);
 
 }
 
 
 .encabezado h1 {
 
-  margin:
-    0;
+  margin: 0;
 
-  font-size:
-    27px;
+  font-size: 27px;
 
-  color:
-    #243047;
+  font-weight: 700;
+
+  color: #273142;
 
 }
 
@@ -132,58 +111,47 @@ body {
   color:
     var(--texto-secundario);
 
-  font-size:
-    14px;
+  font-size: 14px;
 
 }
 
 
-/* =====================================================
+/* ======================================================
    CONEXIÓN
-===================================================== */
+====================================================== */
 
 .conexion {
 
-  display:
-    flex;
+  display: flex;
 
-  align-items:
-    center;
+  align-items: center;
 
-  gap:
-    8px;
+  gap: 8px;
 
-  padding:
-    8px 13px;
+  background: #f7f9fb;
 
   border:
     1px solid var(--borde);
 
-  border-radius:
-    20px;
+  padding:
+    8px 13px;
 
-  background:
-    #fafbfd;
+  border-radius: 20px;
 
-  font-size:
-    13px;
+  font-size: 13px;
 
-  color:
-    var(--texto-secundario);
+  color: #5f6b7d;
 
 }
 
 
 .punto {
 
-  width:
-    10px;
+  width: 9px;
 
-  height:
-    10px;
+  height: 9px;
 
-  border-radius:
-    50%;
+  border-radius: 50%;
 
   background:
     #f2b84b;
@@ -191,17 +159,15 @@ body {
 }
 
 
-/* =====================================================
+/* ======================================================
    CONTENEDOR
-===================================================== */
+====================================================== */
 
 .contenedor {
 
-  width:
-    94%;
+  width: 94%;
 
-  max-width:
-    1500px;
+  max-width: 1500px;
 
   margin:
     24px auto;
@@ -209,35 +175,31 @@ body {
 }
 
 
-/* =====================================================
-   BARRA SUPERIOR
-===================================================== */
+/* ======================================================
+   BARRA ACCIONES
+====================================================== */
 
-.barra-superior {
+.barra-acciones {
 
   background:
-    var(--blanco);
+    #ffffff;
 
   border:
     1px solid var(--borde);
 
-  border-radius:
-    12px;
+  border-radius: 12px;
 
   padding:
-    13px 17px;
+    14px 18px;
 
-  margin-bottom:
-    18px;
+  margin-bottom: 18px;
 
-  display:
-    flex;
-
-  align-items:
-    center;
+  display: flex;
 
   justify-content:
     space-between;
+
+  align-items: center;
 
   box-shadow:
     var(--sombra);
@@ -245,45 +207,37 @@ body {
 }
 
 
-.barra-superior strong {
+.barra-acciones strong {
 
-  font-size:
-    23px;
+  font-size: 24px;
 
   color:
-    #4f6f95;
+    #526b82;
 
 }
 
 
-.barra-superior span {
-
-  margin-left:
-    5px;
+.barra-acciones span {
 
   color:
     var(--texto-secundario);
 
-  font-size:
-    13px;
+  font-size: 13px;
 
 }
 
 
-/* =====================================================
+/* ======================================================
    BOTONES
-===================================================== */
+====================================================== */
 
 button {
 
-  border:
-    none;
+  border: none;
 
-  cursor:
-    pointer;
+  cursor: pointer;
 
-  font-family:
-    inherit;
+  font-family: inherit;
 
   transition:
     .2s;
@@ -294,19 +248,16 @@ button {
 #btnActualizar {
 
   background:
-    #9ecae1;
+    #e8a1ad;
 
-  color:
-    #25445a;
+  color: #ffffff;
 
   padding:
-    10px 17px;
+    10px 18px;
 
-  border-radius:
-    8px;
+  border-radius: 8px;
 
-  font-weight:
-    700;
+  font-weight: 600;
 
 }
 
@@ -314,7 +265,7 @@ button {
 #btnActualizar:hover {
 
   background:
-    #83bcd7;
+    #d88f9d;
 
   transform:
     translateY(-1px);
@@ -322,48 +273,141 @@ button {
 }
 
 
-.btn-limpiar {
+/* ======================================================
+   KPI
+====================================================== */
 
-  width:
-    100%;
+.tarjetas {
 
-  height:
-    38px;
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, 1fr);
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+
+}
+
+
+.tarjeta {
 
   background:
-    #f1f3f7;
+    #ffffff;
 
-  color:
-    #5f6b7d;
+  border-radius:
+    12px;
+
+  padding:
+    18px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  min-height:
+    105px;
 
   border:
     1px solid var(--borde);
 
-  border-radius:
-    7px;
+  box-shadow:
+    var(--sombra);
 
-  font-weight:
-    600;
+  transition:
+    .2s;
 
 }
 
 
-.btn-limpiar:hover {
+.tarjeta:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 7px 22px
+    rgba(40, 55, 75, .10);
+
+}
+
+
+.icono {
+
+  width: 44px;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
 
   background:
-    #e8ecf2;
+    #f3f7fa;
+
+  border:
+    1px solid #e4eaf0;
+
+  border-radius:
+    10px;
+
+  font-size:
+    19px;
+
+  color:
+    #6d8398;
 
 }
 
 
-/* =====================================================
+.titulo {
+
+  display: block;
+
+  color:
+    var(--texto-secundario);
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+
+  margin-bottom:
+    5px;
+
+}
+
+
+.tarjeta strong {
+
+  display: block;
+
+  font-size:
+    23px;
+
+  color:
+    #303b4b;
+
+}
+
+
+/* ======================================================
    FILTROS
-===================================================== */
+====================================================== */
 
 .filtros {
 
   background:
-    var(--blanco);
+    #ffffff;
+
+  padding:
+    17px;
 
   border:
     1px solid var(--borde);
@@ -371,14 +415,15 @@ button {
   border-radius:
     12px;
 
-  padding:
-    17px;
-
-  display:
-    grid;
+  display: grid;
 
   grid-template-columns:
-    repeat(5, 1fr) auto;
+    1.3fr
+    1fr
+    1.3fr
+    1fr
+    1.2fr
+    auto;
 
   gap:
     12px;
@@ -400,17 +445,17 @@ button {
   display:
     block;
 
-  margin-bottom:
-    6px;
-
-  color:
-    #707b8e;
-
   font-size:
-    11px;
+    10px;
 
   font-weight:
     700;
+
+  color:
+    #7c8797;
+
+  margin-bottom:
+    6px;
 
 }
 
@@ -427,7 +472,7 @@ button {
     0 10px;
 
   border:
-    1px solid #dce2eb;
+    1px solid #dfe5eb;
 
   border-radius:
     7px;
@@ -436,7 +481,7 @@ button {
     #ffffff;
 
   color:
-    #374151;
+    #465366;
 
   outline:
     none;
@@ -447,39 +492,68 @@ button {
 .filtro select:focus {
 
   border-color:
-    #8ecae6;
+    #a9c4d8;
 
   box-shadow:
-    0 0 0 3px rgba(142,202,230,.15);
+    0 0 0 2px
+    rgba(169, 196, 216, .18);
 
 }
 
 
-/* =====================================================
-   TARJETAS
-===================================================== */
-
-.tarjetas {
-
-  display:
-    grid;
-
-  grid-template-columns:
-    repeat(6,1fr);
-
-  gap:
-    14px;
-
-  margin-bottom:
-    20px;
-
-}
-
-
-.tarjeta {
+.filtro select option {
 
   background:
-    var(--blanco);
+    #ffffff;
+
+  color:
+    #465366;
+
+}
+
+
+.btn-limpiar {
+
+  height:
+    38px;
+
+  padding:
+    0 15px;
+
+  border-radius:
+    7px;
+
+  background:
+    #f3f5f7;
+
+  border:
+    1px solid #dfe5eb;
+
+  color:
+    #657184;
+
+  font-weight:
+    600;
+
+}
+
+
+.btn-limpiar:hover {
+
+  background:
+    #e9edf1;
+
+}
+
+
+/* ======================================================
+   GRÁFICO
+====================================================== */
+
+.grafico {
+
+  background:
+    #ffffff;
 
   border:
     1px solid var(--borde);
@@ -488,157 +562,83 @@ button {
     12px;
 
   padding:
-    16px;
+    18px;
 
   min-height:
-    105px;
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  gap:
-    12px;
+    320px;
 
   box-shadow:
     var(--sombra);
 
+  margin-bottom:
+    20px;
+
 }
 
 
-.kpi-icono {
+.grafico-grande {
 
-  width:
-    42px;
+  min-height:
+    500px;
 
-  height:
-    42px;
+}
 
-  display:
-    flex;
 
-  align-items:
-    center;
+.grafico-header {
 
-  justify-content:
-    center;
-
-  border-radius:
+  margin-bottom:
     10px;
 
-  font-weight:
-    700;
-
 }
 
 
-.kpi-icono.coin {
+.grafico-header h2 {
 
-  background:
-    #e1f2f8;
-
-  color:
-    #5a9bb7;
-
-}
-
-
-.kpi-icono.venta {
-
-  background:
-    #e5f5ef;
-
-  color:
-    #5c9d7c;
-
-}
-
-
-.kpi-icono.netwin {
-
-  background:
-    #f2eaf6;
-
-  color:
-    #936da5;
-
-}
-
-
-.kpi-icono.pago {
-
-  background:
-    #fff4d8;
-
-  color:
-    #b18a39;
-
-}
-
-
-.kpi-icono.maquinas {
-
-  background:
-    #fde8ed;
-
-  color:
-    #b66b7b;
-
-}
-
-
-.kpi-icono.locales {
-
-  background:
-    #e6edf9;
-
-  color:
-    #647fae;
-
-}
-
-
-.kpi-titulo {
-
-  display:
-    block;
+  margin:
+    0;
 
   font-size:
-    10px;
+    17px;
 
-  font-weight:
-    700;
+  color:
+    #303b4b;
+
+}
+
+
+.grafico-header p {
+
+  margin:
+    5px 0 0;
+
+  font-size:
+    12px;
 
   color:
     var(--texto-secundario);
 
-  margin-bottom:
-    5px;
+}
+
+
+.grafico-contenido {
+
+  height:
+    400px;
+
+  position:
+    relative;
 
 }
 
 
-.tarjeta strong {
-
-  font-size:
-    22px;
-
-  color:
-    #2d394f;
-
-}
-
-
-/* =====================================================
-   PANELES
-===================================================== */
+/* ======================================================
+   TABLA
+====================================================== */
 
 .panel {
 
   background:
-    var(--blanco);
+    #ffffff;
 
   border:
     1px solid var(--borde);
@@ -646,14 +646,11 @@ button {
   border-radius:
     12px;
 
-  box-shadow:
-    var(--sombra);
-
   overflow:
     hidden;
 
-  margin-bottom:
-    20px;
+  box-shadow:
+    var(--sombra);
 
 }
 
@@ -666,15 +663,6 @@ button {
   border-bottom:
     1px solid var(--borde);
 
-  display:
-    flex;
-
-  justify-content:
-    space-between;
-
-  align-items:
-    center;
-
 }
 
 
@@ -684,18 +672,21 @@ button {
     0;
 
   font-size:
-    17px;
+    18px;
 
   color:
-    #2c3850;
+    #303b4b;
 
 }
 
 
-.panel-header p {
+.panel-header span {
 
-  margin:
-    5px 0 0;
+  display:
+    block;
+
+  margin-top:
+    4px;
 
   color:
     var(--texto-secundario);
@@ -706,65 +697,6 @@ button {
 }
 
 
-.etiqueta {
-
-  background:
-    #edf4fa;
-
-  color:
-    #5c7892;
-
-  border:
-    1px solid #dce9f2;
-
-  padding:
-    7px 12px;
-
-  border-radius:
-    20px;
-
-  font-size:
-    12px;
-
-  font-weight:
-    700;
-
-}
-
-
-/* =====================================================
-   GRÁFICO
-===================================================== */
-
-.grafico-contenedor {
-
-  height:
-    520px;
-
-  padding:
-    20px;
-
-  position:
-    relative;
-
-}
-
-
-#graficoMensual {
-
-  width:
-    100% !important;
-
-  height:
-    100% !important;
-
-}
-
-
-/* =====================================================
-   TABLA
-===================================================== */
-
 .tabla-contenedor {
 
   width:
@@ -774,7 +706,7 @@ button {
     auto;
 
   max-height:
-    500px;
+    600px;
 
   overflow-y:
     auto;
@@ -808,10 +740,10 @@ thead th {
     2;
 
   background:
-    #f6f8fb;
+    #f7f9fb;
 
   color:
-    #69758a;
+    #65768a;
 
   padding:
     12px 10px;
@@ -826,7 +758,7 @@ thead th {
     nowrap;
 
   border-bottom:
-    1px solid var(--borde);
+    1px solid #e5e9ee;
 
 }
 
@@ -839,14 +771,22 @@ tbody td {
   font-size:
     12px;
 
-  color:
-    #465268;
-
   border-bottom:
-    1px solid #eef1f5;
+    1px solid #edf0f3;
 
   white-space:
     nowrap;
+
+  color:
+    #4c596b;
+
+}
+
+
+tbody tr {
+
+  transition:
+    .15s;
 
 }
 
@@ -859,9 +799,9 @@ tbody tr:hover {
 }
 
 
-/* =====================================================
+/* ======================================================
    SCROLL
-===================================================== */
+====================================================== */
 
 ::-webkit-scrollbar {
 
@@ -877,7 +817,7 @@ tbody tr:hover {
 ::-webkit-scrollbar-track {
 
   background:
-    #f1f3f6;
+    #f5f6f8;
 
 }
 
@@ -885,7 +825,7 @@ tbody tr:hover {
 ::-webkit-scrollbar-thumb {
 
   background:
-    #c7ced9;
+    #cbd3dc;
 
   border-radius:
     10px;
@@ -893,23 +833,24 @@ tbody tr:hover {
 }
 
 
-/* =====================================================
+/* ======================================================
    RESPONSIVE
-===================================================== */
+====================================================== */
 
 @media (max-width: 1200px) {
 
   .tarjetas {
 
     grid-template-columns:
-      repeat(3,1fr);
+      repeat(3, 1fr);
 
   }
+
 
   .filtros {
 
     grid-template-columns:
-      repeat(3,1fr);
+      repeat(3, 1fr);
 
   }
 
@@ -925,6 +866,17 @@ tbody tr:hover {
 
     align-items:
       flex-start;
+
+    padding:
+      18px;
+
+  }
+
+
+  .encabezado h1 {
+
+    font-size:
+      22px;
 
   }
 
@@ -951,7 +903,7 @@ tbody tr:hover {
   }
 
 
-  .barra-superior {
+  .barra-acciones {
 
     flex-direction:
       column;
@@ -973,6 +925,50 @@ tbody tr:hover {
   }
 
 
+  .tarjetas {
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap:
+      10px;
+
+  }
+
+
+  .tarjeta {
+
+    padding:
+      13px;
+
+    min-height:
+      90px;
+
+  }
+
+
+  .tarjeta .icono {
+
+    width:
+      36px;
+
+    height:
+      36px;
+
+    font-size:
+      16px;
+
+  }
+
+
+  .tarjeta strong {
+
+    font-size:
+      19px;
+
+  }
+
+
   .filtros {
 
     grid-template-columns:
@@ -981,52 +977,26 @@ tbody tr:hover {
   }
 
 
-  .tarjetas {
+  .btn-limpiar {
 
-    grid-template-columns:
-      1fr 1fr;
+    width:
+      100%;
 
   }
 
 
-  .tarjeta {
+  .grafico-grande {
 
     min-height:
-      90px;
-
-    padding:
-      12px;
+      430px;
 
   }
 
 
-  .tarjeta strong {
-
-    font-size:
-      18px;
-
-  }
-
-
-  .grafico-contenedor {
+  .grafico-contenido {
 
     height:
-      450px;
-
-    padding:
-      10px;
-
-  }
-
-}
-
-
-@media (max-width: 450px) {
-
-  .tarjetas {
-
-    grid-template-columns:
-      1fr;
+      340px;
 
   }
 
