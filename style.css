@@ -1,58 +1,18 @@
-/* =====================================================
-   GENERAL
-===================================================== */
+/* ======================================================
+   CONFIGURACIÓN GENERAL
+====================================================== */
 
 * {
   box-sizing: border-box;
 }
 
-:root {
-
-  --fondo: #ffffff;
-
-  --panel: #ffffff;
-
-  --borde: #e5e9ef;
-
-  --texto: #263238;
-
-  --texto-secundario: #75808f;
-
-  --sombra:
-    0 4px 18px rgba(50, 60, 80, 0.08);
-
-  --rojo: #e9a6a6;
-
-  --azul: #a8cbe3;
-
-  --verde: #abd9c0;
-
-  --amarillo: #f3d79b;
-
-  --morado: #cbb5df;
-
-  --naranja: #e7bd9d;
-
-  --rosa: #e4b1c0;
-
-}
-
-
-/* =====================================================
-   BODY
-===================================================== */
-
 html {
-
-  background: #ffffff;
-
+  scroll-behavior: smooth;
 }
 
 body {
-
   margin: 0;
-
-  min-height: 100vh;
+  padding: 0;
 
   font-family:
     Arial,
@@ -61,63 +21,64 @@ body {
 
   background: #ffffff;
 
-  color: var(--texto);
-
+  color: #344054;
 }
 
 
-/* =====================================================
+/* ======================================================
    ENCABEZADO
-===================================================== */
+====================================================== */
 
 .encabezado {
 
+  width: 100%;
+
+  padding:
+    24px 35px;
+
   background: #ffffff;
 
-  padding: 22px 4%;
+  border-bottom:
+    1px solid #eaecf0;
 
   display: flex;
 
-  justify-content: space-between;
-
   align-items: center;
 
+  justify-content: space-between;
+
   gap: 20px;
-
-  border-bottom:
-    1px solid var(--borde);
-
-  box-shadow:
-    0 2px 10px rgba(0, 0, 0, 0.04);
 
 }
 
 
 .encabezado h1 {
 
-  margin: 0;
+  margin: 0 0 6px 0;
 
-  font-size: 28px;
+  font-size: 27px;
 
-  color: #344054;
+  font-weight: 700;
+
+  color: #1d2939;
 
 }
 
 
 .encabezado p {
 
-  margin: 6px 0 0;
-
-  color: var(--texto-secundario);
+  margin: 0;
 
   font-size: 14px;
+
+  color: #667085;
 
 }
 
 
-/* =====================================================
+/* ======================================================
    CONEXIÓN
-===================================================== */
+====================================================== */
 
 .conexion {
 
@@ -125,20 +86,13 @@ body {
 
   align-items: center;
 
-  gap: 8px;
-
-  padding: 9px 14px;
-
-  border:
-    1px solid var(--borde);
-
-  border-radius: 20px;
-
-  background: #fafbfc;
+  gap: 9px;
 
   font-size: 13px;
 
-  color: #5d6878;
+  color: #667085;
+
+  white-space: nowrap;
 
 }
 
@@ -149,6 +103,8 @@ body {
 
   height: 10px;
 
+  display: inline-block;
+
   border-radius: 50%;
 
   background: #f2b84b;
@@ -156,35 +112,39 @@ body {
 }
 
 
-/* =====================================================
-   CONTENEDOR
-===================================================== */
+/* ======================================================
+   CONTENEDOR PRINCIPAL
+====================================================== */
 
 .contenedor {
 
-  width: 94%;
+  width: 100%;
 
-  max-width: 1500px;
+  max-width: 1600px;
 
-  margin: 24px auto;
+  margin: 0 auto;
+
+  padding:
+    25px 35px 45px 35px;
 
 }
 
 
-/* =====================================================
-   BARRA
-===================================================== */
+/* ======================================================
+   BARRA DE ACCIONES
+====================================================== */
 
 .barra-acciones {
 
   background: #ffffff;
 
   border:
-    1px solid var(--borde);
+    1px solid #eaecf0;
 
   border-radius: 12px;
 
-  padding: 14px 18px;
+  padding:
+    16px 20px;
 
   margin-bottom: 18px;
 
@@ -194,23 +154,25 @@ body {
 
   align-items: center;
 
-  box-shadow: var(--sombra);
+  gap: 15px;
 
 }
 
 
 .barra-acciones strong {
 
-  font-size: 25px;
+  font-size: 20px;
 
-  color: #526779;
+  color: #1d2939;
 
 }
 
 
 .barra-acciones span {
 
-  color: var(--texto-secundario);
+  margin-left: 5px;
+
+  color: #667085;
 
   font-size: 13px;
 
@@ -221,99 +183,100 @@ body {
 
   display: flex;
 
+  align-items: center;
+
   gap: 10px;
 
 }
 
 
-/* =====================================================
-   BOTONES
-===================================================== */
+.acciones button {
 
-button {
-
-  border: none;
-
-  cursor: pointer;
-
-  font-family: inherit;
-
-  transition: 0.2s;
-
-}
-
-
-#btnActualizar {
-
-  background: #b7cfe0;
-
-  color: #314554;
-
-  padding: 10px 18px;
+  border: 0;
 
   border-radius: 8px;
 
+  padding:
+    10px 16px;
+
+  background: #344054;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
   font-weight: 600;
 
-}
+  cursor: pointer;
 
-
-#btnActualizar:hover {
-
-  background: #a5c3d8;
-
-  transform: translateY(-1px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 
 }
 
 
-/* =====================================================
+.acciones button:hover {
+
+  opacity: 0.88;
+
+  transform:
+    translateY(-1px);
+
+}
+
+
+/* ======================================================
    FILTROS
-===================================================== */
+====================================================== */
 
 .filtros {
 
   background: #ffffff;
 
-  padding: 17px;
-
   border:
-    1px solid var(--borde);
+    1px solid #eaecf0;
 
   border-radius: 12px;
+
+  padding: 20px;
+
+  margin-bottom: 22px;
 
   display: grid;
 
   grid-template-columns:
-    1.5fr
-    1fr
-    1fr
-    1fr
-    1fr
+    repeat(5, minmax(150px, 1fr))
     auto;
 
-  gap: 12px;
+  gap: 15px;
 
   align-items: end;
 
-  margin-bottom: 20px;
+}
 
-  box-shadow: var(--sombra);
+
+.filtro {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
 
 }
 
 
 .filtro label {
 
-  display: block;
-
   font-size: 11px;
 
   font-weight: 700;
 
-  color: #697586;
+  color: #667085;
 
-  margin-bottom: 6px;
+  letter-spacing:
+    0.04em;
 
 }
 
@@ -322,100 +285,132 @@ button {
 
   width: 100%;
 
-  height: 38px;
+  min-height: 40px;
 
-  padding: 0 10px;
+  padding:
+    0 11px;
 
   border:
-    1px solid #dce2e9;
+    1px solid #d0d5dd;
 
-  border-radius: 7px;
+  border-radius: 8px;
 
   background: #ffffff;
 
   color: #344054;
 
+  font-size: 13px;
+
   outline: none;
+
+  cursor: pointer;
 
 }
 
 
 .filtro select:focus {
 
-  border-color: #a8cbe3;
+  border-color:
+    #98a2b3;
 
   box-shadow:
-    0 0 0 2px rgba(168, 203, 227, 0.18);
+    0 0 0 3px
+    rgba(152, 162, 179, 0.12);
 
 }
 
 
 .btn-limpiar {
 
-  height: 38px;
+  min-height: 40px;
 
-  padding: 0 15px;
-
-  border-radius: 7px;
-
-  background: #f3f5f7;
+  padding:
+    0 15px;
 
   border:
-    1px solid #dce2e9;
+    1px solid #d0d5dd;
 
-  color: #596579;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #475467;
+
+  font-size: 13px;
 
   font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
 
 }
 
 
 .btn-limpiar:hover {
 
-  background: #e9edf1;
+  background: #f9fafb;
 
 }
 
 
-/* =====================================================
-   GRÁFICOS
-===================================================== */
+/* ======================================================
+   CONTENEDOR DE GRÁFICOS
+====================================================== */
 
 .graficos {
 
   display: grid;
 
   grid-template-columns:
-    1fr 1fr;
+    repeat(2, minmax(0, 1fr));
 
-  gap: 18px;
+  gap: 20px;
 
-  margin-bottom: 20px;
+  width: 100%;
 
 }
 
+
+/* ======================================================
+   TARJETA DE GRÁFICO
+====================================================== */
 
 .grafico {
 
   background: #ffffff;
 
   border:
-    1px solid var(--borde);
+    1px solid #eaecf0;
 
-  border-radius: 12px;
+  border-radius: 14px;
 
-  padding: 18px;
+  padding: 18px 20px 15px 20px;
 
-  min-height: 350px;
+  min-width: 0;
 
-  box-shadow: var(--sombra);
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
 
 }
 
 
+/* ======================================================
+   ENCABEZADO DEL GRÁFICO
+====================================================== */
+
 .grafico-header {
 
-  margin-bottom: 12px;
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 10px;
 
 }
 
@@ -424,58 +419,76 @@ button {
 
   margin: 0;
 
-  font-size: 17px;
+  font-size: 16px;
 
-  color: #344054;
+  font-weight: 700;
+
+  color: #1d2939;
 
 }
 
 
 .grafico-header span {
 
-  display: block;
+  font-size: 11px;
 
-  margin-top: 4px;
-
-  font-size: 12px;
-
-  color: var(--texto-secundario);
+  color: #98a2b3;
 
 }
 
+
+/* ======================================================
+   ÁREA DEL CANVAS
+====================================================== */
 
 .grafico-contenido {
 
-  height: 280px;
-
   position: relative;
+
+  width: 100%;
+
+  height: 330px;
 
 }
 
 
-/* =====================================================
+.grafico-contenido canvas {
+
+  width: 100% !important;
+
+  height: 100% !important;
+
+}
+
+
+/* ======================================================
    PANEL % PAGO
-===================================================== */
+====================================================== */
 
 .pago-panel {
+
+  margin-top: 22px;
 
   background: #ffffff;
 
   border:
-    1px solid var(--borde);
+    1px solid #eaecf0;
 
-  border-radius: 12px;
+  border-radius: 14px;
 
-  padding: 20px;
+  padding:
+    20px;
 
-  margin-bottom: 20px;
-
-  box-shadow: var(--sombra);
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
 
 }
 
 
 .pago-contenido {
+
+  min-height: 350px;
 
   display: flex;
 
@@ -490,11 +503,20 @@ button {
 
 .grafico-pago {
 
-  width: 340px;
+  width: 360px;
 
-  height: 340px;
+  height: 320px;
 
   position: relative;
+
+}
+
+
+.grafico-pago canvas {
+
+  width: 100% !important;
+
+  height: 100% !important;
 
 }
 
@@ -507,6 +529,8 @@ button {
 
   gap: 6px;
 
+  align-items: flex-start;
+
 }
 
 
@@ -514,73 +538,80 @@ button {
 
   font-size: 34px;
 
-  color: #526779;
+  line-height: 1;
+
+  color: #1d2939;
 
 }
 
 
 .pago-valor span {
 
-  color: var(--texto-secundario);
-
   font-size: 13px;
+
+  color: #667085;
 
 }
 
 
-/* =====================================================
-   TABLA
-===================================================== */
+/* ======================================================
+   PANEL TABLA
+====================================================== */
 
 .panel {
+
+  margin-top: 22px;
 
   background: #ffffff;
 
   border:
-    1px solid var(--borde);
+    1px solid #eaecf0;
 
-  border-radius: 12px;
+  border-radius: 14px;
 
   overflow: hidden;
 
-  box-shadow: var(--sombra);
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
 
 }
 
 
 .panel-header {
 
-  padding: 18px 20px;
+  padding:
+    20px;
 
   border-bottom:
-    1px solid var(--borde);
+    1px solid #eaecf0;
 
 }
 
 
 .panel-header h2 {
 
-  margin: 0;
+  margin: 0 0 5px 0;
 
-  font-size: 18px;
+  font-size: 17px;
 
-  color: #344054;
+  color: #1d2939;
 
 }
 
 
 .panel-header span {
 
-  display: block;
-
-  margin-top: 4px;
-
-  color: var(--texto-secundario);
-
   font-size: 12px;
+
+  color: #98a2b3;
 
 }
 
+
+/* ======================================================
+   TABLA
+====================================================== */
 
 .tabla-contenedor {
 
@@ -597,57 +628,80 @@ table {
 
   border-collapse: collapse;
 
-  min-width: 900px;
+  min-width: 850px;
 
 }
 
 
-thead th {
+thead {
 
-  background: #f7f9fb;
+  background: #f9fafb;
 
-  color: #667085;
+}
 
-  padding: 12px 10px;
 
-  font-size: 11px;
+th {
+
+  padding:
+    13px 14px;
 
   text-align: left;
 
-  white-space: nowrap;
-
   border-bottom:
-    1px solid var(--borde);
+    1px solid #eaecf0;
+
+  color: #667085;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
 
 }
 
 
-tbody td {
+td {
 
-  padding: 11px 10px;
+  padding:
+    13px 14px;
+
+  border-bottom:
+    1px solid #f2f4f7;
+
+  color: #475467;
 
   font-size: 12px;
 
-  border-bottom:
-    1px solid #eef1f4;
-
   white-space: nowrap;
-
-  color: #475467;
 
 }
 
 
 tbody tr:hover {
 
-  background: #fafbfd;
+  background: #fafafa;
 
 }
 
 
-/* =====================================================
-   SCROLL
-===================================================== */
+tbody tr:last-child td {
+
+  border-bottom: 0;
+
+}
+
+
+td strong {
+
+  color: #344054;
+
+}
+
+
+/* ======================================================
+   SCROLLBAR
+====================================================== */
 
 ::-webkit-scrollbar {
 
@@ -660,43 +714,127 @@ tbody tr:hover {
 
 ::-webkit-scrollbar-track {
 
-  background: #f4f6f8;
+  background: #f2f4f7;
 
 }
 
 
 ::-webkit-scrollbar-thumb {
 
-  background: #c9d1da;
+  background: #d0d5dd;
 
   border-radius: 10px;
 
 }
 
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+::-webkit-scrollbar-thumb:hover {
 
-@media (max-width: 1100px) {
+  background: #98a2b3;
+
+}
+
+
+/* ======================================================
+   RESPONSIVE - TABLET
+====================================================== */
+
+@media (
+  max-width: 1200px
+) {
+
+  .contenedor {
+
+    padding:
+      22px;
+
+  }
+
 
   .filtros {
 
     grid-template-columns:
-      1fr 1fr 1fr;
+      repeat(3, minmax(150px, 1fr));
+
+  }
+
+
+  .graficos {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
 
   }
 
 }
 
 
-@media (max-width: 800px) {
+/* ======================================================
+   RESPONSIVE - MÓVIL
+====================================================== */
+
+@media (
+  max-width: 800px
+) {
+
+  .encabezado {
+
+    padding:
+      20px;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+  }
+
+
+  .encabezado h1 {
+
+    font-size: 23px;
+
+  }
+
+
+  .contenedor {
+
+    padding:
+      16px;
+
+  }
+
+
+  .barra-acciones {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+  }
+
+
+  .filtros {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
 
   .graficos {
 
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
   }
+
+
+  .grafico-contenido {
+
+    height: 300px;
+
+  }
+
 
   .pago-contenido {
 
@@ -704,66 +842,79 @@ tbody tr:hover {
 
     gap: 20px;
 
+    padding:
+      10px 0 25px 0;
+
+  }
+
+
+  .grafico-pago {
+
+    width: 100%;
+
+    max-width: 350px;
+
+    height: 300px;
+
+  }
+
+
+  .pago-valor {
+
+    align-items: center;
+
   }
 
 }
 
 
-@media (max-width: 600px) {
+/* ======================================================
+   MÓVIL PEQUEÑO
+====================================================== */
+
+@media (
+  max-width: 480px
+) {
 
   .encabezado {
+
+    padding:
+      17px;
+
+  }
+
+
+  .encabezado h1 {
+
+    font-size: 21px;
+
+  }
+
+
+  .contenedor {
+
+    padding:
+      12px;
+
+  }
+
+
+  .grafico {
+
+    padding:
+      15px;
+
+  }
+
+
+  .grafico-header {
 
     flex-direction: column;
 
     align-items: flex-start;
 
-    padding: 18px;
-
   }
 
-  .conexion {
-
-    width: 100%;
-
-    justify-content: center;
-
-  }
-
-  .contenedor {
-
-    width: 96%;
-
-    margin: 15px auto;
-
-  }
-
-  .barra-acciones {
-
-    flex-direction: column;
-
-    align-items: stretch;
-
-    gap: 12px;
-
-  }
-
-  #btnActualizar {
-
-    width: 100%;
-
-  }
-
-  .filtros {
-
-    grid-template-columns: 1fr;
-
-  }
-
-  .grafico {
-
-    min-height: 330px;
-
-  }
 
   .grafico-contenido {
 
@@ -771,11 +922,19 @@ tbody tr:hover {
 
   }
 
-  .grafico-pago {
 
-    width: 280px;
+  .pago-panel {
 
-    height: 280px;
+    padding:
+      15px;
+
+  }
+
+
+  .pago-contenido {
+
+    min-height:
+      auto;
 
   }
 
