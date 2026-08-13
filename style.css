@@ -633,9 +633,11 @@ table {
 }
 
 
+/* ENCABEZADO ROJO */
+
 thead {
 
-  background: #f9fafb;
+  background: #b91c1c;
 
 }
 
@@ -647,10 +649,16 @@ th {
 
   text-align: left;
 
-  border-bottom:
-    1px solid #eaecf0;
+  border-top:
+    1px solid #991b1b;
 
-  color: #667085;
+  border-right:
+    1px solid rgba(255, 255, 255, 0.25);
+
+  border-bottom:
+    1px solid #991b1b;
+
+  color: #ffffff;
 
   font-size: 11px;
 
@@ -661,13 +669,25 @@ th {
 }
 
 
+th:last-child {
+
+  border-right: 0;
+
+}
+
+
+/* CELDAS */
+
 td {
 
   padding:
     13px 14px;
 
+  border-right:
+    1px solid #eaecf0;
+
   border-bottom:
-    1px solid #f2f4f7;
+    1px solid #eaecf0;
 
   color: #475467;
 
@@ -678,12 +698,23 @@ td {
 }
 
 
-tbody tr:hover {
+td:last-child {
 
-  background: #fafafa;
+  border-right: 0;
 
 }
 
+
+/* EFECTO AL PASAR EL MOUSE */
+
+tbody tr:hover {
+
+  background: #fff5f5;
+
+}
+
+
+/* ÚLTIMA FILA */
 
 tbody tr:last-child td {
 
