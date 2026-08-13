@@ -2,385 +2,697 @@
 <html lang="es">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Dashboard de Producción</title>
 
   <link rel="stylesheet" href="style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
 </head>
+
 
 <body>
 
+
+<!-- ======================================================
+     ENCABEZADO
+====================================================== -->
+
 <header class="topbar">
 
-  <div class="brand">
-    <div class="brand-icon">MM</div>
+  <div>
 
-    <div>
-      <h1>Dashboard de Producción</h1>
-      <p>Análisis de rendimiento de máquinas</p>
+    <div class="titulo">
+      Dashboard de Producción
     </div>
+
+    <div class="subtitulo">
+      Análisis de máquinas, marcas, juegos e indicadores
+    </div>
+
   </div>
 
-  <div class="conexion">
-    <span id="indicadorConexion"></span>
+
+  <div class="estado">
+
+    <span
+      id="indicadorConexion"
+      class="estado-punto"
+    ></span>
+
     <span id="textoConexion">
       Conectando con Google Sheets...
     </span>
+
   </div>
 
 </header>
 
 
+
 <main class="dashboard">
 
 
-  <!-- =====================================================
-       FILTROS
-  ====================================================== -->
+<!-- ======================================================
+     BARRA SUPERIOR
+====================================================== -->
 
-  <section class="filtros-panel">
+<section class="barra-superior">
 
-    <div class="filtro">
-      <label>LOCAL</label>
-      <select id="filtroSala">
-        <option value="">TODOS</option>
-      </select>
+  <div class="contador">
+
+    <span class="contador-numero" id="contadorResultados">
+      0
+    </span>
+
+    <span class="contador-texto">
+      registros
+    </span>
+
+  </div>
+
+
+  <button
+    id="btnActualizar"
+    class="btn-actualizar"
+  >
+    ↻ Actualizar datos
+  </button>
+
+</section>
+
+
+
+<!-- ======================================================
+     FILTROS
+====================================================== -->
+
+<section class="panel filtros-panel">
+
+  <div class="panel-titulo">
+
+    <div>
+
+      <h2>
+        Filtros
+      </h2>
+
+      <span>
+        Los filtros están vinculados entre sí
+      </span>
+
     </div>
 
-    <div class="filtro">
-      <label>AÑO</label>
-      <select id="filtroAnio">
-        <option value="">TODOS</option>
-      </select>
-    </div>
 
-    <div class="filtro">
-      <label>MES</label>
-      <select id="filtroMes">
-        <option value="">TODOS</option>
-      </select>
-    </div>
-
-    <div class="filtro">
-      <label>MARCA / TIPO / VERSIÓN</label>
-      <select id="filtroMarca">
-        <option value="">TODOS</option>
-      </select>
-    </div>
-
-    <div class="filtro">
-      <label>SERIE DE MÁQUINA</label>
-      <select id="filtroSerie">
-        <option value="">TODAS</option>
-      </select>
-    </div>
-
-    <div class="filtro">
-      <label>JUEGO</label>
-      <select id="filtroJuego">
-        <option value="">TODOS</option>
-      </select>
-    </div>
-
-    <div class="filtro indicador-filtro">
-      <label>INDICADOR</label>
-
-      <select id="filtroIndicador">
-
-        <option value="COIN">COIN</option>
-        <option value="COIN PROM">COIN PROM</option>
-        <option value="VENTA">VENTA</option>
-        <option value="VENTA PROM">VENTA PROM</option>
-        <option value="NETWIN ($)">NETWIN ($)</option>
-        <option value="G.PLAYED">G.PLAYED</option>
-        <option value="% PAGO">% PAGO</option>
-        <option value="T.C">T.C.</option>
-
-      </select>
-    </div>
-
-    <button id="btnLimpiar" class="btn-limpiar">
+    <button
+      id="btnLimpiar"
+      class="btn-limpiar"
+    >
       Limpiar filtros
     </button>
 
-    <button id="btnActualizar" class="btn-actualizar">
-      ↻ Actualizar
-    </button>
-
-  </section>
+  </div>
 
 
-
-  <!-- =====================================================
-       TARJETAS PRINCIPALES
-  ====================================================== -->
-
-  <section class="kpis">
-
-    <article class="kpi">
-      <span>REGISTROS</span>
-      <strong id="kpiRegistros">0</strong>
-      <small>registros filtrados</small>
-    </article>
-
-    <article class="kpi">
-      <span>INDICADOR</span>
-      <strong id="kpiIndicador">COIN</strong>
-      <small>indicador seleccionado</small>
-    </article>
-
-    <article class="kpi">
-      <span>PROMEDIO</span>
-      <strong id="kpiPromedio">0</strong>
-      <small>promedio actual</small>
-    </article>
-
-    <article class="kpi">
-      <span>TOTAL</span>
-      <strong id="kpiTotal">0</strong>
-      <small>valor acumulado</small>
-    </article>
-
-    <article class="kpi">
-      <span>MEJOR SERIE</span>
-      <strong id="kpiMejorSerie">-</strong>
-      <small>mejor rendimiento</small>
-    </article>
-
-  </section>
+  <div class="filtros-grid">
 
 
+    <!-- SALA -->
 
-  <!-- =====================================================
-       RANKING
-  ====================================================== -->
+    <div class="filtro">
 
-  <section class="dashboard-grid">
+      <label>
+        SALA
+      </label>
 
-    <article class="card ranking-card">
+      <select id="filtroSala">
 
-      <div class="card-header">
+        <option value="">
+          Todas las salas
+        </option>
 
-        <div>
-          <h2>Ranking de máquinas</h2>
-          <p id="rankingSubtitulo">
-            Según indicador seleccionado
-          </p>
-        </div>
+      </select>
 
-      </div>
-
-      <div id="rankingLista" class="ranking-lista"></div>
-
-    </article>
+    </div>
 
 
-    <article class="card">
+    <!-- MARCA -->
 
-      <div class="card-header">
+    <div class="filtro">
 
-        <div>
-          <h2>Comparación por máquina</h2>
-          <p>Top máquinas según indicador</p>
-        </div>
+      <label>
+        MARCA
+      </label>
 
-      </div>
+      <select id="filtroMarca">
 
-      <div class="chart-box chart-ranking">
-        <canvas id="graficoRanking"></canvas>
-      </div>
+        <option value="">
+          Todas las marcas
+        </option>
 
-    </article>
+      </select>
 
-  </section>
-
+    </div>
 
 
-  <!-- =====================================================
-       EVOLUCIÓN
-  ====================================================== -->
+    <!-- SERIE -->
 
-  <section class="card grafico-evolucion">
+    <div class="filtro">
 
-    <div class="card-header">
+      <label>
+        SERIE / MÁQUINA
+      </label>
+
+      <select id="filtroSerie">
+
+        <option value="">
+          Todas las series
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- JUEGO -->
+
+    <div class="filtro">
+
+      <label>
+        JUEGO
+      </label>
+
+      <select id="filtroJuego">
+
+        <option value="">
+          Todos los juegos
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- MES -->
+
+    <div class="filtro">
+
+      <label>
+        MES
+      </label>
+
+      <select id="filtroMes">
+
+        <option value="">
+          Todos los meses
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- AÑO -->
+
+    <div class="filtro">
+
+      <label>
+        AÑO
+      </label>
+
+      <select id="filtroAnio">
+
+        <option value="">
+          Todos los años
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- INDICADOR -->
+
+    <div class="filtro">
+
+      <label>
+        INDICADOR
+      </label>
+
+      <select id="filtroIndicador">
+
+        <option value="COIN">
+          COIN
+        </option>
+
+        <option value="COIN PROM">
+          COIN PROM
+        </option>
+
+        <option value="VENTA">
+          VENTA
+        </option>
+
+        <option value="VENTA PROM">
+          VENTA PROM
+        </option>
+
+        <option value="NETWIN ($)">
+          NETWIN ($)
+        </option>
+
+        <option value="G.PLAYED">
+          G.PLAYED
+        </option>
+
+        <option value="% PAGO">
+          % PAGO
+        </option>
+
+        <option value="T.C">
+          T.C.
+        </option>
+
+      </select>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     TARJETAS DE RESUMEN
+====================================================== -->
+
+<section class="metricas">
+
+
+  <div class="metrica metrica-azul">
+
+    <span>
+      COIN
+    </span>
+
+    <strong id="resumenCoin">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="metrica metrica-verde">
+
+    <span>
+      VENTA
+    </span>
+
+    <strong id="resumenVenta">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="metrica metrica-morado">
+
+    <span>
+      NETWIN
+    </span>
+
+    <strong id="resumenNetwin">
+      0
+    </strong>
+
+  </div>
+
+
+  <div class="metrica metrica-naranja">
+
+    <span>
+      % PAGO
+    </span>
+
+    <strong id="resumenPago">
+      0.00%
+    </strong>
+
+  </div>
+
+
+  <div class="metrica metrica-celeste">
+
+    <span>
+      MÁQUINAS
+    </span>
+
+    <strong id="resumenMaquinas">
+      0
+    </strong>
+
+  </div>
+
+
+</section>
+
+
+
+<!-- ======================================================
+     RESUMEN DE SELECCIÓN
+====================================================== -->
+
+<section class="seleccion-resumen">
+
+  <div>
+
+    <span class="seleccion-label">
+      SELECCIÓN ACTUAL
+    </span>
+
+    <strong id="textoSeleccion">
+      Todas las máquinas
+    </strong>
+
+  </div>
+
+
+  <div>
+
+    <span class="seleccion-label">
+      INDICADOR
+    </span>
+
+    <strong id="textoIndicador">
+      COIN
+    </strong>
+
+  </div>
+
+</section>
+
+
+
+<!-- ======================================================
+     GRÁFICOS
+====================================================== -->
+
+<section class="graficos-grid">
+
+
+  <!-- RANKING -->
+
+  <article class="grafico-card grafico-grande">
+
+    <div class="grafico-titulo">
 
       <div>
-        <h2>Evolución del indicador</h2>
 
-        <p>
-          Comportamiento mensual según los filtros seleccionados
-        </p>
-      </div>
+        <h2>
+          Ranking por marca
+        </h2>
 
-      <div class="indicador-activo" id="indicadorActivo">
-        COIN
+        <span>
+          Haz clic en una marca para filtrar el dashboard
+        </span>
+
       </div>
 
     </div>
 
-    <div class="chart-box chart-evolucion">
-      <canvas id="graficoEvolucion"></canvas>
+
+    <div class="canvas-ranking">
+
+      <canvas id="graficoRanking"></canvas>
+
     </div>
 
-  </section>
+  </article>
 
 
 
-  <!-- =====================================================
-       DETALLE DE INDICADORES
-  ====================================================== -->
+  <!-- INDICADORES -->
 
-  <section class="dashboard-grid">
+  <article class="grafico-card">
 
-    <article class="card">
-
-      <div class="card-header">
-
-        <div>
-          <h2>Indicadores</h2>
-          <p>Resumen del resultado filtrado</p>
-        </div>
-
-      </div>
-
-      <div class="indicadores-grid">
-
-        <div>
-          <span>COIN</span>
-          <strong id="detalleCoin">0</strong>
-        </div>
-
-        <div>
-          <span>COIN PROM</span>
-          <strong id="detalleCoinProm">0</strong>
-        </div>
-
-        <div>
-          <span>VENTA</span>
-          <strong id="detalleVenta">0</strong>
-        </div>
-
-        <div>
-          <span>VENTA PROM</span>
-          <strong id="detalleVentaProm">0</strong>
-        </div>
-
-        <div>
-          <span>NETWIN</span>
-          <strong id="detalleNetwin">0</strong>
-        </div>
-
-        <div>
-          <span>G.PLAYED</span>
-          <strong id="detalleGPlayed">0</strong>
-        </div>
-
-        <div>
-          <span>% PAGO</span>
-          <strong id="detallePago">0%</strong>
-        </div>
-
-        <div>
-          <span>T.C.</span>
-          <strong id="detalleTC">0</strong>
-        </div>
-
-      </div>
-
-    </article>
-
-
-    <article class="card">
-
-      <div class="card-header">
-
-        <div>
-          <h2>Distribución</h2>
-          <p>Participación por serie</p>
-        </div>
-
-      </div>
-
-      <div class="chart-box chart-dona">
-        <canvas id="graficoDistribucion"></canvas>
-      </div>
-
-    </article>
-
-  </section>
-
-
-
-  <!-- =====================================================
-       TABLA FINAL ÚNICA
-  ====================================================== -->
-
-  <section class="card tabla-panel">
-
-    <div class="card-header">
+    <div class="grafico-titulo">
 
       <div>
-        <h2>Detalle completo</h2>
 
-        <p>
-          Información correspondiente a los filtros seleccionados
-        </p>
+        <h2>
+          Evolución del indicador
+        </h2>
+
+        <span>
+          Resultado según mes
+        </span>
+
       </div>
 
-      <strong id="contadorTabla">
-        0 registros
-      </strong>
+    </div>
+
+
+    <div class="canvas-normal">
+
+      <canvas id="graficoIndicador"></canvas>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- COMPARACIÓN -->
+
+  <article class="grafico-card">
+
+    <div class="grafico-titulo">
+
+      <div>
+
+        <h2>
+          Comparación de indicadores
+        </h2>
+
+        <span>
+          Resumen de producción
+        </span>
+
+      </div>
 
     </div>
 
 
-    <div class="tabla-scroll">
+    <div class="canvas-normal">
 
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>MARCA / TIPO / VERSION</th>
-            <th>SERIE / MAQUINA</th>
-            <th>JUEGO</th>
-
-            <th>COIN</th>
-            <th>COIN PROM</th>
-            <th>VENTA</th>
-            <th>VENTA PROM</th>
-            <th>NETWIN ($)</th>
-            <th>G.PLAYED</th>
-            <th>% PAGO</th>
-            <th>T.C.</th>
-
-            <th>LOCAL</th>
-            <th>MES</th>
-            <th>AÑO</th>
-
-          </tr>
-
-        </thead>
-
-        <tbody id="tablaCuerpo"></tbody>
-
-      </table>
+      <canvas id="graficoComparacion"></canvas>
 
     </div>
 
-  </section>
+  </article>
+
+
+
+  <!-- MARCAS -->
+
+  <article class="grafico-card grafico-grande">
+
+    <div class="grafico-titulo">
+
+      <div>
+
+        <h2>
+          Distribución por marca
+        </h2>
+
+        <span>
+          Cantidad de máquinas
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="canvas-normal">
+
+      <canvas id="graficoMarcas"></canvas>
+
+    </div>
+
+  </article>
+
+
+
+  <!-- PAGO -->
+
+  <article class="grafico-card">
+
+    <div class="grafico-titulo">
+
+      <div>
+
+        <h2>
+          Porcentaje de pago
+        </h2>
+
+        <span>
+          Promedio de la selección
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="canvas-pago">
+
+      <canvas id="graficoPago"></canvas>
+
+    </div>
+
+
+    <div
+      class="pago-centro"
+      id="pagoCentro"
+    >
+      0.00%
+    </div>
+
+  </article>
+
+
+</section>
+
+
+
+<!-- ======================================================
+     TABLA COMPLETA
+====================================================== -->
+
+<section class="panel tabla-panel">
+
+  <div class="panel-titulo">
+
+    <div>
+
+      <h2>
+        Detalle completo de producción
+      </h2>
+
+      <span>
+        Información correspondiente a los filtros seleccionados
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <div class="tabla-scroll">
+
+    <table id="tablaDatos">
+
+
+      <thead>
+
+        <tr>
+
+          <th>
+            MARCA / TIPO / VERSION
+          </th>
+
+          <th>
+            SERIE / MÁQUINA
+          </th>
+
+          <th>
+            JUEGO
+          </th>
+
+          <th>
+            COIN
+          </th>
+
+          <th>
+            COIN PROM
+          </th>
+
+          <th>
+            VENTA
+          </th>
+
+          <th>
+            VENTA PROM
+          </th>
+
+          <th>
+            NETWIN ($)
+          </th>
+
+          <th>
+            G.PLAYED
+          </th>
+
+          <th>
+            % PAGO
+          </th>
+
+          <th>
+            MODELO COM.
+          </th>
+
+          <th>
+            LOCAL
+          </th>
+
+          <th>
+            MES
+          </th>
+
+          <th>
+            AÑO
+          </th>
+
+          <th>
+            T.C.
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="tablaCuerpo">
+
+      </tbody>
+
+
+    </table>
+
+  </div>
+
+</section>
 
 
 </main>
 
 
+
 <script src="script.js"></script>
 
 </body>
+
 </html>
