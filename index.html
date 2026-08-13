@@ -9,15 +9,15 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Análisis de Producción</title>
+  <title>Análisis Producción</title>
+
+  <link rel="stylesheet" href="style.css">
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- PapaParse para leer CSV -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js"></script>
-
-  <link rel="stylesheet" href="style.css">
+  <!-- Plugin para mostrar etiquetas -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
 
 <body>
@@ -32,15 +32,15 @@
       <h1>Análisis de Producción</h1>
 
       <p>
-        Dashboard de máquinas y resultados
+        Dashboard conectado directamente a Google Sheets
       </p>
     </div>
 
     <div class="conexion">
 
       <span
-        class="punto"
         id="indicadorConexion"
+        class="punto"
       ></span>
 
       <span id="textoConexion">
@@ -60,7 +60,7 @@
 
 
     <!-- ===================================================
-         BARRA SUPERIOR
+         BARRA
     ==================================================== -->
 
     <section class="barra-acciones">
@@ -85,128 +85,6 @@
         >
           Actualizar datos
         </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         KPI
-    ==================================================== -->
-
-    <section class="tarjetas">
-
-      <div class="tarjeta">
-
-        <div class="icono">
-          ◉
-        </div>
-
-        <div>
-          <span class="titulo">
-            COIN TOTAL
-          </span>
-
-          <strong id="kpiCoin">
-            0
-          </strong>
-        </div>
-
-      </div>
-
-
-      <div class="tarjeta">
-
-        <div class="icono">
-          $
-        </div>
-
-        <div>
-          <span class="titulo">
-            VENTA TOTAL
-          </span>
-
-          <strong id="kpiVenta">
-            0
-          </strong>
-        </div>
-
-      </div>
-
-
-      <div class="tarjeta">
-
-        <div class="icono">
-          N
-        </div>
-
-        <div>
-          <span class="titulo">
-            NETWIN
-          </span>
-
-          <strong id="kpiNetwin">
-            0
-          </strong>
-        </div>
-
-      </div>
-
-
-      <div class="tarjeta">
-
-        <div class="icono">
-          %
-        </div>
-
-        <div>
-          <span class="titulo">
-            % PAGO
-          </span>
-
-          <strong id="kpiPago">
-            0 %
-          </strong>
-        </div>
-
-      </div>
-
-
-      <div class="tarjeta">
-
-        <div class="icono">
-          M
-        </div>
-
-        <div>
-          <span class="titulo">
-            MÁQUINAS
-          </span>
-
-          <strong id="kpiMaquinas">
-            0
-          </strong>
-        </div>
-
-      </div>
-
-
-      <div class="tarjeta">
-
-        <div class="icono">
-          S
-        </div>
-
-        <div>
-          <span class="titulo">
-            SALAS
-          </span>
-
-          <strong id="kpiLocales">
-            0
-          </strong>
-        </div>
 
       </div>
 
@@ -267,7 +145,7 @@
       <div class="filtro">
 
         <label for="filtroNumero">
-          NÚMERO DE MÁQUINA
+          NRO. MÁQUINA
         </label>
 
         <select id="filtroNumero">
@@ -306,30 +184,202 @@
 
 
     <!-- ===================================================
-         GRÁFICO PRINCIPAL
+         GRÁFICOS
     ==================================================== -->
 
-    <section class="grafico grafico-grande">
+    <section class="graficos">
 
-      <div class="grafico-header">
 
-        <div>
+      <!-- GRÁFICO 1 -->
+
+      <article class="grafico">
+
+        <div class="grafico-header">
 
           <h2>
-            Evolución mensual 2026
+            COIN PROM
           </h2>
 
-          <p>
-            Comparación de indicadores por mes
-          </p>
+          <span>
+            Promedio mensual
+          </span>
 
         </div>
 
+        <div class="grafico-contenido">
+
+          <canvas id="graficoCoinProm"></canvas>
+
+        </div>
+
+      </article>
+
+
+      <!-- GRÁFICO 2 -->
+
+      <article class="grafico">
+
+        <div class="grafico-header">
+
+          <h2>
+            VENTA PROM
+          </h2>
+
+          <span>
+            Promedio mensual
+          </span>
+
+        </div>
+
+        <div class="grafico-contenido">
+
+          <canvas id="graficoVentaProm"></canvas>
+
+        </div>
+
+      </article>
+
+
+      <!-- GRÁFICO 3 -->
+
+      <article class="grafico">
+
+        <div class="grafico-header">
+
+          <h2>
+            COIN TOTAL
+          </h2>
+
+          <span>
+            Total mensual
+          </span>
+
+        </div>
+
+        <div class="grafico-contenido">
+
+          <canvas id="graficoCoinTotal"></canvas>
+
+        </div>
+
+      </article>
+
+
+      <!-- GRÁFICO 4 -->
+
+      <article class="grafico">
+
+        <div class="grafico-header">
+
+          <h2>
+            VENTA TOTAL
+          </h2>
+
+          <span>
+            Total mensual
+          </span>
+
+        </div>
+
+        <div class="grafico-contenido">
+
+          <canvas id="graficoVentaTotal"></canvas>
+
+        </div>
+
+      </article>
+
+
+      <!-- GRÁFICO 5 -->
+
+      <article class="grafico">
+
+        <div class="grafico-header">
+
+          <h2>
+            NETWIN ($)
+          </h2>
+
+          <span>
+            Total mensual
+          </span>
+
+        </div>
+
+        <div class="grafico-contenido">
+
+          <canvas id="graficoNetwin"></canvas>
+
+        </div>
+
+      </article>
+
+
+      <!-- GRÁFICO 6 -->
+
+      <article class="grafico">
+
+        <div class="grafico-header">
+
+          <h2>
+            T.C.
+          </h2>
+
+          <span>
+            Promedio mensual
+          </span>
+
+        </div>
+
+        <div class="grafico-contenido">
+
+          <canvas id="graficoTC"></canvas>
+
+        </div>
+
+      </article>
+
+
+    </section>
+
+
+    <!-- ===================================================
+         % PAGO
+    ==================================================== -->
+
+    <section class="pago-panel">
+
+      <div class="grafico-header">
+
+        <h2>
+          Porcentaje de Pago
+        </h2>
+
+        <span>
+          % PAGO vs. porcentaje restante
+        </span>
+
       </div>
 
-      <div class="grafico-contenido">
+      <div class="pago-contenido">
 
-        <canvas id="graficoMensual"></canvas>
+        <div class="grafico-pago">
+
+          <canvas id="graficoPago"></canvas>
+
+        </div>
+
+        <div class="pago-valor">
+
+          <strong id="valorPago">
+            0.00%
+          </strong>
+
+          <span>
+            Porcentaje de pago
+          </span>
+
+        </div>
 
       </div>
 
@@ -337,7 +387,7 @@
 
 
     <!-- ===================================================
-         TABLA
+         TABLA RESUMEN
     ==================================================== -->
 
     <section class="panel">
@@ -351,7 +401,7 @@
           </h2>
 
           <span>
-            Datos según filtros seleccionados
+            Información correspondiente a los filtros seleccionados
           </span>
 
         </div>
@@ -392,7 +442,7 @@
               </th>
 
               <th>
-                T.C
+                T.C.
               </th>
 
               <th>
@@ -413,12 +463,9 @@
 
     </section>
 
+
   </main>
 
-
-  <!-- =====================================================
-       SCRIPT
-  ====================================================== -->
 
   <script src="script.js"></script>
 
