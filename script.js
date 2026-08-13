@@ -8,6 +8,7 @@ const SHEET_ID =
 const SHEET_GID =
   "683959855";
 
+// Google Visualization
 const URL_DATOS =
   `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 
@@ -22,10 +23,10 @@ let graficos = {};
 
 
 // ======================================================
-// MESES
+// ORDEN DE MESES
 // ======================================================
 
-const ORDEN_MESES = [
+const MESES = [
   "ENERO",
   "FEBRERO",
   "MARZO",
@@ -67,6 +68,37 @@ const COLORES = {
 
 
 // ======================================================
+// COLUMNAS DE DATA
+// ======================================================
+//
+// IMPORTANTE:
+// Se utiliza la posición de las columnas.
+//
+// 0  = Marca / Tipo / Version
+// 1  = Nro.
+// 2  = Maquina
+// 3  = Fecha Ini.
+// 4  = Fecha Fin
+// 5  = Juego
+// 6  = Dias
+// 7  = COIN
+// 8  = COIN PROM
+// 9  = VENTA
+// 10 = VENTA PROM
+// 11 = NETWIN ($)
+// 12 = G.PLAYED
+// 13 = % PAGO
+// 14 = Modelo Com.
+// 15 = LOCAL
+// 16 = MES
+// 17 = AÑO
+// 18 = TIPO MAQUINA
+// 19 = T.C.
+//
+// ======================================================
+
+
+// ======================================================
 // INICIO
 // ======================================================
 
@@ -96,6 +128,7 @@ function configurarEventos() {
     "filtroJuego"
   ];
 
+
   filtros.forEach(
     function (id) {
 
@@ -120,6 +153,7 @@ function configurarEventos() {
       "btnLimpiar"
     );
 
+
   if (btnLimpiar) {
 
     btnLimpiar.addEventListener(
@@ -135,6 +169,7 @@ function configurarEventos() {
       "btnActualizar"
     );
 
+
   if (btnActualizar) {
 
     btnActualizar.addEventListener(
@@ -148,7 +183,7 @@ function configurarEventos() {
 
 
 // ======================================================
-// CARGAR DATOS DE GOOGLE SHEETS
+// CARGAR DATOS
 // ======================================================
 
 async function cargarDatos() {
@@ -158,28 +193,15 @@ async function cargarDatos() {
     "#f2b84b"
   );
 
+
   try {
 
-    const url =
-      URL_DATOS +
-      "&t=" +
-      Date.now();
-
-
-    console.log(
-      "URL GOOGLE SHEETS:",
-      url
-    );
-
-
     const respuesta =
-      await fetch(url);
-
-
-    console.log(
-      "STATUS GOOGLE:",
-      respuesta.status
-    );
+      await fetch(
+        URL_DATOS +
+        "&t=" +
+        Date.now()
+      );
 
 
     if (!respuesta.ok) {
@@ -197,133 +219,24 @@ async function cargarDatos() {
 
 
     console.log(
-      "RESPUESTA GOOGLE:",
+      "Respuesta Google Sheets:",
       texto.substring(0, 500)
     );
 
 
-    const inicio =
-      texto.indexOf("{");
-
-
-    const fin =
-      texto.lastIndexOf("}");
-
-
-    if (
-      inicio === -1 ||
-      fin === -1
-    ) {
-
-      throw new Error(
-        "Google Sheets no devolvió JSON válido."
-      );
-
-    }
-
-
-    const json =
-      JSON.parse(
-        texto.substring(
-          inicio,
-          fin + 1
-        )
-      );
-
-
-    console.log(
-      "JSON GOOGLE:",
-      json
-    );
-
-
-    if (
-      !json.table ||
-      !json.table.cols
-    ) {
-
-      throw new Error(
-        "No se encontró la tabla Google Sheets."
-      );
-
-    }
-
-
-    const columnas =
-      json.table.cols.map(
-        function (columna) {
-
-          return (
-            columna.label ||
-            columna.id
-          );
-
-        }
-      );
-
-
-    console.log(
-      "COLUMNAS DETECTADAS:",
-      columnas
-    );
-
-
     const datos =
-      json.table.rows.map(
-        function (fila) {
-
-          const registro = {};
-
-
-          columnas.forEach(
-            function (
-              columna,
-              indice
-            ) {
-
-              const celda =
-                fila.c
-                  ? fila.c[indice]
-                  : null;
-
-
-              registro[columna] =
-                celda
-                  ? (
-                      celda.v ??
-                      celda.f ??
-                      ""
-                    )
-                  : "";
-
-            }
-          );
-
-
-          return registro;
-
-        }
+      convertirGViz(
+        texto
       );
 
 
-    console.log(
-      "TOTAL REGISTROS:",
-      datos.length
-    );
-
-
-    console.log(
-      "PRIMER REGISTRO:",
-      datos[0]
-    );
-
-
     if (
+      !Array.isArray(datos) ||
       datos.length === 0
     ) {
 
       throw new Error(
-        "El Sheet no devolvió registros."
+        "No se encontraron registros en la pestaña DATA."
       );
 
     }
@@ -337,6 +250,12 @@ async function cargarDatos() {
       [...datosOriginales];
 
 
+    console.log(
+      "Registros cargados:",
+      datosOriginales.length
+    );
+
+
     cambiarEstadoConexion(
       "Google Sheets conectado",
       "#45a878"
@@ -348,12 +267,10 @@ async function cargarDatos() {
     actualizarDashboard();
 
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
-      "ERROR GOOGLE SHEETS:",
+      "Error cargando Google Sheets:",
       error
     );
 
@@ -364,6 +281,193 @@ async function cargarDatos() {
     );
 
   }
+
+}
+
+
+// ======================================================
+// CONVERTIR GVIZ
+// ======================================================
+
+function convertirGViz(texto) {
+
+  const inicio =
+    texto.indexOf("{");
+
+  const fin =
+    texto.lastIndexOf("}");
+
+
+  if (
+    inicio === -1 ||
+    fin === -1
+  ) {
+
+    throw new Error(
+      "Google Sheets no devolvió JSON válido."
+    );
+
+  }
+
+
+  const json =
+    JSON.parse(
+      texto.substring(
+        inicio,
+        fin + 1
+      )
+    );
+
+
+  if (
+    !json.table ||
+    !json.table.rows
+  ) {
+
+    throw new Error(
+      "No se encontró información de la hoja."
+    );
+
+  }
+
+
+  const filas =
+    json.table.rows;
+
+
+  /*
+    Convertimos las columnas
+    por posición.
+  */
+
+
+  return filas.map(
+    function (fila) {
+
+      const c =
+        fila.c || [];
+
+
+      return {
+
+        "Marca / Tipo / Version":
+          obtenerCelda(c, 0),
+
+        "Nro.":
+          obtenerCelda(c, 1),
+
+        "Maquina":
+          obtenerCelda(c, 2),
+
+        "Fecha Ini.":
+          obtenerCelda(c, 3),
+
+        "Fecha Fin":
+          obtenerCelda(c, 4),
+
+        "Juego":
+          obtenerCelda(c, 5),
+
+        "Dias":
+          obtenerCelda(c, 6),
+
+        "COIN":
+          obtenerCelda(c, 7),
+
+        "COIN PROM":
+          obtenerCelda(c, 8),
+
+        "VENTA":
+          obtenerCelda(c, 9),
+
+        "VENTA PROM":
+          obtenerCelda(c, 10),
+
+        "NETWIN ($)":
+          obtenerCelda(c, 11),
+
+        "G.PLAYED":
+          obtenerCelda(c, 12),
+
+        "% PAGO":
+          obtenerCelda(c, 13),
+
+        "Modelo Com.":
+          obtenerCelda(c, 14),
+
+        "LOCAL":
+          obtenerCelda(c, 15),
+
+        "MES":
+          obtenerCelda(c, 16),
+
+        "AÑO":
+          obtenerCelda(c, 17),
+
+        "TIPO MAQUINA":
+          obtenerCelda(c, 18),
+
+        "T.C":
+          obtenerCelda(c, 19)
+
+      };
+
+    }
+  );
+
+}
+
+
+// ======================================================
+// OBTENER CELDA
+// ======================================================
+
+function obtenerCelda(
+  columnas,
+  indice
+) {
+
+  const celda =
+    columnas[indice];
+
+
+  if (
+    !celda
+  ) {
+
+    return "";
+
+  }
+
+
+  /*
+    Preferimos el valor real.
+    Si no existe usamos el valor
+    formateado.
+  */
+
+
+  if (
+    celda.v !== undefined &&
+    celda.v !== null
+  ) {
+
+    return celda.v;
+
+  }
+
+
+  if (
+    celda.f !== undefined &&
+    celda.f !== null
+  ) {
+
+    return celda.f;
+
+  }
+
+
+  return "";
 
 }
 
@@ -408,7 +512,7 @@ function cambiarEstadoConexion(
 
 
 // ======================================================
-// FILTROS
+// LLENAR FILTROS
 // ======================================================
 
 function llenarFiltros() {
@@ -447,7 +551,7 @@ function llenarFiltros() {
 
 
 // ======================================================
-// CREAR SELECT
+// LLENAR SELECT
 // ======================================================
 
 function llenarSelect(
@@ -460,7 +564,11 @@ function llenarSelect(
     document.getElementById(id);
 
 
-  if (!select) return;
+  if (!select) {
+
+    return;
+
+  }
 
 
   const valorAnterior =
@@ -470,21 +578,20 @@ function llenarSelect(
   select.innerHTML = "";
 
 
-  const opcionInicial =
+  const inicial =
     document.createElement(
       "option"
     );
 
 
-  opcionInicial.value = "";
+  inicial.value = "";
 
-
-  opcionInicial.textContent =
+  inicial.textContent =
     textoInicial;
 
 
   select.appendChild(
-    opcionInicial
+    inicial
   );
 
 
@@ -497,14 +604,20 @@ function llenarSelect(
           .map(
             function (registro) {
 
-              return String(
-                registro[campo] ?? ""
-              ).trim();
+              return limpiarTexto(
+                registro[campo]
+              );
 
             }
           )
 
-          .filter(Boolean)
+          .filter(
+            function (valor) {
+
+              return valor !== "";
+
+            }
+          )
 
       )
     ];
@@ -566,7 +679,7 @@ function llenarSelect(
 
 
 // ======================================================
-// FILTRO MES
+// FILTRO DE MES
 // ======================================================
 
 function llenarFiltroMes() {
@@ -577,11 +690,11 @@ function llenarFiltroMes() {
     );
 
 
-  if (!select) return;
+  if (!select) {
 
+    return;
 
-  const valorAnterior =
-    select.value;
+  }
 
 
   select.innerHTML = "";
@@ -595,7 +708,6 @@ function llenarFiltroMes() {
 
   inicial.value = "";
 
-
   inicial.textContent =
     "Todos los meses";
 
@@ -605,7 +717,7 @@ function llenarFiltroMes() {
   );
 
 
-  ORDEN_MESES.forEach(
+  MESES.forEach(
     function (mes) {
 
       const opcion =
@@ -628,18 +740,6 @@ function llenarFiltroMes() {
 
     }
   );
-
-
-  if (
-    ORDEN_MESES.includes(
-      valorAnterior
-    )
-  ) {
-
-    select.value =
-      valorAnterior;
-
-  }
 
 }
 
@@ -767,13 +867,18 @@ function aplicarFiltros() {
 
 function limpiarFiltros() {
 
-  [
+  const ids = [
+
     "filtroSala",
     "filtroMes",
     "filtroModelo",
     "filtroNumero",
     "filtroJuego"
-  ].forEach(
+
+  ];
+
+
+  ids.forEach(
     function (id) {
 
       const elemento =
@@ -844,15 +949,20 @@ function construirResumenMensual() {
   datosFiltrados.forEach(
     function (registro) {
 
-
       const año =
         obtenerNumero(
           registro["AÑO"]
         );
 
 
+      /*
+        Si existe año y no es 2026,
+        no lo consideramos.
+      */
+
       if (
-        año &&
+        año !== null &&
+        año !== 0 &&
         año !== 2026
       ) {
 
@@ -868,9 +978,7 @@ function construirResumenMensual() {
 
 
       if (
-        !ORDEN_MESES.includes(
-          mes
-        )
+        !MESES.includes(mes)
       ) {
 
         return;
@@ -1027,16 +1135,28 @@ function construirResumenMensual() {
 
 
   /*
-   * IMPORTANTE:
-   * Solo aparecen meses que
-   * realmente tienen información.
-   */
+    AQUÍ ESTÁ LA CORRECCIÓN IMPORTANTE.
+
+    Solamente mostramos meses que
+    realmente existen en los datos.
+  */
 
   const meses =
-    ORDEN_MESES.filter(
+    MESES.filter(
       function (mes) {
 
-        return grupos[mes];
+        return (
+          grupos[mes] &&
+          (
+            grupos[mes].coinProm.length > 0 ||
+            grupos[mes].ventaProm.length > 0 ||
+            grupos[mes].coinTotal !== 0 ||
+            grupos[mes].ventaTotal !== 0 ||
+            grupos[mes].netwin !== 0 ||
+            grupos[mes].tc.length > 0 ||
+            grupos[mes].pago.length > 0
+          )
+        );
 
       }
     );
@@ -1044,7 +1164,8 @@ function construirResumenMensual() {
 
   return {
 
-    labels: meses,
+    labels:
+      meses,
 
 
     coinProm:
@@ -1075,7 +1196,8 @@ function construirResumenMensual() {
       meses.map(
         function (mes) {
 
-          return grupos[mes].coinTotal;
+          return grupos[mes]
+            .coinTotal;
 
         }
       ),
@@ -1085,7 +1207,8 @@ function construirResumenMensual() {
       meses.map(
         function (mes) {
 
-          return grupos[mes].ventaTotal;
+          return grupos[mes]
+            .ventaTotal;
 
         }
       ),
@@ -1095,7 +1218,8 @@ function construirResumenMensual() {
       meses.map(
         function (mes) {
 
-          return grupos[mes].netwin;
+          return grupos[mes]
+            .netwin;
 
         }
       ),
@@ -1130,7 +1254,7 @@ function construirResumenMensual() {
 
 
 // ======================================================
-// CREAR TODOS LOS GRÁFICOS
+// CONSTRUIR LOS 6 GRÁFICOS
 // ======================================================
 
 function construirGraficos() {
@@ -1138,6 +1262,8 @@ function construirGraficos() {
   const resumen =
     construirResumenMensual();
 
+
+  // GRÁFICO 1
 
   crearGraficoLinea(
     "graficoCoinProm",
@@ -1148,6 +1274,8 @@ function construirGraficos() {
   );
 
 
+  // GRÁFICO 2
+
   crearGraficoLinea(
     "graficoVentaProm",
     "VENTA PROM",
@@ -1156,6 +1284,8 @@ function construirGraficos() {
     COLORES.ventaProm
   );
 
+
+  // GRÁFICO 3
 
   crearGraficoLinea(
     "graficoCoinTotal",
@@ -1166,6 +1296,8 @@ function construirGraficos() {
   );
 
 
+  // GRÁFICO 4
+
   crearGraficoLinea(
     "graficoVentaTotal",
     "VENTA TOTAL",
@@ -1175,6 +1307,8 @@ function construirGraficos() {
   );
 
 
+  // GRÁFICO 5
+
   crearGraficoLinea(
     "graficoNetwin",
     "NETWIN ($)",
@@ -1183,6 +1317,8 @@ function construirGraficos() {
     COLORES.netwin
   );
 
+
+  // GRÁFICO 6
 
   crearGraficoLinea(
     "graficoTC",
@@ -1242,7 +1378,9 @@ function crearGraficoLinea(
 
         data: {
 
-          labels: labels,
+          labels:
+            labels,
+
 
           datasets: [
 
@@ -1291,11 +1429,18 @@ function crearGraficoLinea(
         },
 
 
+        plugins: [
+          ChartDataLabels
+        ],
+
+
         options: {
 
-          responsive: true,
+          responsive:
+            true,
 
-          maintainAspectRatio: false,
+          maintainAspectRatio:
+            false,
 
 
           interaction: {
@@ -1338,6 +1483,54 @@ function crearGraficoLinea(
                 }
 
               }
+
+            },
+
+
+            datalabels: {
+
+              display:
+                true,
+
+              align:
+                "top",
+
+              anchor:
+                "end",
+
+              color:
+                "#667085",
+
+              font: {
+
+                size:
+                  10,
+
+                weight:
+                  "600"
+
+              },
+
+
+              formatter:
+                function (valor) {
+
+                  if (
+                    esTC
+                  ) {
+
+                    return Number(
+                      valor
+                    ).toFixed(2);
+
+                  }
+
+
+                  return formatearNumero(
+                    valor
+                  );
+
+                }
 
             },
 
@@ -1412,6 +1605,7 @@ function crearGraficoLinea(
 
                     }
 
+
                     return formatearNumero(
                       valor
                     );
@@ -1444,7 +1638,11 @@ function construirGraficoPago() {
     );
 
 
-  if (!canvas) return;
+  if (!canvas) {
+
+    return;
+
+  }
 
 
   if (
@@ -1483,6 +1681,10 @@ function construirGraficoPago() {
       valores
     );
 
+
+  /*
+    El valor debe estar entre 0 y 100.
+  */
 
   pago =
     Math.max(
@@ -1566,6 +1768,11 @@ function construirGraficoPago() {
         },
 
 
+        plugins: [
+          ChartDataLabels
+        ],
+
+
         options: {
 
           responsive:
@@ -1598,6 +1805,32 @@ function construirGraficoPago() {
 
               }
 
+            },
+
+
+            datalabels: {
+
+              color:
+                "#475467",
+
+              font: {
+
+                size:
+                  14,
+
+                weight:
+                  "700"
+
+              },
+
+              formatter:
+                function (valor) {
+
+                  return valor.toFixed(1) +
+                    "%";
+
+                }
+
             }
 
           }
@@ -1622,7 +1855,11 @@ function construirTabla() {
     );
 
 
-  if (!cuerpo) return;
+  if (!cuerpo) {
+
+    return;
+
+  }
 
 
   const resumen =
@@ -1638,7 +1875,6 @@ function construirTabla() {
       indice
     ) {
 
-
       const fila =
         document.createElement(
           "tr"
@@ -1648,7 +1884,9 @@ function construirTabla() {
       fila.innerHTML = `
 
         <td>
-          <strong>${mes}</strong>
+          <strong>
+            ${mes}
+          </strong>
         </td>
 
         <td>
@@ -1690,7 +1928,8 @@ function construirTabla() {
         <td>
           ${Number(
             resumen.pago[indice] || 0
-          ).toFixed(2)} %
+          ).toFixed(2)}
+          %
         </td>
 
       `;
@@ -1731,7 +1970,7 @@ function obtenerValor(id) {
 
 
 // ======================================================
-// LIMPIAR TEXTO
+// NORMALIZAR TEXTO
 // ======================================================
 
 function limpiarTexto(valor) {
@@ -1784,6 +2023,13 @@ function normalizarMes(valor) {
       );
 
 
+  /*
+    Si viene como número:
+    1 = ENERO
+    2 = FEBRERO
+    etc.
+  */
+
   const numero =
     Number(mes);
 
@@ -1794,8 +2040,54 @@ function normalizarMes(valor) {
     numero <= 12
   ) {
 
-    return ORDEN_MESES[
+    return MESES[
       numero - 1
+    ];
+
+  }
+
+
+  /*
+    También aceptamos abreviaturas.
+  */
+
+  const equivalencias = {
+
+    ENE: "ENERO",
+
+    FEB: "FEBRERO",
+
+    MAR: "MARZO",
+
+    ABR: "ABRIL",
+
+    MAY: "MAYO",
+
+    JUN: "JUNIO",
+
+    JUL: "JULIO",
+
+    AGO: "AGOSTO",
+
+    SEP: "SEPTIEMBRE",
+
+    SET: "SEPTIEMBRE",
+
+    OCT: "OCTUBRE",
+
+    NOV: "NOVIEMBRE",
+
+    DIC: "DICIEMBRE"
+
+  };
+
+
+  if (
+    equivalencias[mes]
+  ) {
+
+    return equivalencias[
+      mes
     ];
 
   }
@@ -1846,6 +2138,10 @@ function obtenerNumero(valor) {
   }
 
 
+  /*
+    Elimina porcentaje.
+  */
+
   texto =
     texto.replace(
       /%/g,
@@ -1854,10 +2150,13 @@ function obtenerNumero(valor) {
 
 
   /*
-   * 1,234.56
-   * 1234.56
-   * 1.234,56
-   */
+    Manejo de números:
+
+    1,234.56
+    1234.56
+    1.234,56
+    1234,56
+  */
 
   if (
     texto.includes(",") &&
@@ -1880,9 +2179,7 @@ function obtenerNumero(valor) {
             "."
           );
 
-    }
-
-    else {
+    } else {
 
       texto =
         texto.replace(
@@ -1892,9 +2189,7 @@ function obtenerNumero(valor) {
 
     }
 
-  }
-
-  else if (
+  } else if (
     texto.includes(",")
   ) {
 
@@ -1903,7 +2198,7 @@ function obtenerNumero(valor) {
 
 
     if (
-      partes[1] &&
+      partes.length === 2 &&
       partes[1].length <= 2
     ) {
 
@@ -1913,9 +2208,7 @@ function obtenerNumero(valor) {
           "."
         );
 
-    }
-
-    else {
+    } else {
 
       texto =
         texto.replace(
@@ -1927,6 +2220,10 @@ function obtenerNumero(valor) {
 
   }
 
+
+  /*
+    Eliminar símbolos.
+  */
 
   texto =
     texto.replace(
@@ -2024,7 +2321,10 @@ function formatearNumero(
   return numero.toLocaleString(
     "es-PE",
     {
-      maximumFractionDigits: 2
+
+      maximumFractionDigits:
+        2
+
     }
   );
 
