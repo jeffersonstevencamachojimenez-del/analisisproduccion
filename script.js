@@ -1,5 +1,12 @@
 // ======================================================
-// CONFIGURACIÓN GOOGLE SHEETS
+// SCRIPT.JS
+// ANÁLISIS DE PRODUCCIÓN
+// CONEXIÓN CON GOOGLE SHEETS + FILTROS + GRÁFICOS + TABLA
+// ======================================================
+
+
+// ======================================================
+// 01. CONFIGURACIÓN GOOGLE SHEETS
 // ======================================================
 
 const SHEET_ID =
@@ -14,7 +21,7 @@ const URL_DATOS =
 
 
 // ======================================================
-// VARIABLES
+// 02. VARIABLES PRINCIPALES
 // ======================================================
 
 let datosOriginales = [];
@@ -23,7 +30,7 @@ let graficos = {};
 
 
 // ======================================================
-// ORDEN DE MESES
+// 03. ORDEN DE MESES
 // ======================================================
 
 const MESES = [
@@ -43,7 +50,7 @@ const MESES = [
 
 
 // ======================================================
-// COLORES PASTEL
+// 04. COLORES DE LOS GRÁFICOS
 // ======================================================
 
 const COLORES = {
@@ -68,11 +75,8 @@ const COLORES = {
 
 
 // ======================================================
-// COLUMNAS DE DATA
+// 05. ESTRUCTURA DE COLUMNAS DE GOOGLE SHEETS
 // ======================================================
-//
-// IMPORTANTE:
-// Se utiliza la posición de las columnas.
 //
 // 0  = Marca / Tipo / Version
 // 1  = Nro.
@@ -99,7 +103,7 @@ const COLORES = {
 
 
 // ======================================================
-// INICIO
+// 06. INICIO DEL SISTEMA
 // ======================================================
 
 document.addEventListener(
@@ -115,7 +119,7 @@ document.addEventListener(
 
 
 // ======================================================
-// EVENTOS
+// 07. CONFIGURACIÓN DE EVENTOS
 // ======================================================
 
 function configurarEventos() {
@@ -183,7 +187,7 @@ function configurarEventos() {
 
 
 // ======================================================
-// CARGAR DATOS
+// 08. CARGAR DATOS DESDE GOOGLE SHEETS
 // ======================================================
 
 async function cargarDatos() {
@@ -286,7 +290,7 @@ async function cargarDatos() {
 
 
 // ======================================================
-// CONVERTIR GVIZ
+// 09. CONVERTIR RESPUESTA GVIZ A DATOS
 // ======================================================
 
 function convertirGViz(texto) {
@@ -333,12 +337,6 @@ function convertirGViz(texto) {
 
   const filas =
     json.table.rows;
-
-
-  /*
-    Convertimos las columnas
-    por posición.
-  */
 
 
   return filas.map(
@@ -419,7 +417,7 @@ function convertirGViz(texto) {
 
 
 // ======================================================
-// OBTENER CELDA
+// 10. OBTENER CELDA DE GOOGLE SHEETS
 // ======================================================
 
 function obtenerCelda(
@@ -438,13 +436,6 @@ function obtenerCelda(
     return "";
 
   }
-
-
-  /*
-    Preferimos el valor real.
-    Si no existe usamos el valor
-    formateado.
-  */
 
 
   if (
@@ -473,7 +464,7 @@ function obtenerCelda(
 
 
 // ======================================================
-// ESTADO DE CONEXIÓN
+// 11. ESTADO DE CONEXIÓN
 // ======================================================
 
 function cambiarEstadoConexion(
@@ -512,7 +503,7 @@ function cambiarEstadoConexion(
 
 
 // ======================================================
-// LLENAR FILTROS
+// 12. CARGAR OPCIONES DE LOS FILTROS
 // ======================================================
 
 function llenarFiltros() {
@@ -551,7 +542,7 @@ function llenarFiltros() {
 
 
 // ======================================================
-// LLENAR SELECT
+// 13. LLENAR SELECT INDIVIDUAL
 // ======================================================
 
 function llenarSelect(
@@ -679,7 +670,7 @@ function llenarSelect(
 
 
 // ======================================================
-// FILTRO DE MES
+// 14. LLENAR FILTRO DE MES
 // ======================================================
 
 function llenarFiltroMes() {
@@ -745,7 +736,7 @@ function llenarFiltroMes() {
 
 
 // ======================================================
-// APLICAR FILTROS
+// 15. APLICAR FILTROS
 // ======================================================
 
 function aplicarFiltros() {
@@ -862,7 +853,7 @@ function aplicarFiltros() {
 
 
 // ======================================================
-// LIMPIAR FILTROS
+// 16. LIMPIAR TODOS LOS FILTROS
 // ======================================================
 
 function limpiarFiltros() {
@@ -905,7 +896,7 @@ function limpiarFiltros() {
 
 
 // ======================================================
-// ACTUALIZAR DASHBOARD
+// 17. ACTUALIZAR TODO EL DASHBOARD
 // ======================================================
 
 function actualizarDashboard() {
@@ -922,7 +913,7 @@ function actualizarDashboard() {
 
 
 // ======================================================
-// CONTADOR
+// 18. ACTUALIZAR CONTADOR DE REGISTROS
 // ======================================================
 
 function actualizarContador() {
@@ -938,7 +929,7 @@ function actualizarContador() {
 
 
 // ======================================================
-// RESUMEN MENSUAL
+// 19. CONSTRUIR RESUMEN MENSUAL
 // ======================================================
 
 function construirResumenMensual() {
@@ -954,11 +945,6 @@ function construirResumenMensual() {
           registro["AÑO"]
         );
 
-
-      /*
-        Si existe año y no es 2026,
-        no lo consideramos.
-      */
 
       if (
         año !== null &&
@@ -1134,13 +1120,6 @@ function construirResumenMensual() {
   );
 
 
-  /*
-    AQUÍ ESTÁ LA CORRECCIÓN IMPORTANTE.
-
-    Solamente mostramos meses que
-    realmente existen en los datos.
-  */
-
   const meses =
     MESES.filter(
       function (mes) {
@@ -1254,7 +1233,7 @@ function construirResumenMensual() {
 
 
 // ======================================================
-// CONSTRUIR LOS 6 GRÁFICOS
+// 20. CONSTRUIR LOS 6 GRÁFICOS
 // ======================================================
 
 function construirGraficos() {
@@ -1263,7 +1242,7 @@ function construirGraficos() {
     construirResumenMensual();
 
 
-  // GRÁFICO 1
+  // GRÁFICO 1 - COIN PROM
 
   crearGraficoLinea(
     "graficoCoinProm",
@@ -1274,7 +1253,7 @@ function construirGraficos() {
   );
 
 
-  // GRÁFICO 2
+  // GRÁFICO 2 - VENTA PROM
 
   crearGraficoLinea(
     "graficoVentaProm",
@@ -1285,7 +1264,7 @@ function construirGraficos() {
   );
 
 
-  // GRÁFICO 3
+  // GRÁFICO 3 - COIN TOTAL
 
   crearGraficoLinea(
     "graficoCoinTotal",
@@ -1296,7 +1275,7 @@ function construirGraficos() {
   );
 
 
-  // GRÁFICO 4
+  // GRÁFICO 4 - VENTA TOTAL
 
   crearGraficoLinea(
     "graficoVentaTotal",
@@ -1307,7 +1286,7 @@ function construirGraficos() {
   );
 
 
-  // GRÁFICO 5
+  // GRÁFICO 5 - NETWIN
 
   crearGraficoLinea(
     "graficoNetwin",
@@ -1318,7 +1297,7 @@ function construirGraficos() {
   );
 
 
-  // GRÁFICO 6
+  // GRÁFICO 6 - T.C.
 
   crearGraficoLinea(
     "graficoTC",
@@ -1333,7 +1312,7 @@ function construirGraficos() {
 
 
 // ======================================================
-// GRÁFICO DE LÍNEA
+// 21. CONFIGURACIÓN DE GRÁFICOS DE LÍNEA
 // ======================================================
 
 function crearGraficoLinea(
@@ -1627,7 +1606,7 @@ function crearGraficoLinea(
 
 
 // ======================================================
-// GRÁFICO CIRCULAR % PAGO
+// 22. GRÁFICO CIRCULAR - % PAGO
 // ======================================================
 
 function construirGraficoPago() {
@@ -1681,10 +1660,6 @@ function construirGraficoPago() {
       valores
     );
 
-
-  /*
-    El valor debe estar entre 0 y 100.
-  */
 
   pago =
     Math.max(
@@ -1844,7 +1819,7 @@ function construirGraficoPago() {
 
 
 // ======================================================
-// TABLA
+// 23. CONSTRUIR TABLA RESUMEN
 // ======================================================
 
 function construirTabla() {
@@ -1946,7 +1921,7 @@ function construirTabla() {
 
 
 // ======================================================
-// OBTENER VALOR SELECT
+// 24. OBTENER VALOR DE UN SELECT
 // ======================================================
 
 function obtenerValor(id) {
@@ -1970,7 +1945,7 @@ function obtenerValor(id) {
 
 
 // ======================================================
-// NORMALIZAR TEXTO
+// 25. NORMALIZAR TEXTO
 // ======================================================
 
 function limpiarTexto(valor) {
@@ -1993,7 +1968,7 @@ function limpiarTexto(valor) {
 
 
 // ======================================================
-// NORMALIZAR MES
+// 26. NORMALIZAR MES
 // ======================================================
 
 function normalizarMes(valor) {
@@ -2023,13 +1998,6 @@ function normalizarMes(valor) {
       );
 
 
-  /*
-    Si viene como número:
-    1 = ENERO
-    2 = FEBRERO
-    etc.
-  */
-
   const numero =
     Number(mes);
 
@@ -2046,10 +2014,6 @@ function normalizarMes(valor) {
 
   }
 
-
-  /*
-    También aceptamos abreviaturas.
-  */
 
   const equivalencias = {
 
@@ -2099,7 +2063,7 @@ function normalizarMes(valor) {
 
 
 // ======================================================
-// OBTENER NÚMERO
+// 27. CONVERTIR VALOR A NÚMERO
 // ======================================================
 
 function obtenerNumero(valor) {
@@ -2138,25 +2102,12 @@ function obtenerNumero(valor) {
   }
 
 
-  /*
-    Elimina porcentaje.
-  */
-
   texto =
     texto.replace(
       /%/g,
       ""
     );
 
-
-  /*
-    Manejo de números:
-
-    1,234.56
-    1234.56
-    1.234,56
-    1234,56
-  */
 
   if (
     texto.includes(",") &&
@@ -2221,10 +2172,6 @@ function obtenerNumero(valor) {
   }
 
 
-  /*
-    Eliminar símbolos.
-  */
-
   texto =
     texto.replace(
       /[^0-9.-]/g,
@@ -2244,7 +2191,7 @@ function obtenerNumero(valor) {
 
 
 // ======================================================
-// PROMEDIO
+// 28. CALCULAR PROMEDIO
 // ======================================================
 
 function promedioArray(
@@ -2307,7 +2254,7 @@ function promedioArray(
 
 
 // ======================================================
-// FORMATEAR NÚMERO
+// 29. FORMATEAR NÚMEROS
 // ======================================================
 
 function formatearNumero(
@@ -2332,7 +2279,7 @@ function formatearNumero(
 
 
 // ======================================================
-// ESTABLECER TEXTO
+// 30. ESTABLECER TEXTO EN HTML
 // ======================================================
 
 function establecerTexto(
@@ -2355,7 +2302,11 @@ function establecerTexto(
 
 
 // ======================================================
-// ACTUALIZACIÓN AUTOMÁTICA
+// 31. ACTUALIZACIÓN AUTOMÁTICA
+// ======================================================
+//
+// Cada 5 minutos vuelve a consultar Google Sheets.
+//
 // ======================================================
 
 setInterval(
