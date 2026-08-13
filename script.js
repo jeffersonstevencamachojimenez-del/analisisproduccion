@@ -1,9 +1,23 @@
-// ======================================================
-// CONFIGURACIÓN
-// ======================================================
+/* ======================================================
+   CONFIGURACIÓN
+====================================================== */
+
+
+/*
+  Google Sheets
+
+  Archivo:
+  1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY
+
+  Hoja:
+  DATA
+
+  GID:
+  683959855
+*/
 
 const URL_DATOS =
-  "https://script.google.com/macros/s/AKfycbydQfKHv-TvsvW8aHc4Vl3ZxAakQRLNRVZRx0q1NEQl2wQlxwnKhlc1f3pLGvuFqWP1/exec";
+  "https://docs.google.com/spreadsheets/d/1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY/export?format=csv&gid=683959855";
 
 
 let datosOriginales = [];
@@ -13,9 +27,9 @@ let datosFiltrados = [];
 let graficoMensual = null;
 
 
-// ======================================================
-// MESES 2026
-// ======================================================
+/* ======================================================
+   MESES
+====================================================== */
 
 const MESES_2026 = [
 
@@ -35,9 +49,9 @@ const MESES_2026 = [
 ];
 
 
-// ======================================================
-// INICIO
-// ======================================================
+/* ======================================================
+   INICIO
+====================================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -51,12 +65,11 @@ document.addEventListener(
 );
 
 
-// ======================================================
-// CONFIGURAR EVENTOS
-// ======================================================
+/* ======================================================
+   EVENTOS
+====================================================== */
 
 function configurarEventos() {
-
 
   const filtros = [
 
@@ -89,15 +102,15 @@ function configurarEventos() {
   );
 
 
-  const botonLimpiar =
+  const btnLimpiar =
     document.getElementById(
       "btnLimpiar"
     );
 
 
-  if (botonLimpiar) {
+  if (btnLimpiar) {
 
-    botonLimpiar.addEventListener(
+    btnLimpiar.addEventListener(
       "click",
       limpiarFiltros
     );
@@ -105,15 +118,15 @@ function configurarEventos() {
   }
 
 
-  const botonActualizar =
+  const btnActualizar =
     document.getElementById(
       "btnActualizar"
     );
 
 
-  if (botonActualizar) {
+  if (btnActualizar) {
 
-    botonActualizar.addEventListener(
+    btnActualizar.addEventListener(
       "click",
       cargarDatos
     );
@@ -123,12 +136,11 @@ function configurarEventos() {
 }
 
 
-// ======================================================
-// CARGAR DATOS
-// ======================================================
+/* ======================================================
+   CARGAR DATOS DIRECTAMENTE DESDE GOOGLE SHEETS
+====================================================== */
 
 async function cargarDatos() {
-
 
   const textoConexion =
     document.getElementById(
@@ -143,7 +155,6 @@ async function cargarDatos() {
 
 
   try {
-
 
     if (textoConexion) {
 
@@ -161,45 +172,122 @@ async function cargarDatos() {
     }
 
 
+    const url =
+      URL_DATOS +
+      "&t=" +
+      Date.now();
+
+
     const respuesta =
-      await fetch(
-        URL_DATOS +
-        "?t=" +
-        Date.now()
-      );
+      await fetch(url);
 
 
     if (!respuesta.ok) {
 
       throw new Error(
-        "Error HTTP " +
+        "Error HTTP: " +
         respuesta.status
       );
 
     }
 
 
-    const datos =
-      await respuesta.json();
+    const texto =
+      await respuesta.text();
+
+
+    if (!texto) {
+
+      throw new Error(
+        "Google Sheets devolvió datos vacíos."
+      );
+
+    }
+
+
+    const resultado =
+      Papa.parse(
+        texto,
+        {
+
+          header: true,
+
+          skipEmptyLines: true,
+
+          transformHeader:
+            function (header) {
+
+              return header
+                .trim();
+
+            }
+
+        }
+      );
 
 
     if (
-      !Array.isArray(datos)
+      resultado.errors &&
+      resultado.errors.length > 0
     ) {
 
-      throw new Error(
-        "La API no devolvió un arreglo de datos."
+      console.warn(
+        "Advertencias CSV:",
+        resultado.errors
       );
 
     }
 
 
     datosOriginales =
-      datos;
+      resultado.data
+        .filter(
+          function (fila) {
+
+            return Object.values(fila)
+              .some(
+                function (valor) {
+
+                  return String(
+                    valor ?? ""
+                  ).trim() !== "";
+
+                }
+              );
+
+          }
+        );
+
+
+    if (
+      datosOriginales.length === 0
+    ) {
+
+      throw new Error(
+        "No se encontraron registros en DATA."
+      );
+
+    }
+
+
+    console.log(
+      "Datos cargados:",
+      datosOriginales
+    );
+
+
+    console.log(
+      "Columnas:",
+      Object.keys(
+        datosOriginales[0]
+      )
+    );
 
 
     datosFiltrados =
-      [...datosOriginales];
+      [
+        ...datosOriginales
+      ];
 
 
     if (textoConexion) {
@@ -213,7 +301,7 @@ async function cargarDatos() {
     if (indicador) {
 
       indicador.style.background =
-        "#45a878";
+        "#5ca77d";
 
     }
 
@@ -223,11 +311,11 @@ async function cargarDatos() {
     actualizarDashboard();
 
 
-  } catch (error) {
-
+  }
+  catch (error) {
 
     console.error(
-      "Error cargando datos:",
+      "ERROR:",
       error
     );
 
@@ -243,21 +331,72 @@ async function cargarDatos() {
     if (indicador) {
 
       indicador.style.background =
-        "#e46a6a";
+        "#dc7777";
 
     }
+
+
+    mostrarErrorConexion(
+      error.message
+    );
 
   }
 
 }
 
 
-// ======================================================
-// LLENAR FILTROS
-// ======================================================
+/* ======================================================
+   ERROR
+====================================================== */
+
+function mostrarErrorConexion(
+  mensaje
+) {
+
+  const cuerpo =
+    document.getElementById(
+      "tablaCuerpo"
+    );
+
+
+  if (!cuerpo) return;
+
+
+  cuerpo.innerHTML = `
+
+    <tr>
+
+      <td
+        colspan="8"
+        style="
+          text-align:center;
+          padding:35px;
+          color:#c56f6f;
+        "
+      >
+
+        No se pudieron cargar los datos.
+
+        <br><br>
+
+        <small>
+          ${mensaje}
+        </small>
+
+      </td>
+
+    </tr>
+
+  `;
+
+}
+
+
+/* ======================================================
+   FILTROS
+====================================================== */
 
 function llenarFiltros() {
-
 
   llenarSelect(
     "filtroSala",
@@ -292,16 +431,15 @@ function llenarFiltros() {
 }
 
 
-// ======================================================
-// SELECT NORMAL
-// ======================================================
+/* ======================================================
+   SELECT
+====================================================== */
 
 function llenarSelect(
   id,
   campo,
   textoInicial
 ) {
-
 
   const select =
     document.getElementById(id);
@@ -310,29 +448,27 @@ function llenarSelect(
   if (!select) return;
 
 
-  const valorActual =
+  const valorAnterior =
     select.value;
 
 
   select.innerHTML = "";
 
 
-  const opcionInicial =
+  const inicial =
     document.createElement(
       "option"
     );
 
 
-  opcionInicial.value =
-    "";
+  inicial.value = "";
 
-
-  opcionInicial.textContent =
+  inicial.textContent =
     textoInicial;
 
 
   select.appendChild(
-    opcionInicial
+    inicial
   );
 
 
@@ -401,24 +537,23 @@ function llenarSelect(
 
   if (
     valores.includes(
-      valorActual
+      valorAnterior
     )
   ) {
 
     select.value =
-      valorActual;
+      valorAnterior;
 
   }
 
 }
 
 
-// ======================================================
-// FILTRO MES
-// ======================================================
+/* ======================================================
+   FILTRO MES
+====================================================== */
 
 function llenarFiltroMes() {
-
 
   const select =
     document.getElementById(
@@ -438,9 +573,7 @@ function llenarFiltroMes() {
     );
 
 
-  inicial.value =
-    "";
-
+  inicial.value = "";
 
   inicial.textContent =
     "Todos los meses";
@@ -478,12 +611,11 @@ function llenarFiltroMes() {
 }
 
 
-// ======================================================
-// APLICAR FILTROS
-// ======================================================
+/* ======================================================
+   APLICAR FILTROS
+====================================================== */
 
 function aplicarFiltros() {
-
 
   const sala =
     obtenerValorSelect(
@@ -520,21 +652,18 @@ function aplicarFiltros() {
       function (registro) {
 
 
-        // LOCAL
-
         if (
           sala &&
-          String(
-            registro["LOCAL"] ?? ""
-          ).trim() !== sala
+          normalizarTexto(
+            registro["LOCAL"]
+          ) !==
+          normalizarTexto(sala)
         ) {
 
           return false;
 
         }
 
-
-        // MES
 
         if (
           mes &&
@@ -549,27 +678,25 @@ function aplicarFiltros() {
         }
 
 
-        // MODELO
-
         if (
           modelo &&
-          String(
-            registro["Modelo Com."] ?? ""
-          ).trim() !== modelo
+          normalizarTexto(
+            registro["Modelo Com."]
+          ) !==
+          normalizarTexto(modelo)
         ) {
 
           return false;
 
         }
 
-
-        // NUMERO
 
         if (
           numero &&
-          String(
-            registro["Nro."] ?? ""
-          ).trim() !== numero
+          normalizarTexto(
+            registro["Nro."]
+          ) !==
+          normalizarTexto(numero)
         ) {
 
           return false;
@@ -577,13 +704,12 @@ function aplicarFiltros() {
         }
 
 
-        // JUEGO
-
         if (
           juego &&
-          String(
-            registro["Juego"] ?? ""
-          ).trim() !== juego
+          normalizarTexto(
+            registro["Juego"]
+          ) !==
+          normalizarTexto(juego)
         ) {
 
           return false;
@@ -602,12 +728,11 @@ function aplicarFiltros() {
 }
 
 
-// ======================================================
-// OBTENER VALOR SELECT
-// ======================================================
+/* ======================================================
+   OBTENER SELECT
+====================================================== */
 
 function obtenerValorSelect(id) {
-
 
   const elemento =
     document.getElementById(id);
@@ -627,12 +752,11 @@ function obtenerValorSelect(id) {
 }
 
 
-// ======================================================
-// LIMPIAR FILTROS
-// ======================================================
+/* ======================================================
+   LIMPIAR FILTROS
+====================================================== */
 
 function limpiarFiltros() {
-
 
   const ids = [
 
@@ -654,8 +778,7 @@ function limpiarFiltros() {
 
       if (elemento) {
 
-        elemento.value =
-          "";
+        elemento.value = "";
 
       }
 
@@ -664,7 +787,9 @@ function limpiarFiltros() {
 
 
   datosFiltrados =
-    [...datosOriginales];
+    [
+      ...datosOriginales
+    ];
 
 
   actualizarDashboard();
@@ -672,12 +797,11 @@ function limpiarFiltros() {
 }
 
 
-// ======================================================
-// ACTUALIZAR DASHBOARD
-// ======================================================
+/* ======================================================
+   DASHBOARD
+====================================================== */
 
 function actualizarDashboard() {
-
 
   actualizarContador();
 
@@ -690,36 +814,27 @@ function actualizarDashboard() {
 }
 
 
-// ======================================================
-// CONTADOR
-// ======================================================
+/* ======================================================
+   CONTADOR
+====================================================== */
 
 function actualizarContador() {
 
-
-  const elemento =
-    document.getElementById(
-      "contadorResultados"
-    );
-
-
-  if (!elemento) return;
-
-
-  elemento.textContent =
+  establecerTexto(
+    "contadorResultados",
     formatearNumero(
       datosFiltrados.length
-    );
+    )
+  );
 
 }
 
 
-// ======================================================
-// KPI
-// ======================================================
+/* ======================================================
+   KPI
+====================================================== */
 
 function actualizarKPI() {
-
 
   const coin =
     sumarCampo(
@@ -828,12 +943,11 @@ function actualizarKPI() {
 }
 
 
-// ======================================================
-// GRÁFICO MENSUAL
-// ======================================================
+/* ======================================================
+   GRÁFICO
+====================================================== */
 
 function crearGraficoMensual() {
-
 
   const canvas =
     document.getElementById(
@@ -871,320 +985,60 @@ function crearGraficoMensual() {
 
           datasets: [
 
-
-            // =========================================
-            // COIN PROM
-            // =========================================
-
-            {
-
-              label:
-                "COIN PROM",
-
-              data:
-                resumen.coinProm,
-
-              borderColor:
-                "#8ecae6",
-
-              backgroundColor:
-                "#8ecae6",
-
-              pointBackgroundColor:
-                "#8ecae6",
-
-              pointBorderColor:
-                "#ffffff",
-
-              pointBorderWidth:
-                2,
-
-              pointRadius:
-                5,
-
-              pointHoverRadius:
-                7,
-
-              borderWidth:
-                3,
-
-              tension:
-                0.3,
-
-              yAxisID:
-                "y"
-
-            },
-
-
-            // =========================================
-            // COIN TOTAL
-            // =========================================
-
-            {
-
-              label:
-                "COIN TOTAL",
-
-              data:
-                resumen.coinTotal,
-
-              borderColor:
-                "#a8dadc",
-
-              backgroundColor:
-                "#a8dadc",
-
-              pointBackgroundColor:
-                "#a8dadc",
-
-              pointBorderColor:
-                "#ffffff",
-
-              pointBorderWidth:
-                2,
-
-              pointRadius:
-                5,
-
-              pointHoverRadius:
-                7,
-
-              borderWidth:
-                3,
-
-              tension:
-                0.3,
-
-              yAxisID:
-                "y"
-
-            },
-
-
-            // =========================================
-            // VENTA PROM
-            // =========================================
-
-            {
-
-              label:
-                "VENTA PROM",
-
-              data:
-                resumen.ventaProm,
-
-              borderColor:
-                "#95d5b2",
-
-              backgroundColor:
-                "#95d5b2",
-
-              pointBackgroundColor:
-                "#95d5b2",
-
-              pointBorderColor:
-                "#ffffff",
-
-              pointBorderWidth:
-                2,
-
-              pointRadius:
-                5,
-
-              pointHoverRadius:
-                7,
-
-              borderWidth:
-                3,
-
-              tension:
-                0.3,
-
-              yAxisID:
-                "y"
-
-            },
-
-
-            // =========================================
-            // VENTA TOTAL
-            // =========================================
-
-            {
-
-              label:
-                "VENTA TOTAL",
-
-              data:
-                resumen.ventaTotal,
-
-              borderColor:
-                "#f9d88c",
-
-              backgroundColor:
-                "#f9d88c",
-
-              pointBackgroundColor:
-                "#f9d88c",
-
-              pointBorderColor:
-                "#ffffff",
-
-              pointBorderWidth:
-                2,
-
-              pointRadius:
-                5,
-
-              pointHoverRadius:
-                7,
-
-              borderWidth:
-                3,
-
-              tension:
-                0.3,
-
-              yAxisID:
-                "y"
-
-            },
-
-
-            // =========================================
-            // NETWIN
-            // =========================================
-
-            {
-
-              label:
-                "NETWIN ($)",
-
-              data:
-                resumen.netwin,
-
-              borderColor:
-                "#cdb4db",
-
-              backgroundColor:
-                "#cdb4db",
-
-              pointBackgroundColor:
-                "#cdb4db",
-
-              pointBorderColor:
-                "#ffffff",
-
-              pointBorderWidth:
-                2,
-
-              pointRadius:
-                5,
-
-              pointHoverRadius:
-                7,
-
-              borderWidth:
-                3,
-
-              tension:
-                0.3,
-
-              yAxisID:
-                "y"
-
-            },
-
-
-            // =========================================
-            // T.C
-            // =========================================
-
-            {
-
-              label:
-                "T.C",
-
-              data:
-                resumen.tc,
-
-              borderColor:
-                "#f4b183",
-
-              backgroundColor:
-                "#f4b183",
-
-              pointBackgroundColor:
-                "#f4b183",
-
-              pointBorderColor:
-                "#ffffff",
-
-              pointBorderWidth:
-                2,
-
-              pointRadius:
-                5,
-
-              pointHoverRadius:
-                7,
-
-              borderWidth:
-                3,
-
-              tension:
-                0.3,
-
-              yAxisID:
-                "tc"
-
-            },
-
-
-            // =========================================
-            // % PAGO
-            // =========================================
-
-            {
-
-              label:
-                "% PAGO",
-
-              data:
-                resumen.pago,
-
-              borderColor:
-                "#f3a6b8",
-
-              backgroundColor:
-                "#f3a6b8",
-
-              pointBackgroundColor:
-                "#f3a6b8",
-
-              pointBorderColor:
-                "#ffffff",
-
-              pointBorderWidth:
-                2,
-
-              pointRadius:
-                5,
-
-              pointHoverRadius:
-                7,
-
-              borderWidth:
-                3,
-
-              tension:
-                0.3,
-
-              yAxisID:
-                "pago"
-
-            }
+            crearSerie(
+              "COIN PROM",
+              resumen.coinProm,
+              "#9ecae1",
+              "y"
+            ),
+
+
+            crearSerie(
+              "COIN TOTAL",
+              resumen.coinTotal,
+              "#a8d5ba",
+              "y"
+            ),
+
+
+            crearSerie(
+              "VENTA PROM",
+              resumen.ventaProm,
+              "#f5d98b",
+              "y"
+            ),
+
+
+            crearSerie(
+              "VENTA TOTAL",
+              resumen.ventaTotal,
+              "#c9b6dc",
+              "y"
+            ),
+
+
+            crearSerie(
+              "NETWIN ($)",
+              resumen.netwin,
+              "#e8b4c3",
+              "y"
+            ),
+
+
+            crearSerie(
+              "T.C",
+              resumen.tc,
+              "#efc39b",
+              "tc"
+            ),
+
+
+            crearSerie(
+              "% PAGO",
+              resumen.pago,
+              "#b7c9e2",
+              "pago"
+            )
 
           ]
 
@@ -1224,10 +1078,10 @@ function crearGraficoMensual() {
                   true,
 
                 padding:
-                  18,
+                  16,
 
                 color:
-                  "#5f6b7d",
+                  "#667386",
 
                 font: {
 
@@ -1244,7 +1098,7 @@ function crearGraficoMensual() {
             tooltip: {
 
               backgroundColor:
-                "#263248",
+                "#334155",
 
               titleColor:
                 "#ffffff",
@@ -1253,7 +1107,7 @@ function crearGraficoMensual() {
                 "#ffffff",
 
               padding:
-                12,
+                11,
 
               displayColors:
                 true
@@ -1265,18 +1119,7 @@ function crearGraficoMensual() {
 
           scales: {
 
-
-            // =======================================
-            // ESCALA PRINCIPAL
-            // =======================================
-
             y: {
-
-              type:
-                "linear",
-
-              position:
-                "left",
 
               beginAtZero:
                 true,
@@ -1291,7 +1134,7 @@ function crearGraficoMensual() {
               ticks: {
 
                 color:
-                  "#7b8498",
+                  "#7c8797",
 
                 callback:
                   function (valor) {
@@ -1306,10 +1149,6 @@ function crearGraficoMensual() {
 
             },
 
-
-            // =======================================
-            // T.C
-            // =======================================
 
             tc: {
 
@@ -1332,7 +1171,7 @@ function crearGraficoMensual() {
               ticks: {
 
                 color:
-                  "#c38a58",
+                  "#b5835d",
 
                 callback:
                   function (valor) {
@@ -1347,10 +1186,6 @@ function crearGraficoMensual() {
 
             },
 
-
-            // =======================================
-            // % PAGO
-            // =======================================
 
             pago: {
 
@@ -1379,7 +1214,7 @@ function crearGraficoMensual() {
               ticks: {
 
                 color:
-                  "#c47788",
+                  "#a46f80",
 
                 callback:
                   function (valor) {
@@ -1422,12 +1257,68 @@ function crearGraficoMensual() {
 }
 
 
-// ======================================================
-// CONSTRUIR RESUMEN MENSUAL
-// ======================================================
+/* ======================================================
+   CREAR SERIE
+====================================================== */
+
+function crearSerie(
+  nombre,
+  datos,
+  color,
+  eje
+) {
+
+  return {
+
+    label:
+      nombre,
+
+    data:
+      datos,
+
+    borderColor:
+      color,
+
+    backgroundColor:
+      color,
+
+    pointBackgroundColor:
+      color,
+
+    pointBorderColor:
+      "#ffffff",
+
+    pointBorderWidth:
+      2,
+
+    pointRadius:
+      5,
+
+    pointHoverRadius:
+      7,
+
+    borderWidth:
+      3,
+
+    tension:
+      0.3,
+
+    yAxisID:
+      eje,
+
+    spanGaps:
+      true
+
+  };
+
+}
+
+
+/* ======================================================
+   RESUMEN MENSUAL
+====================================================== */
 
 function construirResumenMensual() {
-
 
   const grupos = {};
 
@@ -1460,15 +1351,14 @@ function construirResumenMensual() {
   datosFiltrados.forEach(
     function (registro) {
 
-
       const año =
-        Number(
+        obtenerNumero(
           registro["AÑO"]
         );
 
 
       if (
-        año &&
+        año !== null &&
         año !== 2026
       ) {
 
@@ -1534,33 +1424,56 @@ function construirResumenMensual() {
         );
 
 
-      grupos[mes]
-        .coinProm
-        .push(
-          coinProm
-        );
+      if (
+        coinProm !== null
+      ) {
+
+        grupos[mes]
+          .coinProm
+          .push(coinProm);
+
+      }
 
 
-      grupos[mes]
-        .coinTotal +=
-        coin;
+      if (
+        coin !== null
+      ) {
+
+        grupos[mes]
+          .coinTotal += coin;
+
+      }
 
 
-      grupos[mes]
-        .ventaProm
-        .push(
-          ventaProm
-        );
+      if (
+        ventaProm !== null
+      ) {
+
+        grupos[mes]
+          .ventaProm
+          .push(ventaProm);
+
+      }
 
 
-      grupos[mes]
-        .ventaTotal +=
-        venta;
+      if (
+        venta !== null
+      ) {
+
+        grupos[mes]
+          .ventaTotal += venta;
+
+      }
 
 
-      grupos[mes]
-        .netwin +=
-        netwin;
+      if (
+        netwin !== null
+      ) {
+
+        grupos[mes]
+          .netwin += netwin;
+
+      }
 
 
       if (
@@ -1593,6 +1506,7 @@ function construirResumenMensual() {
     labels:
       MESES_2026,
 
+
     coinProm:
       MESES_2026.map(
         function (mes) {
@@ -1604,6 +1518,7 @@ function construirResumenMensual() {
         }
       ),
 
+
     coinTotal:
       MESES_2026.map(
         function (mes) {
@@ -1613,6 +1528,7 @@ function construirResumenMensual() {
 
         }
       ),
+
 
     ventaProm:
       MESES_2026.map(
@@ -1625,6 +1541,7 @@ function construirResumenMensual() {
         }
       ),
 
+
     ventaTotal:
       MESES_2026.map(
         function (mes) {
@@ -1634,6 +1551,7 @@ function construirResumenMensual() {
 
         }
       ),
+
 
     netwin:
       MESES_2026.map(
@@ -1645,6 +1563,7 @@ function construirResumenMensual() {
         }
       ),
 
+
     tc:
       MESES_2026.map(
         function (mes) {
@@ -1655,6 +1574,7 @@ function construirResumenMensual() {
 
         }
       ),
+
 
     pago:
       MESES_2026.map(
@@ -1672,12 +1592,11 @@ function construirResumenMensual() {
 }
 
 
-// ======================================================
-// TABLA
-// ======================================================
+/* ======================================================
+   TABLA
+====================================================== */
 
 function actualizarTabla() {
-
 
   const cuerpo =
     document.getElementById(
@@ -1697,7 +1616,6 @@ function actualizarTabla() {
 
   resumen.labels.forEach(
     function (mes, indice) {
-
 
       const fila =
         document.createElement(
@@ -1768,22 +1686,20 @@ function actualizarTabla() {
 }
 
 
-// ======================================================
-// SUMAR CAMPO
-// ======================================================
+/* ======================================================
+   SUMAR
+====================================================== */
 
 function sumarCampo(
   datos,
   campo
 ) {
 
-
   return datos.reduce(
     function (
       total,
       registro
     ) {
-
 
       const numero =
         obtenerNumero(
@@ -1805,15 +1721,14 @@ function sumarCampo(
 }
 
 
-// ======================================================
-// PROMEDIO
-// ======================================================
+/* ======================================================
+   PROMEDIO CAMPO
+====================================================== */
 
 function promedioCampo(
   datos,
   campo
 ) {
-
 
   const valores =
     datos
@@ -1844,14 +1759,13 @@ function promedioCampo(
 }
 
 
-// ======================================================
-// PROMEDIO ARRAY
-// ======================================================
+/* ======================================================
+   PROMEDIO ARRAY
+====================================================== */
 
 function promedioArray(
   valores
 ) {
-
 
   if (
     !valores ||
@@ -1884,14 +1798,13 @@ function promedioArray(
 }
 
 
-// ======================================================
-// OBTENER NÚMERO
-// ======================================================
+/* ======================================================
+   OBTENER NÚMERO
+====================================================== */
 
 function obtenerNumero(
   valor
 ) {
-
 
   if (
     valor === null ||
@@ -1927,7 +1840,6 @@ function obtenerNumero(
   }
 
 
-  // Quitar símbolos de porcentaje
   texto =
     texto.replace(
       /%/g,
@@ -1935,12 +1847,42 @@ function obtenerNumero(
     );
 
 
-  // Quitar separadores de miles
-  // conservando decimal
+  /*
+    Manejo de números:
+
+    1,234.56
+    1234.56
+    1234,56
+  */
+
+  if (
+    texto.includes(",") &&
+    texto.includes(".")
+  ) {
+
+    texto =
+      texto.replace(
+        /,/g,
+        ""
+      );
+
+  }
+  else if (
+    texto.includes(",")
+  ) {
+
+    texto =
+      texto.replace(
+        ",",
+        "."
+      );
+
+  }
+
 
   texto =
     texto.replace(
-      /,/g,
+      /[^\d.-]/g,
       ""
     );
 
@@ -1956,14 +1898,38 @@ function obtenerNumero(
 }
 
 
-// ======================================================
-// NORMALIZAR MES
-// ======================================================
+/* ======================================================
+   NORMALIZAR TEXTO
+====================================================== */
+
+function normalizarTexto(
+  valor
+) {
+
+  if (
+    valor === null ||
+    valor === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(valor)
+    .trim()
+    .toUpperCase();
+
+}
+
+
+/* ======================================================
+   NORMALIZAR MES
+====================================================== */
 
 function normalizarMes(
   valor
 ) {
-
 
   if (
     valor === null ||
@@ -1981,18 +1947,14 @@ function normalizarMes(
       .toUpperCase();
 
 
-  // Quitar acentos
-
   mes =
-    mes.normalize(
-      "NFD"
-    ).replace(
-      /[\u0300-\u036f]/g,
-      ""
-    );
+    mes
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      );
 
-
-  // Si viene como número
 
   const numero =
     Number(mes);
@@ -2016,14 +1978,13 @@ function normalizarMes(
 }
 
 
-// ======================================================
-// FORMATEAR NÚMERO
-// ======================================================
+/* ======================================================
+   FORMATEAR NÚMERO
+====================================================== */
 
 function formatearNumero(
   valor
 ) {
-
 
   const numero =
     Number(valor) || 0;
@@ -2039,14 +2000,13 @@ function formatearNumero(
 }
 
 
-// ======================================================
-// FORMATEAR DECIMAL
-// ======================================================
+/* ======================================================
+   FORMATEAR DECIMAL
+====================================================== */
 
 function formatearDecimal(
   valor
 ) {
-
 
   const numero =
     Number(valor) || 0;
@@ -2063,15 +2023,14 @@ function formatearDecimal(
 }
 
 
-// ======================================================
-// ESTABLECER TEXTO
-// ======================================================
+/* ======================================================
+   ESTABLECER TEXTO
+====================================================== */
 
 function establecerTexto(
   id,
   texto
 ) {
-
 
   const elemento =
     document.getElementById(id);
@@ -2087,9 +2046,9 @@ function establecerTexto(
 }
 
 
-// ======================================================
-// ACTUALIZACIÓN AUTOMÁTICA
-// ======================================================
+/* ======================================================
+   ACTUALIZACIÓN AUTOMÁTICA
+====================================================== */
 
 setInterval(
   function () {
