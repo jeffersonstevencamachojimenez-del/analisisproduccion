@@ -229,3 +229,449 @@ STYLE.CSS
                          ▼
                     style.css
     
+
+
+
+const SHEET_ID = "1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY";
+const SHEET_GID = "683959855";
+
+const NOMBRE_ARCHIVO_CACHE =
+  "dashboard_produccion_cache.json";
+
+
+/* ======================================================
+   API
+====================================================== */
+
+function doGet(e){
+
+  try{
+
+    const actualizar =
+      e &&
+      e.parameter &&
+      e.parameter.actualizar === "1";
+
+
+    let datos;
+
+
+    if(actualizar){
+
+      datos =
+        actualizarDatos();
+
+    }else{
+
+      datos =
+        obtenerDatos();
+
+    }
+
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify(datos)
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+
+  }catch(error){
+
+    return ContentService
+      .createTextOutput(
+        JSON.stringify({
+
+          error:true,
+
+          message:
+            error.message
+
+        })
+      )
+      .setMimeType(
+        ContentService.MimeType.JSON
+      );
+
+  }
+
+}
+
+
+/* ======================================================
+   OBTENER DATOS
+====================================================== */
+
+function obtenerDatos(){
+
+  const datosCache =
+    obtenerCacheDrive();
+
+
+  if(datosCache){
+
+    return datosCache;
+
+  }
+
+
+  return actualizarDatos();
+
+}
+
+
+/* ======================================================
+   ACTUALIZAR DATOS
+====================================================== */
+
+function actualizarDatos(){
+
+  const ss =
+    SpreadsheetApp.openById(
+      SHEET_ID
+    );
+
+
+  const hoja =
+    ss
+      .getSheets()
+      .find(
+        h =>
+          String(
+            h.getSheetId()
+          ) ===
+          String(
+            SHEET_GID
+          )
+      );
+
+
+  if(!hoja){
+
+    throw new Error(
+      "No se encontró la pestaña DATA."
+    );
+
+  }
+
+
+  const datos =
+    hoja
+      .getDataRange()
+      .getValues();
+
+
+  if(
+    datos.length < 2
+  ){
+
+    guardarCacheDrive([]);
+
+    return [];
+
+  }
+
+
+  const resultado =
+    datos
+      .slice(1)
+      .map(
+        fila => ({
+
+          marca:
+            fila[0],
+
+          serie:
+            fila[2],
+
+          juego:
+            fila[5],
+
+          coin:
+            numero(
+              fila[7]
+            ),
+
+          coinProm:
+            numero(
+              fila[8]
+            ),
+
+          venta:
+            numero(
+              fila[9]
+            ),
+
+          ventaProm:
+            numero(
+              fila[10]
+            ),
+
+          netwin:
+            numero(
+              fila[11]
+            ),
+
+          pago:
+            numero(
+              fila[13]
+            ),
+
+          sala:
+            fila[15],
+
+          mes:
+            fila[16],
+
+          anio:
+            fila[17],
+
+          tc:
+            numero(
+              fila[19]
+            )
+
+        })
+      )
+
+      .filter(
+        f =>
+          f.sala ||
+          f.marca ||
+          f.serie ||
+          f.juego
+      );
+
+
+  guardarCacheDrive(
+    resultado
+  );
+
+
+  return resultado;
+
+}
+
+
+/* ======================================================
+   GUARDAR CACHE DRIVE
+====================================================== */
+
+function guardarCacheDrive(
+  datos
+){
+
+  const archivos =
+    DriveApp
+      .getFilesByName(
+        NOMBRE_ARCHIVO_CACHE
+      );
+
+
+  const contenido =
+    JSON.stringify(
+      datos
+    );
+
+
+  if(
+    archivos.hasNext()
+  ){
+
+    const archivo =
+      archivos.next();
+
+
+    archivo.setContent(
+      contenido
+    );
+
+  }else{
+
+    DriveApp.createFile(
+      NOMBRE_ARCHIVO_CACHE,
+      contenido,
+      MimeType.PLAIN_TEXT
+    );
+
+  }
+
+}
+
+
+/* ======================================================
+   LEER CACHE DRIVE
+====================================================== */
+
+function obtenerCacheDrive(){
+
+  const archivos =
+    DriveApp
+      .getFilesByName(
+        NOMBRE_ARCHIVO_CACHE
+      );
+
+
+  if(
+    !archivos.hasNext()
+  ){
+
+    return null;
+
+  }
+
+
+  const archivo =
+    archivos.next();
+
+
+  try{
+
+    const contenido =
+      archivo
+        .getBlob()
+        .getDataAsString();
+
+
+    if(
+      !contenido
+    ){
+
+      return null;
+
+    }
+
+
+    return JSON.parse(
+      contenido
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Error leyendo cache:",
+      error
+    );
+
+
+    return null;
+
+  }
+
+}
+
+
+/* ======================================================
+   NÚMERO
+====================================================== */
+
+function numero(
+  valor
+){
+
+  if(
+
+    valor === "" ||
+
+    valor === null ||
+
+    valor === undefined
+
+  ){
+
+    return null;
+
+  }
+
+
+  if(
+    typeof valor === "number"
+  ){
+
+    return isFinite(valor)
+      ? valor
+      : null;
+
+  }
+
+
+  let texto =
+    String(valor)
+      .trim()
+      .replace(
+        /%/g,
+        ""
+      );
+
+
+  if(
+
+    texto.includes(",") &&
+
+    texto.includes(".")
+
+  ){
+
+    if(
+
+      texto.lastIndexOf(",") >
+
+      texto.lastIndexOf(".")
+
+    ){
+
+      texto =
+        texto
+          .replace(
+            /\./g,
+            ""
+          )
+          .replace(
+            ",",
+            "."
+          );
+
+    }else{
+
+      texto =
+        texto.replace(
+          /,/g,
+          ""
+        );
+
+    }
+
+  }else if(
+    texto.includes(",")
+  ){
+
+    texto =
+      texto.replace(
+        ",",
+        "."
+      );
+
+  }
+
+
+  texto =
+    texto.replace(
+      /[^0-9.-]/g,
+      ""
+    );
+
+
+  const n =
+    Number(
+      texto
+    );
+
+
+  return isFinite(n)
+    ? n
+    : null;
+
+}
