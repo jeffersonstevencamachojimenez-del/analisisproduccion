@@ -1,41 +1,36 @@
-// ======================================================
-// DASHBOARD DE PRODUCCIÓN
-// ======================================================
+/* ======================================================
+   CONFIGURACIÓN API
+====================================================== */
+
+/*
+  REEMPLAZA ESTA URL por la URL DE IMPLEMENTACIÓN
+  de tu Google Apps Script.
+
+  Ejemplo:
+
+  https://script.google.com/macros/s/XXXXXXXXXXXX/exec
+*/
+
+const API_URL =
+  "PEGAR_AQUI_URL_DE_TU_APPS_SCRIPT";
 
 
-// ======================================================
-// 01. GOOGLE SHEETS
-// ======================================================
+/* ======================================================
+   VARIABLES
+====================================================== */
 
-const SHEET_ID =
-  "1kR5qsAetOMi2Szb4c-gVo3vVhZhwJUC_AgSNI13eluY";
-
-const SHEET_GID =
-  "683959855";
-
-const URL_DATOS =
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
+let datos = [];
+let filtrados = [];
+let charts = {};
+let mapaGeoJSON = null;
+let mapaBounds = null;
 
 
-// ======================================================
-// 02. VARIABLES
-// ======================================================
+/* ======================================================
+   MESES
+====================================================== */
 
-let datosOriginales = [];
-
-let datosFiltrados = [];
-
-let graficos = {};
-
-let cargando = false;
-
-
-// ======================================================
-// 03. MESES
-// ======================================================
-
-const MESES = [
-
+const meses = [
   "ENERO",
   "FEBRERO",
   "MARZO",
@@ -48,345 +43,509 @@ const MESES = [
   "OCTUBRE",
   "NOVIEMBRE",
   "DICIEMBRE"
-
 ];
 
 
-// ======================================================
-// 04. CONFIGURACIÓN INDICADORES
-// ======================================================
+/* ======================================================
+   SALAS POR DEPARTAMENTO
+====================================================== */
 
-const INDICADORES = {
+const salasPorDepartamento = {
 
-  "COIN": {
-    campo: "COIN",
-    tipo: "total"
-  },
+  "AMAZONAS":[
+    "BAGUA GRANDE"
+  ],
 
-  "COIN PROM": {
-    campo: "COIN PROM",
-    tipo: "promedio"
-  },
+  "ANCASH":[
+    "CHIMBOTE 1",
+    "CHIMBOTE 3",
+    "HUARAZ 1",
+    "HUARAZ 2",
+    "HUARAZ 4",
+    "HUARAZ 5",
+    "HUARMEY 2"
+  ],
 
-  "VENTA": {
-    campo: "VENTA",
-    tipo: "total"
-  },
+  "APURIMAC":[
+    "ABANCAY 1",
+    "ABANCAY 2",
+    "ANDAHUAYLAS 1",
+    "ANDAHUAYLAS 2"
+  ],
 
-  "VENTA PROM": {
-    campo: "VENTA PROM",
-    tipo: "promedio"
-  },
+  "AREQUIPA":[
+    "AREQUIPA 1"
+  ],
 
-  "NETWIN ($)": {
-    campo: "NETWIN ($)",
-    tipo: "total"
-  },
+  "AYACUCHO":[
+    "AYACUCHO"
+  ],
 
-  "T.C": {
-    campo: "T.C",
-    tipo: "promedio"
-  },
+  "CAJAMARCA":[
+    "CAJAMARCA 1",
+    "CAJAMARCA 2",
+    "CAJAMARCA 3",
+    "CAJAMARCA 4",
+    "JAEN"
+  ],
 
-  "% PAGO": {
-    campo: "% PAGO",
-    tipo: "promedio"
-  }
+  "CUSCO":[
+    "CUSCO 1",
+    "CUSCO 2"
+  ],
+
+  "ICA":[
+    "CHINCHA 1",
+    "CHINCHA 3",
+    "CHINCHA 4",
+    "ICA 1",
+    "ICA 2"
+  ],
+
+  "JUNIN":[
+    "HUANCAYO"
+  ],
+
+  "LA LIBERTAD":[
+    "TRUJILLO 1",
+    "TRUJILLO 2"
+  ],
+
+  "LAMBAYEQUE":[
+    "CHICLAYO 1",
+    "CHICLAYO 2",
+    "LAMBAYEQUE 1",
+    "LAMBAYEQUE 2"
+  ],
+
+  "LIMA":[
+    "2 DE MAYO",
+    "BARRANCA 1",
+    "BARRANCA 2",
+    "BARRANCA 3",
+    "BOLIVAR",
+    "BARRANCO 1",
+    "CHORRILLOS",
+    "CHOSICA 1",
+    "CHOSICA 2",
+    "COMAS 1",
+    "COMAS 3",
+    "COMAS 4",
+    "COMAS 5",
+    "ELIO",
+    "GAMARRA",
+    "HUACHO 1",
+    "HUACHO 2",
+    "HUACHO 3",
+    "HUARAL 1",
+    "LOS OLIVOS 2",
+    "LOS OLIVOS 3",
+    "LURIN",
+    "MANCO CAPAC",
+    "SAN JUAN 1",
+    "SAN JUAN 3",
+    "SAN JUAN 4",
+    "SAN JUAN 6",
+    "SAN MARTIN 2",
+    "SAN MARTIN 3",
+    "SAN MARTIN 4",
+    "SAN MARTIN 5",
+    "SANTA ANITA",
+    "VILLA 2",
+    "ZARATE 1",
+    "ZARATE 3"
+  ],
+
+  "LORETO":[
+    "IQUITOS 1",
+    "IQUITOS 2",
+    "IQUITOS 3",
+    "IQUITOS 4",
+    "IQUITOS 6"
+  ],
+
+  "MOQUEGUA":[
+    "ILO",
+    "MOQUEGUA"
+  ],
+
+  "PIURA":[
+    "PIURA 1",
+    "PIURA 2",
+    "SULLANA 1",
+    "SULLANA 3"
+  ],
+
+  "PUNO":[
+    "JULIACA 1",
+    "JULIACA 2",
+    "JULIACA 3",
+    "PUNO 2"
+  ],
+
+  "SAN MARTIN":[
+    "MOYOBAMBA 1",
+    "TARAPOTO 1",
+    "TARAPOTO 3",
+    "TARAPOTO 4",
+    "TARAPOTO 5"
+  ],
+
+  "TACNA":[
+    "TACNA"
+  ],
+
+  "TUMBES":[
+    "TUMBES 2",
+    "TUMBES 3"
+  ],
+
+  "UCAYALI":[
+    "PUCALLPA 1",
+    "PUCALLPA 2",
+    "PUCALLPA 3"
+  ],
+
+  "CALLAO":[
+    "COLONIAL",
+    "VENTANILLA 2",
+    "VENTANILLA 3"
+  ]
 
 };
 
 
-// ======================================================
-// 05. INICIO
-// ======================================================
+/* ======================================================
+   INICIO
+====================================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
-  () => {
-
-    configurarEventos();
-
-    cargarDatos();
-
-  }
+  iniciarDashboard
 );
 
 
-// ======================================================
-// 06. EVENTOS
-// ======================================================
+async function iniciarDashboard(){
 
-function configurarEventos() {
+  try {
 
-  const filtros = [
+    await cargarDatos();
 
-    "filtroSala",
-    "filtroModelo",
-    "filtroNumero",
-    "filtroJuego",
-    "filtroMes",
-    "filtroIndicador"
+    configurarEventos();
 
-  ];
+    cargarMapa();
 
+  } catch(error){
 
-  filtros.forEach(
-    id => {
+    console.error(error);
 
-      const elemento =
-        document.getElementById(id);
-
-
-      if (!elemento) return;
-
-
-      elemento.addEventListener(
-        "change",
-        manejarCambioFiltro
-      );
-
-    }
-  );
-
-
-  document
-    .getElementById("btnLimpiar")
-    ?.addEventListener(
-      "click",
-      limpiarFiltros
+    mostrarError(
+      error.message ||
+      "No se pudo cargar la información."
     );
-
-
-  document
-    .getElementById("btnActualizar")
-    ?.addEventListener(
-      "click",
-      cargarDatos
-    );
-
-}
-
-
-// ======================================================
-// 07. CAMBIO DE FILTRO
-// ======================================================
-
-function manejarCambioFiltro(evento) {
-
-  const id =
-    evento.target.id;
-
-
-  if (
-    id === "filtroIndicador"
-  ) {
-
-    aplicarFiltros();
-
-    return;
 
   }
 
-
-  aplicarFiltros();
-
 }
 
 
-// ======================================================
-// 08. CARGAR DATOS
-// ======================================================
+/* ======================================================
+   CARGAR DATOS
+====================================================== */
 
-async function cargarDatos() {
+async function cargarDatos(
+  forzarActualizacion = false
+){
 
-  if (cargando) return;
-
-  cargando = true;
-
-
-  cambiarEstadoConexion(
-    "Conectando con Google Sheets...",
-    "#f59e0b"
+  mostrarCargando(
+    forzarActualizacion
+      ? "Actualizando información..."
+      : "Cargando información..."
   );
 
 
   try {
 
+    let url = API_URL;
+
+
+    if(forzarActualizacion){
+
+      url +=
+        "?actualizar=1&t=" +
+        Date.now();
+
+    }else{
+
+      url +=
+        "?t=" +
+        Date.now();
+
+    }
+
+
     const respuesta =
       await fetch(
-        URL_DATOS +
-        "&t=" +
-        Date.now()
+        url,
+        {
+          method:"GET",
+          cache:"no-store"
+        }
       );
 
 
-    if (!respuesta.ok) {
+    if(!respuesta.ok){
 
       throw new Error(
-        "HTTP " +
+        "Error HTTP: " +
         respuesta.status
       );
 
     }
 
 
-    const texto =
-      await respuesta.text();
+    const data =
+      await respuesta.json();
 
 
-    const datos =
-      convertirGViz(texto);
-
-
-    if (
-      !Array.isArray(datos) ||
-      datos.length === 0
-    ) {
+    if(
+      !Array.isArray(data)
+    ){
 
       throw new Error(
-        "No se encontraron registros."
+        "La API no devolvió una lista de datos."
       );
 
     }
 
 
-    datosOriginales =
-      datos;
+    datos = data;
+
+    filtrados = [...datos];
 
 
-    datosFiltrados =
-      [...datosOriginales];
-
-
-    cambiarEstadoConexion(
-      "Google Sheets conectado",
-      "#16a34a"
+    llenarSelect(
+      "sala",
+      datos.map(x=>x.sala),
+      "TODOS LOS LOCALES"
     );
 
 
-    llenarTodosLosFiltros();
-
-
-    actualizarDashboard();
-
-
-  } catch (error) {
-
-    console.error(error);
-
-
-    cambiarEstadoConexion(
-      "Error al conectar con Google Sheets",
-      "#dc2626"
+    llenarSelect(
+      "mes",
+      datos.map(x=>x.mes),
+      "TODOS"
     );
 
-  } finally {
 
-    cargando = false;
+    llenarSelect(
+      "anio",
+      datos.map(x=>x.anio),
+      "TODOS"
+    );
+
+
+    actualizarFiltrosDependientes();
+
+    aplicarFiltros();
+
+
+    ocultarCargando();
+
+
+  }catch(error){
+
+    console.error(
+      "Error cargando datos:",
+      error
+    );
+
+    mostrarError(
+      "No se pudo cargar la información. " +
+      error.message
+    );
+
+    throw error;
 
   }
 
 }
 
 
-// ======================================================
-// 09. CONVERTIR GVIZ
-// ======================================================
+/* ======================================================
+   EVENTOS
+====================================================== */
 
-function convertirGViz(texto) {
+function configurarEventos(){
 
-  const inicio =
-    texto.indexOf("{");
-
-  const fin =
-    texto.lastIndexOf("}");
-
-
-  if (
-    inicio === -1 ||
-    fin === -1
-  ) {
-
-    throw new Error(
-      "Respuesta GViz inválida."
-    );
-
-  }
-
-
-  const json =
-    JSON.parse(
-      texto.substring(
-        inicio,
-        fin + 1
-      )
+  document
+    .getElementById("sala")
+    .addEventListener(
+      "change",
+      ()=>{
+        actualizarFiltrosDependientes();
+        aplicarFiltros();
+      }
     );
 
 
-  if (
-    !json.table ||
-    !json.table.rows
-  ) {
-
-    throw new Error(
-      "No se encontraron filas."
+  document
+    .getElementById("marca")
+    .addEventListener(
+      "change",
+      ()=>{
+        actualizarFiltrosDependientes();
+        aplicarFiltros();
+      }
     );
 
-  }
+
+  document
+    .getElementById("serie")
+    .addEventListener(
+      "change",
+      ()=>{
+        actualizarFiltrosDependientes();
+        aplicarFiltros();
+      }
+    );
 
 
-  return json.table.rows.map(
-    fila => {
+  document
+    .getElementById("juego")
+    .addEventListener(
+      "change",
+      aplicarFiltros
+    );
 
-      const c =
-        fila.c || [];
+
+  document
+    .getElementById("mes")
+    .addEventListener(
+      "change",
+      aplicarFiltros
+    );
 
 
-      return {
+  document
+    .getElementById("anio")
+    .addEventListener(
+      "change",
+      aplicarFiltros
+    );
 
-        "Marca / Tipo / Version":
-          obtenerCelda(c, 0),
 
-        "Maquina":
-          obtenerCelda(c, 2),
+  document
+    .getElementById("indicador")
+    .addEventListener(
+      "change",
+      actualizar
+    );
 
-        "Juego":
-          obtenerCelda(c, 5),
 
-        "COIN":
-          obtenerCelda(c, 7),
+  let temporizadorBusqueda = null;
 
-        "COIN PROM":
-          obtenerCelda(c, 8),
 
-        "VENTA":
-          obtenerCelda(c, 9),
+  document
+    .getElementById("busqueda")
+    .addEventListener(
+      "input",
+      function(){
 
-        "VENTA PROM":
-          obtenerCelda(c, 10),
+        clearTimeout(
+          temporizadorBusqueda
+        );
 
-        "NETWIN ($)":
-          obtenerCelda(c, 11),
 
-        "G.PLAYED":
-          obtenerCelda(c, 12),
+        temporizadorBusqueda =
+          setTimeout(
+            ()=>{
+              actualizarFiltrosDependientes();
+              aplicarFiltros();
+            },
+            250
+          );
 
-        "% PAGO":
-          obtenerCelda(c, 13),
+      }
+    );
 
-        "LOCAL":
-          obtenerCelda(c, 15),
 
-        "MES":
-          obtenerCelda(c, 16),
+  document
+    .getElementById("btnLimpiar")
+    .addEventListener(
+      "click",
+      limpiarFiltros
+    );
 
-        "AÑO":
-          obtenerCelda(c, 17),
 
-        "T.C":
-          obtenerCelda(c, 19)
+  document
+    .getElementById("btnActualizarDatos")
+    .addEventListener(
+      "click",
+      ()=>{
+        cargarDatos(true);
+      }
+    );
 
-      };
+
+  document
+    .getElementById("cerrarModal")
+    .addEventListener(
+      "click",
+      cerrarModal
+    );
+
+
+  document
+    .getElementById("cerrarModalDepartamento")
+    .addEventListener(
+      "click",
+      cerrarModalDepartamento
+    );
+
+
+  document
+    .getElementById("modalDetalle")
+    .addEventListener(
+      "click",
+      function(e){
+
+        if(e.target===this){
+
+          cerrarModal();
+
+        }
+
+      }
+    );
+
+
+  document
+    .getElementById("modalDepartamento")
+    .addEventListener(
+      "click",
+      function(e){
+
+        if(e.target===this){
+
+          cerrarModalDepartamento();
+
+        }
+
+      }
+    );
+
+
+  document.addEventListener(
+    "keydown",
+    function(e){
+
+      if(e.key==="Escape"){
+
+        cerrarModal();
+        cerrarModalDepartamento();
+
+      }
 
     }
   );
@@ -394,288 +553,248 @@ function convertirGViz(texto) {
 }
 
 
-// ======================================================
-// 10. OBTENER CELDA
-// ======================================================
+/* ======================================================
+   TEXTO GENERAL
+====================================================== */
 
-function obtenerCelda(
-  columnas,
-  indice
-) {
+function obtenerTextoGeneral(x){
 
-  const celda =
-    columnas[indice];
+  return [
 
+    x.marca,
+    x.serie,
+    x.juego,
+    x.sala,
+    x.mes,
+    x.anio,
+    x.coin,
+    x.coinProm,
+    x.venta,
+    x.ventaProm,
+    x.netwin,
+    x.pago,
+    x.tc
 
-  if (!celda) {
+  ]
 
-    return "";
+  .map(
+    v =>
+      String(v ?? "")
+        .toLowerCase()
+  )
 
-  }
-
-
-  if (
-    celda.v !== undefined &&
-    celda.v !== null
-  ) {
-
-    return celda.v;
-
-  }
-
-
-  if (
-    celda.f !== undefined &&
-    celda.f !== null
-  ) {
-
-    return celda.f;
-
-  }
-
-
-  return "";
+  .join(" ");
 
 }
 
 
-// ======================================================
-// 11. ESTADO
-// ======================================================
+/* ======================================================
+   FILTROS DEPENDIENTES
+====================================================== */
 
-function cambiarEstadoConexion(
-  texto,
-  color
-) {
+function actualizarFiltrosDependientes(){
 
-  const textoElemento =
-    document.getElementById(
-      "textoConexion"
-    );
-
-
-  const punto =
-    document.getElementById(
-      "indicadorConexion"
-    );
+  const busqueda =
+    document
+      .getElementById("busqueda")
+      .value
+      .trim()
+      .toLowerCase();
 
 
-  if (textoElemento) {
+  const salaActual =
+    document.getElementById("sala").value;
 
-    textoElemento.textContent =
-      texto;
+  const marcaActual =
+    document.getElementById("marca").value;
 
-  }
+  const serieActual =
+    document.getElementById("serie").value;
 
+  const juegoActual =
+    document.getElementById("juego").value;
 
-  if (punto) {
+  const mesActual =
+    document.getElementById("mes").value;
 
-    punto.style.background =
-      color;
-
-  }
-
-}
-
-
-// ======================================================
-// 12. FILTROS INICIALES
-// ======================================================
-
-function llenarTodosLosFiltros() {
-
-  actualizarFiltrosDependientes();
-
-  llenarFiltroMes();
-
-}
+  const anioActual =
+    document.getElementById("anio").value;
 
 
-// ======================================================
-// 13. FILTROS DEPENDIENTES
-// ======================================================
+  let base =
+    busqueda
 
-function actualizarFiltrosDependientes() {
+      ? datos.filter(
+          x =>
+            obtenerTextoGeneral(x)
+              .includes(busqueda)
+        )
+
+      : [...datos];
+
+
+  llenarSelect(
+    "sala",
+    base.map(x=>x.sala),
+    "TODOS LOS LOCALES",
+    salaActual
+  );
+
 
   const sala =
-    obtenerValor("filtroSala");
+    document.getElementById("sala").value;
 
 
-  const modelo =
-    obtenerValor("filtroModelo");
+  let baseSala =
+    base.filter(
+      x =>
+        !sala ||
+        String(x.sala).trim()===sala
+    );
+
+
+  llenarSelect(
+    "marca",
+    baseSala.map(x=>x.marca),
+    "TODOS LOS MODELOS",
+    marcaActual
+  );
+
+
+  const marca =
+    document.getElementById("marca").value;
+
+
+  let baseMarca =
+    baseSala.filter(
+      x =>
+        !marca ||
+        String(x.marca).trim()===marca
+    );
+
+
+  llenarSelect(
+    "serie",
+    baseMarca.map(x=>x.serie),
+    "TODAS LAS SERIES",
+    serieActual
+  );
 
 
   const serie =
-    obtenerValor("filtroNumero");
+    document.getElementById("serie").value;
 
 
-  const juego =
-    obtenerValor("filtroJuego");
-
-
-  const baseSala =
-    datosOriginales.filter(
-      r =>
-        !sala ||
-        limpiarTexto(r["LOCAL"]) ===
-        limpiarTexto(sala)
+  let baseSerie =
+    baseMarca.filter(
+      x =>
+        !serie ||
+        String(x.serie).trim()===serie
     );
 
 
-  llenarSelectDesdeDatos(
-    "filtroSala",
-    baseSala,
-    "LOCAL",
-    "Todas las salas"
+  llenarSelect(
+    "juego",
+    baseSerie.map(x=>x.juego),
+    "TODOS LOS JUEGOS",
+    juegoActual
   );
 
 
-  const baseModelo =
-    datosOriginales.filter(
-      r =>
-        (!sala ||
-          limpiarTexto(r["LOCAL"]) ===
-          limpiarTexto(sala))
-    );
-
-
-  llenarSelectDesdeDatos(
-    "filtroModelo",
-    baseModelo,
-    "Marca / Tipo / Version",
-    "Todas las marcas"
+  llenarSelect(
+    "mes",
+    base.map(x=>x.mes),
+    "TODOS",
+    mesActual
   );
 
 
-  const baseSerie =
-    datosOriginales.filter(
-      r =>
-        (!sala ||
-          limpiarTexto(r["LOCAL"]) ===
-          limpiarTexto(sala)) &&
-
-        (!modelo ||
-          limpiarTexto(
-            r["Marca / Tipo / Version"]
-          ) ===
-          limpiarTexto(modelo))
-    );
-
-
-  llenarSelectDesdeDatos(
-    "filtroNumero",
-    baseSerie,
-    "Maquina",
-    "Todas las series"
+  llenarSelect(
+    "anio",
+    base.map(x=>x.anio),
+    "TODOS",
+    anioActual
   );
-
-
-  const baseJuego =
-    datosOriginales.filter(
-      r =>
-        (!sala ||
-          limpiarTexto(r["LOCAL"]) ===
-          limpiarTexto(sala)) &&
-
-        (!modelo ||
-          limpiarTexto(
-            r["Marca / Tipo / Version"]
-          ) ===
-          limpiarTexto(modelo)) &&
-
-        (!serie ||
-          limpiarTexto(r["Maquina"]) ===
-          limpiarTexto(serie))
-    );
-
-
-  llenarSelectDesdeDatos(
-    "filtroJuego",
-    baseJuego,
-    "Juego",
-    "Todos los juegos"
-  );
-
-
-  restaurarValoresFiltros();
 
 }
 
 
-// ======================================================
-// 14. LLENAR SELECT
-// ======================================================
+/* ======================================================
+   LLENAR SELECT
+====================================================== */
 
-function llenarSelectDesdeDatos(
+function llenarSelect(
   id,
-  datos,
-  campo,
-  textoInicial
-) {
+  valores,
+  textoInicial,
+  valorMantener=""
+){
 
   const select =
     document.getElementById(id);
 
 
-  if (!select) return;
-
-
-  const valorActual =
-    select.value;
-
-
-  const valores =
-    [
-      ...new Set(
-
-        datos
-          .map(
-            r =>
-              limpiarTexto(
-                r[campo]
-              )
-          )
-          .filter(Boolean)
-
-      )
-    ];
-
-
-  valores.sort(
-    (a, b) =>
-      a.localeCompare(
-        b,
-        "es",
-        {
-          numeric: true,
-          sensitivity: "base"
-        }
-      )
-  );
+  const valorAnterior =
+    valorMantener ||
+    select.value ||
+    "";
 
 
   select.innerHTML = "";
 
 
-  const inicial =
-    document.createElement(
-      "option"
-    );
+  const primera =
+    document.createElement("option");
 
 
-  inicial.value = "";
+  primera.value = "";
 
-  inicial.textContent =
+  primera.textContent =
     textoInicial;
 
 
   select.appendChild(
-    inicial
+    primera
   );
 
 
-  valores.forEach(
-    valor => {
+  const unicos = [
+
+    ...new Set(
+
+      valores
+
+        .filter(
+          v =>
+            v!==null &&
+            v!==undefined &&
+            String(v).trim()!==""
+        )
+
+        .map(
+          v =>
+            String(v).trim()
+        )
+
+    )
+
+  ];
+
+
+  unicos.sort(
+    (a,b)=>
+      a.localeCompare(
+        b,
+        "es",
+        {
+          numeric:true
+        }
+      )
+  );
+
+
+  unicos.forEach(
+    valor=>{
 
       const option =
         document.createElement(
@@ -698,51 +817,389 @@ function llenarSelectDesdeDatos(
   );
 
 
-  if (
-    valores.includes(
-      limpiarTexto(valorActual)
+  if(
+    valorAnterior &&
+    unicos.includes(
+      valorAnterior
     )
-  ) {
+  ){
 
     select.value =
-      limpiarTexto(valorActual);
+      valorAnterior;
+
+  }else{
+
+    select.value = "";
 
   }
 
 }
 
 
-// ======================================================
-// 15. RESTAURAR FILTROS
-// ======================================================
+/* ======================================================
+   APLICAR FILTROS
+====================================================== */
 
-function restaurarValoresFiltros() {
+function aplicarFiltros(){
 
-  [
-    "filtroSala",
-    "filtroModelo",
-    "filtroNumero",
-    "filtroJuego"
-  ].forEach(
-    id => {
+  const sala =
+    document.getElementById("sala").value;
 
-      const elemento =
-        document.getElementById(id);
+  const marca =
+    document.getElementById("marca").value;
+
+  const serie =
+    document.getElementById("serie").value;
+
+  const juego =
+    document.getElementById("juego").value;
+
+  const mes =
+    document.getElementById("mes").value;
+
+  const anio =
+    document.getElementById("anio").value;
 
 
-      if (!elemento) return;
+  const busqueda =
+    document
+      .getElementById("busqueda")
+      .value
+      .trim()
+      .toLowerCase();
 
 
-      const valor =
-        elemento.dataset.valor;
+  filtrados =
+    datos.filter(
+      x=>{
+
+        const textoGeneral =
+          obtenerTextoGeneral(x);
 
 
-      if (valor) {
+        return (
 
-        elemento.value =
-          valor;
+          (
+            !busqueda ||
+            textoGeneral.includes(
+              busqueda
+            )
+          ) &&
+
+          (
+            !sala ||
+            String(x.sala).trim()===sala
+          ) &&
+
+          (
+            !marca ||
+            String(x.marca).trim()===marca
+          ) &&
+
+          (
+            !serie ||
+            String(x.serie).trim()===serie
+          ) &&
+
+          (
+            !juego ||
+            String(x.juego).trim()===juego
+          ) &&
+
+          (
+            !mes ||
+            String(x.mes).trim()===mes
+          ) &&
+
+          (
+            !anio ||
+            String(x.anio).trim()===anio
+          )
+
+        );
 
       }
+    );
+
+
+  actualizar();
+
+}
+
+
+/* ======================================================
+   LIMPIAR FILTROS
+====================================================== */
+
+function limpiarFiltros(){
+
+  [
+    "sala",
+    "marca",
+    "serie",
+    "juego",
+    "mes",
+    "anio",
+    "busqueda"
+  ]
+
+  .forEach(
+    id =>
+      document.getElementById(id).value=""
+  );
+
+
+  actualizarFiltrosDependientes();
+
+  aplicarFiltros();
+
+}
+
+
+/* ======================================================
+   ACTUALIZAR TODO
+====================================================== */
+
+function actualizar(){
+
+  actualizarCards();
+
+  actualizarGraficos();
+
+  actualizarTabla();
+
+  actualizarMapa();
+
+}
+
+
+/* ======================================================
+   CARDS
+====================================================== */
+
+function actualizarCards(){
+
+  document.getElementById(
+    "totalCoin"
+  ).textContent =
+    formato(
+      suma("coin")
+    );
+
+
+  document.getElementById(
+    "totalVenta"
+  ).textContent =
+    formato(
+      suma("venta")
+    );
+
+
+  document.getElementById(
+    "totalNetwin"
+  ).textContent =
+    formato(
+      suma("netwin")
+    );
+
+
+  const pagos =
+    filtrados
+
+      .map(
+        x=>Number(x.pago)
+      )
+
+      .filter(
+        x=>!isNaN(x)
+      );
+
+
+  const promedio =
+    pagos.length
+
+      ? pagos.reduce(
+          (a,b)=>a+b,
+          0
+        ) / pagos.length
+
+      : 0;
+
+
+  document.getElementById(
+    "totalPago"
+  ).textContent =
+    promedio.toFixed(1) + "%";
+
+}
+
+
+/* ======================================================
+   SUMA
+====================================================== */
+
+function suma(campo){
+
+  return filtrados.reduce(
+    (total,x)=>
+      total +
+      (
+        Number(
+          x[campo]
+        ) || 0
+      ),
+    0
+  );
+
+}
+
+
+/* ======================================================
+   INDICADOR
+====================================================== */
+
+function indicadorActual(){
+
+  return document
+    .getElementById("indicador")
+    .value;
+
+}
+
+
+function nombreIndicador(){
+
+  const nombres = {
+
+    coin:"COIN",
+
+    venta:"VENTA",
+
+    netwin:"NETWIN",
+
+    pago:"% PAGO",
+
+    coinProm:"COIN PROM",
+
+    ventaProm:"VENTA PROM"
+
+  };
+
+
+  return nombres[
+    indicadorActual()
+  ];
+
+}
+
+
+function valorIndicador(x){
+
+  return Number(
+    x[
+      indicadorActual()
+    ]
+  ) || 0;
+
+}
+
+
+/* ======================================================
+   SEMÁFORO
+====================================================== */
+
+function coloresSemaforo(valores){
+
+  if(!valores.length){
+
+    return [];
+
+  }
+
+
+  const max =
+    Math.max(
+      ...valores
+    );
+
+
+  const min =
+    Math.min(
+      ...valores
+    );
+
+
+  const rango =
+    max-min || 1;
+
+
+  return valores.map(
+    valor=>{
+
+      const porcentaje =
+        (valor-min)/rango;
+
+
+      if(
+        porcentaje<=.5
+      ){
+
+        const t =
+          porcentaje/.5;
+
+
+        const r =
+          Math.round(
+            220+
+            (245-220)*t
+          );
+
+
+        const g =
+          Math.round(
+            38+
+            (158-38)*t
+          );
+
+
+        const b =
+          Math.round(
+            38+
+            (11-38)*t
+          );
+
+
+        return `rgb(${r},${g},${b})`;
+
+      }
+
+
+      const t =
+        (porcentaje-.5)/.5;
+
+
+      const r =
+        Math.round(
+          245-
+          (245-22)*t
+        );
+
+
+      const g =
+        Math.round(
+          158+
+          (163-158)*t
+        );
+
+
+      const b =
+        Math.round(
+          11+
+          (74-11)*t
+        );
+
+
+      return `rgb(${r},${g},${b})`;
 
     }
   );
@@ -750,792 +1207,329 @@ function restaurarValoresFiltros() {
 }
 
 
-// ======================================================
-// 16. MES
-// ======================================================
+/* ======================================================
+   GRÁFICOS
+====================================================== */
 
-function llenarFiltroMes() {
+function actualizarGraficos(){
 
-  const select =
-    document.getElementById(
-      "filtroMes"
-    );
+  const indicador =
+    nombreIndicador();
 
 
-  if (!select) return;
+  const mesesData = {};
 
 
-  const valorActual =
-    select.value;
+  filtrados.forEach(
+    x=>{
+
+      const mes =
+        String(
+          x.mes || ""
+        ).toUpperCase();
 
 
-  select.innerHTML = "";
+      if(!mes)return;
 
 
-  const inicial =
-    document.createElement(
-      "option"
-    );
+      if(
+        !mesesData[mes]
+      ){
+
+        mesesData[mes]=[];
+
+      }
 
 
-  inicial.value = "";
-
-  inicial.textContent =
-    "Todos los meses";
-
-
-  select.appendChild(
-    inicial
-  );
-
-
-  MESES.forEach(
-    mes => {
-
-      const option =
-        document.createElement(
-          "option"
-        );
-
-
-      option.value =
-        mes;
-
-      option.textContent =
-        mes;
-
-
-      select.appendChild(
-        option
+      mesesData[mes].push(
+        valorIndicador(x)
       );
 
     }
   );
 
 
-  if (
-    MESES.includes(
-      valorActual
-    )
-  ) {
-
-    select.value =
-      valorActual;
-
-  }
-
-}
-
-
-// ======================================================
-// 17. APLICAR FILTROS
-// ======================================================
-
-function aplicarFiltros() {
-
-  const sala =
-    obtenerValor(
-      "filtroSala"
+  const labelsMes =
+    meses.filter(
+      m=>mesesData[m]
     );
 
 
-  const modelo =
-    obtenerValor(
-      "filtroModelo"
-    );
+  const valoresMes =
+    labelsMes.map(
+      m=>{
+
+        const a =
+          mesesData[m];
 
 
-  const serie =
-    obtenerValor(
-      "filtroNumero"
-    );
-
-
-  const juego =
-    obtenerValor(
-      "filtroJuego"
-    );
-
-
-  const mes =
-    obtenerValor(
-      "filtroMes"
-    );
-
-
-  datosFiltrados =
-    datosOriginales.filter(
-      registro => {
-
-        if (
-          sala &&
-          limpiarTexto(
-            registro["LOCAL"]
-          ) !==
-          limpiarTexto(sala)
-        ) {
-
-          return false;
-
-        }
-
-
-        if (
-          modelo &&
-          limpiarTexto(
-            registro[
-              "Marca / Tipo / Version"
-            ]
-          ) !==
-          limpiarTexto(modelo)
-        ) {
-
-          return false;
-
-        }
-
-
-        if (
-          serie &&
-          limpiarTexto(
-            registro["Maquina"]
-          ) !==
-          limpiarTexto(serie)
-        ) {
-
-          return false;
-
-        }
-
-
-        if (
-          juego &&
-          limpiarTexto(
-            registro["Juego"]
-          ) !==
-          limpiarTexto(juego)
-        ) {
-
-          return false;
-
-        }
-
-
-        if (
-          mes &&
-          normalizarMes(
-            registro["MES"]
-          ) !==
-          normalizarMes(mes)
-        ) {
-
-          return false;
-
-        }
-
-
-        return true;
+        return (
+          a.reduce(
+            (x,y)=>x+y,
+            0
+          ) / a.length
+        );
 
       }
     );
 
 
-  actualizarFiltrosDependientes();
-
-  actualizarDashboard();
-
-}
-
-
-// ======================================================
-// 18. LIMPIAR
-// ======================================================
-
-function limpiarFiltros() {
-
-  [
-    "filtroSala",
-    "filtroModelo",
-    "filtroNumero",
-    "filtroJuego",
-    "filtroMes"
-  ].forEach(
-    id => {
-
-      const elemento =
-        document.getElementById(id);
-
-
-      if (elemento) {
-
-        elemento.value = "";
-
-      }
-
-    }
-  );
-
-
-  datosFiltrados =
-    [...datosOriginales];
-
-
-  actualizarFiltrosDependientes();
-
-  actualizarDashboard();
-
-}
-
-
-// ======================================================
-// 19. DASHBOARD
-// ======================================================
-
-function actualizarDashboard() {
-
-  actualizarResumen();
-
-  actualizarTextoSeleccion();
-
-  construirGraficos();
-
-  construirTabla();
-
-}
-
-
-// ======================================================
-// 20. RESUMEN
-// ======================================================
-
-function actualizarResumen() {
-
-  establecerTexto(
-    "contadorResultados",
-    formatearNumero(
-      datosFiltrados.length,
-      0
-    )
-  );
-
-
-  establecerTexto(
-    "resumenSalas",
-    contarUnicos(
-      datosFiltrados,
-      "LOCAL"
-    )
-  );
-
-
-  establecerTexto(
-    "resumenMarcas",
-    contarUnicos(
-      datosFiltrados,
-      "Marca / Tipo / Version"
-    )
-  );
-
-
-  establecerTexto(
-    "resumenJuegos",
-    contarUnicos(
-      datosFiltrados,
-      "Juego"
-    )
-  );
-
-
-  const indicador =
-    obtenerIndicador();
-
-
-  establecerTexto(
-    "resumenIndicador",
-    indicador
-  );
-
-
-  establecerTexto(
-    "indicadorSeleccionado",
-    indicador
-  );
-
-}
-
-
-// ======================================================
-// 21. TEXTO DE SELECCIÓN
-// ======================================================
-
-function actualizarTextoSeleccion() {
-
-  const indicador =
-    obtenerIndicador();
-
-
-  const partes = [];
-
-
-  const sala =
-    obtenerValor("filtroSala");
-
-
-  const modelo =
-    obtenerValor("filtroModelo");
-
-
-  const serie =
-    obtenerValor("filtroNumero");
-
-
-  const juego =
-    obtenerValor("filtroJuego");
-
-
-  const mes =
-    obtenerValor("filtroMes");
-
-
-  if (sala)
-    partes.push(
-      "Sala: " + sala
-    );
-
-
-  if (modelo)
-    partes.push(
-      "Marca: " + modelo
-    );
-
-
-  if (serie)
-    partes.push(
-      "Serie: " + serie
-    );
-
-
-  if (juego)
-    partes.push(
-      "Juego: " + juego
-    );
-
-
-  if (mes)
-    partes.push(
-      "Mes: " + mes
-    );
-
-
-  establecerTexto(
-    "tituloAnalisis",
-    indicador
-  );
-
-
-  establecerTexto(
-    "detalleSeleccion",
-    partes.length
-      ? partes.join("  •  ")
-      : "Todos los registros"
-  );
-
-}
-
-
-// ======================================================
-// 22. GRÁFICOS
-// ======================================================
-
-function construirGraficos() {
-
-  const indicador =
-    obtenerIndicador();
-
-
-  construirEvolutivo(
-    indicador
-  );
-
-
-  construirRanking(
-    "graficoSalas",
-    "LOCAL",
-    indicador,
-    "#2563eb"
-  );
-
-
-  construirRanking(
-    "graficoJuegos",
-    "Juego",
-    indicador,
-    "#7c3aed"
-  );
-
-
-  construirRanking(
-    "graficoMarcas",
-    "Marca / Tipo / Version",
-    indicador,
-    "#059669"
-  );
-
-}
-
-
-// ======================================================
-// 23. EVOLUTIVO
-// ======================================================
-
-function construirEvolutivo(
-  indicador
-) {
-
-  const resumen =
-    agruparPorMes(
-      datosFiltrados,
-      indicador
-    );
-
-
-  const labels =
-    resumen.map(
-      x => x.nombre
-    );
-
-
-  const valores =
-    resumen.map(
-      x => x.valor
-    );
-
-
-  crearOActualizarGrafico(
-    "graficoEvolutivo",
+  crearGrafico(
+    "evolucion",
     "line",
-    labels,
-    valores,
-    "#2563eb",
+    labelsMes,
+    valoresMes,
     indicador,
     true
   );
 
+
+  ranking(
+    "rankingSala",
+    "sala"
+  );
+
+
+  ranking(
+    "rankingMarca",
+    "marca"
+  );
+
+
+  ranking(
+    "rankingJuego",
+    "juego"
+  );
+
+
+  ranking(
+    "rankingSerie",
+    "serie"
+  );
+
 }
 
 
-// ======================================================
-// 24. RANKING
-// ======================================================
+/* ======================================================
+   RANKING
+====================================================== */
 
-function construirRanking(
-  id,
-  campo,
-  indicador,
-  color
-) {
+function ranking(
+  canvasId,
+  campo
+){
 
-  const grupos =
-    {};
+  const grupos = {};
 
 
-  datosFiltrados.forEach(
-    registro => {
+  filtrados.forEach(
+    x=>{
 
       const nombre =
-        limpiarTexto(
-          registro[campo]
-        );
+        String(
+          x[campo] || ""
+        ).trim();
 
 
-      if (!nombre) return;
+      if(!nombre)return;
 
 
-      if (!grupos[nombre]) {
+      if(
+        !grupos[nombre]
+      ){
 
-        grupos[nombre] = [];
-
-      }
-
-
-      const valor =
-        obtenerNumero(
-          registro[
-            INDICADORES[indicador].campo
-          ]
-        );
-
-
-      if (
-        valor !== null
-      ) {
-
-        grupos[nombre].push(
-          valor
-        );
+        grupos[nombre]=[];
 
       }
+
+
+      grupos[nombre].push(
+        valorIndicador(x)
+      );
 
     }
   );
 
 
-  const datos =
-    Object.keys(grupos)
-      .map(
-        nombre => {
+  const lista =
+    Object.entries(
+      grupos
+    )
 
-          return {
+    .map(
+      ([nombre,valores])=>({
 
-            nombre,
+        nombre,
 
-            valor:
-              INDICADORES[indicador].tipo ===
-              "promedio"
+        valor:
+          valores.reduce(
+            (a,b)=>a+b,
+            0
+          ) / valores.length
 
-                ? promedioArray(
-                    grupos[nombre]
-                  )
+      })
+    )
 
-                : grupos[nombre].reduce(
-                    (
-                      a,
-                      b
-                    ) =>
-                      a + b,
-                    0
-                  )
-
-          };
-
-        }
-      )
-      .sort(
-        (
-          a,
-          b
-        ) =>
-          b.valor -
-          a.valor
-      );
-
-
-  const maximo =
-    30;
-
-
-  const visibles =
-    datos.slice(
-      0,
-      maximo
+    .sort(
+      (a,b)=>
+        b.valor-a.valor
     );
 
 
-  const labels =
-    visibles.map(
-      x =>
-        abreviarEtiqueta(
-          x.nombre
-        )
-    );
-
-
-  const valores =
-    visibles.map(
-      x =>
-        x.valor
-    );
-
-
-  crearOActualizarGrafico(
-    id,
-    "bar",
-    labels,
-    valores,
-    color,
-    indicador,
-    false,
-    visibles
+  crearGraficoRanking(
+    canvasId,
+    lista.map(x=>x.nombre),
+    lista.map(x=>x.valor),
+    nombreIndicador(),
+    campo
   );
 
 }
 
 
-// ======================================================
-// 25. CREAR / ACTUALIZAR GRÁFICO
-// ======================================================
+/* ======================================================
+   GRÁFICO RANKING
+====================================================== */
 
-function crearOActualizarGrafico(
+function crearGraficoRanking(
   id,
-  tipo,
   labels,
   valores,
-  color,
-  indicador,
-  mostrarPuntos,
-  metadata = []
-) {
+  titulo,
+  campo
+){
+
+  if(
+    charts[id]
+  ){
+
+    charts[id].destroy();
+
+  }
+
 
   const canvas =
     document.getElementById(id);
 
 
-  if (!canvas) return;
+  const anchoPorBarra = 65;
+
+  const anchoMinimo = 700;
 
 
-  if (
-    graficos[id]
-  ) {
+  const anchoNecesario =
+    Math.max(
+      anchoMinimo,
+      labels.length *
+      anchoPorBarra
+    );
 
-    graficos[id].destroy();
 
-  }
+  canvas.parentElement.style.width =
+    anchoNecesario +
+    "px";
 
 
-  graficos[id] =
+  charts[id] =
     new Chart(
       canvas,
       {
 
-        type: tipo,
+        type:"bar",
 
 
-        data: {
+        data:{
 
           labels,
 
-          datasets: [
+          datasets:[{
 
-            {
+            label:titulo,
 
-              label:
-                indicador,
+            data:valores,
 
-              data:
-                valores,
+            backgroundColor:
+              coloresSemaforo(
+                valores
+              ),
 
-              borderColor:
-                color,
+            borderColor:
+              coloresSemaforo(
+                valores
+              ),
 
-              backgroundColor:
-                tipo === "bar"
-                  ? color
-                  : color,
+            borderWidth:2,
 
-              borderWidth:
-                2,
+            borderRadius:5,
 
-              borderRadius:
-                tipo === "bar"
-                  ? 5
-                  : 0,
+            borderSkipped:false
 
-              pointRadius:
-                mostrarPuntos
-                  ? 4
-                  : 0,
-
-              pointHoverRadius:
-                7,
-
-              tension:
-                0.28,
-
-              fill:
-                false
-
-            }
-
-          ]
+          }]
 
         },
 
 
-        options: {
+        options:{
 
-          responsive: true,
+          responsive:true,
 
-          maintainAspectRatio: false,
+          maintainAspectRatio:false,
 
-          animation: {
+          animation:false,
 
-            duration: 350
+
+          onClick:function(
+            event,
+            elements
+          ){
+
+            if(
+              !elements ||
+              !elements.length
+            ){
+
+              return;
+
+            }
+
+
+            const indice =
+              elements[0].index;
+
+
+            mostrarDetalleBarra(
+              labels[indice],
+              campo,
+              valores[indice]
+            );
 
           },
 
 
-          interaction: {
+          plugins:{
 
-            mode:
-              "nearest",
-
-            intersect:
-              true
-
-          },
-
-
-          plugins: {
-
-            legend: {
-
-              display: false
-
+            legend:{
+              display:false
             },
 
 
-            tooltip: {
+            tooltip:{
 
-              displayColors:
-                false,
+              callbacks:{
 
-              callbacks: {
+                label:function(
+                  context
+                ){
 
-                title:
-                  function (
-                    elementos
-                  ) {
+                  return (
+                    titulo +
+                    ": " +
+                    formato(
+                      context.raw
+                    )
+                  );
 
-                    if (
-                      !elementos.length
-                    ) return "";
-
-
-                    const indice =
-                      elementos[0].dataIndex;
-
-
-                    if (
-                      metadata[indice]
-                    ) {
-
-                      return metadata[
-                        indice
-                      ].nombre;
-
-                    }
-
-
-                    return labels[indice];
-
-                  },
-
-
-                label:
-                  function (
-                    contexto
-                  ) {
-
-                    return (
-                      indicador +
-                      ": " +
-                      formatearIndicador(
-                        contexto.parsed.y,
-                        indicador
-                      )
-                    );
-
-                  }
+                }
 
               }
 
@@ -1544,36 +1538,41 @@ function crearOActualizarGrafico(
           },
 
 
-          scales: {
+          scales:{
 
-            x: {
+            x:{
 
-              grid: {
+              ticks:{
 
-                display: false
+                autoSkip:false,
 
-              },
+                maxRotation:45,
 
-              ticks: {
+                minRotation:45,
 
-                color:
-                  "#667085",
+                font:{
+                  size:10
+                },
 
-                maxRotation:
-                  45,
 
-                minRotation:
-                  0,
+                callback:function(
+                  value
+                ){
 
-                autoSkip:
-                  true,
+                  const texto =
+                    this.getLabelForValue(
+                      value
+                    );
 
-                maxTicksLimit:
-                  15,
 
-                font: {
+                  return texto.length>15
 
-                  size: 10
+                    ? texto.substring(
+                        0,
+                        15
+                      ) + "…"
+
+                    : texto;
 
                 }
 
@@ -1582,39 +1581,1489 @@ function crearOActualizarGrafico(
             },
 
 
-            y: {
+            y:{
+              beginAtZero:true
+            }
 
-              beginAtZero:
-                true,
+          }
 
-              grid: {
+        }
 
-                color:
-                  "#edf0f4"
+      }
+    );
 
-              },
+}
 
-              ticks: {
 
-                color:
-                  "#667085",
+/* ======================================================
+   MAPA
+====================================================== */
 
-                font: {
+const URL_MAPA_PERU =
+  "https://raw.githubusercontent.com/juaneladio/peru-geojson/master/peru_departamental_simple.geojson";
 
-                  size: 10
 
-                },
+function cargarMapa(){
 
-                callback:
-                  function (
-                    valor
-                  ) {
+  fetch(
+    URL_MAPA_PERU
+  )
 
-                    return formatearNumero(
-                      valor
-                    );
+  .then(
+    res=>{
 
-                  }
+      if(!res.ok){
+
+        throw new Error(
+          "No se pudo cargar el mapa"
+        );
+
+      }
+
+
+      return res.json();
+
+    }
+  )
+
+  .then(
+    geo=>{
+
+      mapaGeoJSON =
+        geo;
+
+
+      document
+        .getElementById(
+          "mapaCargando"
+        )
+        .style.display =
+          "none";
+
+
+      dibujarMapaBase();
+
+      actualizarMapa();
+
+    }
+  )
+
+  .catch(
+    error=>{
+
+      console.error(
+        "Mapa:",
+        error
+      );
+
+
+      document
+        .getElementById(
+          "mapaCargando"
+        )
+        .textContent =
+          "No se pudo cargar el mapa.";
+
+    }
+  );
+
+}
+
+
+/* ======================================================
+   PUNTOS MAPA
+====================================================== */
+
+function obtenerTodosLosPuntos(
+  geo
+){
+
+  const puntos=[];
+
+
+  geo.features.forEach(
+    feature=>{
+
+      const geometry =
+        feature.geometry;
+
+
+      if(!geometry)return;
+
+
+      if(
+        geometry.type ===
+        "Polygon"
+      ){
+
+        geometry.coordinates
+          .forEach(
+            poligono=>{
+
+              poligono.forEach(
+                punto=>
+                  puntos.push(
+                    punto
+                  )
+              );
+
+            }
+          );
+
+      }
+
+
+      if(
+        geometry.type ===
+        "MultiPolygon"
+      ){
+
+        geometry.coordinates
+          .forEach(
+            multi=>{
+
+              multi.forEach(
+                poligono=>{
+
+                  poligono.forEach(
+                    punto=>
+                      puntos.push(
+                        punto
+                      )
+                  );
+
+                }
+              );
+
+            }
+          );
+
+      }
+
+    }
+  );
+
+
+  return puntos;
+
+}
+
+
+/* ======================================================
+   PROYECCIÓN
+====================================================== */
+
+function prepararProyeccion(){
+
+  if(!mapaGeoJSON)return;
+
+
+  const puntos =
+    obtenerTodosLosPuntos(
+      mapaGeoJSON
+    );
+
+
+  const xs =
+    puntos.map(
+      p=>p[0]
+    );
+
+
+  const ys =
+    puntos.map(
+      p=>p[1]
+    );
+
+
+  mapaBounds={
+
+    minX:
+      Math.min(...xs),
+
+    maxX:
+      Math.max(...xs),
+
+    minY:
+      Math.min(...ys),
+
+    maxY:
+      Math.max(...ys)
+
+  };
+
+}
+
+
+function proyectar(
+  lon,
+  lat
+){
+
+  if(!mapaBounds){
+
+    return {
+      x:0,
+      y:0
+    };
+
+  }
+
+
+  const ancho=500;
+
+  const alto=700;
+
+  const margenX=50;
+
+  const margenY=30;
+
+
+  const escalaX =
+    (ancho-margenX*2) /
+    (
+      mapaBounds.maxX -
+      mapaBounds.minX
+    );
+
+
+  const escalaY =
+    (alto-margenY*2) /
+    (
+      mapaBounds.maxY -
+      mapaBounds.minY
+    );
+
+
+  const escala =
+    Math.min(
+      escalaX,
+      escalaY
+    );
+
+
+  const anchoMapa =
+    (
+      mapaBounds.maxX -
+      mapaBounds.minX
+    ) * escala;
+
+
+  const altoMapa =
+    (
+      mapaBounds.maxY -
+      mapaBounds.minY
+    ) * escala;
+
+
+  const offsetX =
+    (600-anchoMapa)/2;
+
+
+  const offsetY =
+    (760-altoMapa)/2;
+
+
+  return {
+
+    x:
+      offsetX +
+      (
+        lon -
+        mapaBounds.minX
+      ) * escala,
+
+    y:
+      offsetY +
+      (
+        mapaBounds.maxY -
+        lat
+      ) * escala
+
+  };
+
+}
+
+
+/* ======================================================
+   NORMALIZAR
+====================================================== */
+
+function normalizarTexto(
+  texto
+){
+
+  return String(
+    texto || ""
+  )
+
+  .normalize("NFD")
+
+  .replace(
+    /[\u0300-\u036f]/g,
+    ""
+  )
+
+  .toUpperCase()
+
+  .trim();
+
+}
+
+
+/* ======================================================
+   DEPARTAMENTO
+====================================================== */
+
+function obtenerDepartamentoSala(
+  local
+){
+
+  const texto =
+    normalizarTexto(
+      local
+    );
+
+
+  for(
+    const departamento
+    in salasPorDepartamento
+  ){
+
+    const salas =
+      salasPorDepartamento[
+        departamento
+      ];
+
+
+    for(
+      const sala
+      of salas
+    ){
+
+      const salaNormalizada =
+        normalizarTexto(
+          sala
+        );
+
+
+      if(
+        texto === salaNormalizada ||
+        texto.includes(
+          salaNormalizada
+        )
+      ){
+
+        return departamento;
+
+      }
+
+    }
+
+  }
+
+
+  return null;
+
+}
+
+
+/* ======================================================
+   NOMBRE DEPARTAMENTO
+====================================================== */
+
+function obtenerNombreDepartamento(
+  feature
+){
+
+  return normalizarTexto(
+
+    feature.properties?.NOMBDEP ||
+
+    feature.properties?.NOMBDEPA ||
+
+    feature.properties?.DEPARTAMENTO ||
+
+    feature.properties?.NAME_1 ||
+
+    feature.properties?.name ||
+
+    ""
+
+  );
+
+}
+
+
+/* ======================================================
+   DIBUJAR MAPA
+====================================================== */
+
+function dibujarMapaBase(){
+
+  if(!mapaGeoJSON)return;
+
+
+  prepararProyeccion();
+
+
+  const svg =
+    document.getElementById(
+      "mapaPeru"
+    );
+
+
+  svg.innerHTML="";
+
+
+  mapaGeoJSON.features.forEach(
+    feature=>{
+
+      const geometry =
+        feature.geometry;
+
+
+      if(!geometry)return;
+
+
+      const path =
+        document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
+        );
+
+
+      let d="";
+
+
+      function agregarPoligono(
+        poligono
+      ){
+
+        poligono.forEach(
+          (coord,index)=>{
+
+            const p =
+              proyectar(
+                coord[0],
+                coord[1]
+              );
+
+
+            d +=
+              index===0
+
+                ? `M ${p.x} ${p.y}`
+
+                : ` L ${p.x} ${p.y}`;
+
+          }
+        );
+
+
+        d += " Z ";
+
+      }
+
+
+      if(
+        geometry.type ===
+        "Polygon"
+      ){
+
+        geometry.coordinates
+          .forEach(
+            agregarPoligono
+          );
+
+      }
+
+
+      if(
+        geometry.type ===
+        "MultiPolygon"
+      ){
+
+        geometry.coordinates
+          .forEach(
+            multi=>{
+
+              multi.forEach(
+                agregarPoligono
+              );
+
+            }
+          );
+
+      }
+
+
+      path.setAttribute(
+        "d",
+        d
+      );
+
+
+      path.classList.add(
+        "departamento"
+      );
+
+
+      const nombre =
+        obtenerNombreDepartamento(
+          feature
+        );
+
+
+      path.setAttribute(
+        "data-departamento",
+        nombre
+      );
+
+
+      path.addEventListener(
+        "click",
+        ()=>{
+          abrirDepartamento(
+            nombre
+          );
+        }
+      );
+
+
+      svg.appendChild(
+        path
+      );
+
+    }
+  );
+
+}
+
+
+/* ======================================================
+   REGISTROS DEPARTAMENTO
+====================================================== */
+
+function registrosDepartamento(
+  departamento
+){
+
+  return filtrados.filter(
+    registro=>
+      obtenerDepartamentoSala(
+        registro.sala
+      ) === departamento
+  );
+
+}
+
+
+/* ======================================================
+   ACTUALIZAR MAPA
+====================================================== */
+
+function actualizarMapa(){
+
+  if(!mapaGeoJSON)return;
+
+
+  document
+    .querySelectorAll(
+      "#mapaPeru .departamento"
+    )
+
+    .forEach(
+      elemento=>{
+
+        delete elemento.dataset.valor;
+
+        elemento.style.fill =
+          "#f1f5f9";
+
+        elemento.classList.add(
+          "departamento-sin-datos"
+        );
+
+      }
+    );
+
+
+  const departamentosConDatos=[];
+
+
+  document
+    .querySelectorAll(
+      "#mapaPeru .departamento"
+    )
+
+    .forEach(
+      elemento=>{
+
+        const departamento =
+          normalizarTexto(
+            elemento.getAttribute(
+              "data-departamento"
+            )
+          );
+
+
+        const registros =
+          registrosDepartamento(
+            departamento
+          );
+
+
+        if(
+          !registros.length
+        ){
+
+          return;
+
+        }
+
+
+        const valores =
+          registros.map(
+            registro=>
+              valorIndicador(
+                registro
+              )
+          );
+
+
+        const promedio =
+          valores.reduce(
+            (a,b)=>a+b,
+            0
+          ) /
+          valores.length;
+
+
+        elemento.dataset.valor =
+          promedio;
+
+
+        departamentosConDatos.push(
+          promedio
+        );
+
+      }
+    );
+
+
+  const colores =
+    coloresSemaforo(
+      departamentosConDatos
+    );
+
+
+  let indice=0;
+
+
+  document
+    .querySelectorAll(
+      "#mapaPeru .departamento"
+    )
+
+    .forEach(
+      elemento=>{
+
+        if(
+          elemento.dataset.valor !==
+          undefined
+        ){
+
+          elemento.style.fill =
+            colores[indice];
+
+
+          elemento.classList.remove(
+            "departamento-sin-datos"
+          );
+
+
+          indice++;
+
+        }
+
+      }
+    );
+
+}
+
+
+/* ======================================================
+   ABRIR DEPARTAMENTO
+====================================================== */
+
+function abrirDepartamento(
+  departamento
+){
+
+  if(!departamento)return;
+
+
+  const registros =
+    registrosDepartamento(
+      departamento
+    );
+
+
+  const lista =
+    document.getElementById(
+      "listaSalasDepartamento"
+    );
+
+
+  document.getElementById(
+    "modalDepartamentoTitulo"
+  ).textContent =
+    capitalizarDepartamento(
+      departamento
+    );
+
+
+  document.getElementById(
+    "departamentoCantidad"
+  ).textContent =
+    contarSalasUnicas(
+      registros
+    );
+
+
+  const valores =
+    registros.map(
+      x=>valorIndicador(x)
+    );
+
+
+  const promedio =
+    valores.length
+
+      ? valores.reduce(
+          (a,b)=>a+b,
+          0
+        ) / valores.length
+
+      : 0;
+
+
+  document.getElementById(
+    "departamentoIndicador"
+  ).textContent =
+    nombreIndicador();
+
+
+  document.getElementById(
+    "departamentoPromedio"
+  ).textContent =
+    formato(
+      promedio
+    );
+
+
+  lista.innerHTML="";
+
+
+  if(!registros.length){
+
+    lista.innerHTML = `
+
+      <div class="sin-salas">
+
+        No hay salas disponibles
+        para este departamento
+        con los filtros actuales.
+
+      </div>
+
+    `;
+
+  }else{
+
+    const grupos={};
+
+
+    registros.forEach(
+      registro=>{
+
+        const nombre =
+          String(
+            registro.sala || ""
+          ).trim();
+
+
+        if(!nombre)return;
+
+
+        if(
+          !grupos[nombre]
+        ){
+
+          grupos[nombre]=[];
+
+        }
+
+
+        grupos[nombre].push(
+          registro
+        );
+
+      }
+    );
+
+
+    const salas =
+      Object.entries(
+        grupos
+      )
+
+      .map(
+        ([nombre,registrosSala])=>{
+
+          const valoresSala =
+            registrosSala.map(
+              registro=>
+                valorIndicador(
+                  registro
+                )
+            );
+
+
+          return {
+
+            nombre,
+
+            registros:
+              registrosSala,
+
+            valor:
+              valoresSala.reduce(
+                (a,b)=>a+b,
+                0
+              ) /
+              valoresSala.length
+
+          };
+
+        }
+      )
+
+      .sort(
+        (a,b)=>
+          b.valor-a.valor
+      );
+
+
+    const colores =
+      coloresSemaforo(
+        salas.map(
+          x=>x.valor
+        )
+      );
+
+
+    salas.forEach(
+      (sala,indice)=>{
+
+        const item =
+          document.createElement(
+            "div"
+          );
+
+
+        item.className =
+          "sala-item";
+
+
+        const nombre =
+          document.createElement(
+            "div"
+          );
+
+
+        nombre.className =
+          "sala-nombre";
+
+
+        const punto =
+          document.createElement(
+            "span"
+          );
+
+
+        punto.className =
+          "sala-punto";
+
+
+        punto.style.background =
+          colores[indice];
+
+
+        const texto =
+          document.createElement(
+            "strong"
+          );
+
+
+        texto.textContent =
+          sala.nombre;
+
+
+        nombre.appendChild(
+          punto
+        );
+
+
+        nombre.appendChild(
+          texto
+        );
+
+
+        const valor =
+          document.createElement(
+            "span"
+          );
+
+
+        valor.className =
+          "sala-valor";
+
+
+        valor.textContent =
+          formato(
+            sala.valor
+          );
+
+
+        item.appendChild(
+          nombre
+        );
+
+
+        item.appendChild(
+          valor
+        );
+
+
+        item.style.cursor =
+          "pointer";
+
+
+        item.addEventListener(
+          "click",
+          ()=>{
+            mostrarDetalleMapa(
+              sala.registros[0]
+            );
+          }
+        );
+
+
+        lista.appendChild(
+          item
+        );
+
+      }
+    );
+
+  }
+
+
+  document
+    .getElementById(
+      "modalDepartamento"
+    )
+    .classList.add(
+      "activo"
+    );
+
+}
+
+
+/* ======================================================
+   CONTAR SALAS
+====================================================== */
+
+function contarSalasUnicas(
+  registros
+){
+
+  return new Set(
+
+    registros.map(
+      x=>
+        String(
+          x.sala || ""
+        ).trim()
+    )
+
+  ).size;
+
+}
+
+
+/* ======================================================
+   CAPITALIZAR
+====================================================== */
+
+function capitalizarDepartamento(
+  texto
+){
+
+  const especiales = {
+
+    "ANCASH":"ÁNCASH",
+
+    "APURIMAC":"APURÍMAC",
+
+    "AREQUIPA":"AREQUIPA",
+
+    "AYACUCHO":"AYACUCHO",
+
+    "CAJAMARCA":"CAJAMARCA",
+
+    "CUSCO":"CUSCO",
+
+    "ICA":"ICA",
+
+    "JUNIN":"JUNÍN",
+
+    "LA LIBERTAD":"LA LIBERTAD",
+
+    "LAMBAYEQUE":"LAMBAYEQUE",
+
+    "LIMA":"LIMA",
+
+    "LORETO":"LORETO",
+
+    "MOQUEGUA":"MOQUEGUA",
+
+    "PIURA":"PIURA",
+
+    "PUNO":"PUNO",
+
+    "SAN MARTIN":"SAN MARTÍN",
+
+    "TACNA":"TACNA",
+
+    "TUMBES":"TUMBES",
+
+    "UCAYALI":"UCAYALI",
+
+    "CALLAO":"CALLAO",
+
+    "AMAZONAS":"AMAZONAS"
+
+  };
+
+
+  return especiales[
+    texto
+  ] || texto;
+
+}
+
+
+/* ======================================================
+   DETALLE MAPA
+====================================================== */
+
+function mostrarDetalleMapa(
+  registro
+){
+
+  document.getElementById(
+    "modalTitulo"
+  ).textContent =
+    "Detalle del local";
+
+
+  document.getElementById(
+    "detalleSala"
+  ).textContent =
+    valorTexto(
+      registro.sala
+    );
+
+
+  document.getElementById(
+    "detalleMarca"
+  ).textContent =
+    valorTexto(
+      registro.marca
+    );
+
+
+  document.getElementById(
+    "detalleSerie"
+  ).textContent =
+    valorTexto(
+      registro.serie
+    );
+
+
+  document.getElementById(
+    "detalleJuego"
+  ).textContent =
+    valorTexto(
+      registro.juego
+    );
+
+
+  document.getElementById(
+    "detalleMes"
+  ).textContent =
+    valorTexto(
+      registro.mes
+    );
+
+
+  document.getElementById(
+    "detalleAnio"
+  ).textContent =
+    valorTexto(
+      registro.anio
+    );
+
+
+  document.getElementById(
+    "detalleIndicadorNombre"
+  ).textContent =
+    nombreIndicador();
+
+
+  document.getElementById(
+    "detalleIndicadorValor"
+  ).textContent =
+    formato(
+      valorIndicador(
+        registro
+      )
+    );
+
+
+  cerrarModalDepartamento();
+
+
+  document.getElementById(
+    "modalDetalle"
+  ).classList.add(
+    "activo"
+  );
+
+}
+
+
+/* ======================================================
+   DETALLE RANKING
+====================================================== */
+
+function mostrarDetalleBarra(
+  nombre,
+  campo,
+  valor
+){
+
+  const registros =
+    filtrados.filter(
+      x =>
+        String(
+          x[campo] || ""
+        ).trim() ===
+        String(
+          nombre
+        ).trim()
+    );
+
+
+  if(
+    !registros.length
+  ){
+
+    return;
+
+  }
+
+
+  const registro =
+    registros[0];
+
+
+  let titulo =
+    "Detalle del ranking";
+
+
+  if(
+    campo==="sala"
+  ){
+
+    titulo =
+      "Detalle del local";
+
+  }
+
+
+  if(
+    campo==="marca"
+  ){
+
+    titulo =
+      "Detalle del modelo";
+
+  }
+
+
+  if(
+    campo==="juego"
+  ){
+
+    titulo =
+      "Detalle del juego";
+
+  }
+
+
+  if(
+    campo==="serie"
+  ){
+
+    titulo =
+      "Detalle de la serie";
+
+  }
+
+
+  document.getElementById(
+    "modalTitulo"
+  ).textContent =
+    titulo;
+
+
+  document.getElementById(
+    "detalleSala"
+  ).textContent =
+    valorTexto(
+      registro.sala
+    );
+
+
+  document.getElementById(
+    "detalleMarca"
+  ).textContent =
+    valorTexto(
+      registro.marca
+    );
+
+
+  document.getElementById(
+    "detalleSerie"
+  ).textContent =
+    valorTexto(
+      registro.serie
+    );
+
+
+  document.getElementById(
+    "detalleJuego"
+  ).textContent =
+    valorTexto(
+      registro.juego
+    );
+
+
+  document.getElementById(
+    "detalleMes"
+  ).textContent =
+    valorTexto(
+      registro.mes
+    );
+
+
+  document.getElementById(
+    "detalleAnio"
+  ).textContent =
+    valorTexto(
+      registro.anio
+    );
+
+
+  document.getElementById(
+    "detalleIndicadorNombre"
+  ).textContent =
+    nombreIndicador();
+
+
+  document.getElementById(
+    "detalleIndicadorValor"
+  ).textContent =
+    formato(
+      valor
+    );
+
+
+  document.getElementById(
+    "modalDetalle"
+  ).classList.add(
+    "activo"
+  );
+
+}
+
+
+/* ======================================================
+   CERRAR MODALES
+====================================================== */
+
+function cerrarModal(){
+
+  document
+    .getElementById(
+      "modalDetalle"
+    )
+    .classList.remove(
+      "activo"
+    );
+
+}
+
+
+function cerrarModalDepartamento(){
+
+  document
+    .getElementById(
+      "modalDepartamento"
+    )
+    .classList.remove(
+      "activo"
+    );
+
+}
+
+
+/* ======================================================
+   GRÁFICO EVOLUCIÓN
+====================================================== */
+
+function crearGrafico(
+  id,
+  tipo,
+  labels,
+  valores,
+  titulo,
+  mostrarLeyenda
+){
+
+  if(
+    charts[id]
+  ){
+
+    charts[id].destroy();
+
+  }
+
+
+  const canvas =
+    document.getElementById(id);
+
+
+  canvas.parentElement.style.width =
+    "100%";
+
+
+  charts[id] =
+    new Chart(
+      canvas,
+      {
+
+        type:tipo,
+
+
+        data:{
+
+          labels,
+
+
+          datasets:[{
+
+            label:titulo,
+
+            data:valores,
+
+
+            backgroundColor:
+
+              tipo==="line"
+
+                ? "rgba(37,99,235,.15)"
+
+                : "rgba(220,38,38,.75)",
+
+
+            borderColor:
+
+              tipo==="line"
+
+                ? "#2563eb"
+
+                : "#dc2626",
+
+
+            borderWidth:2,
+
+
+            fill:
+              tipo==="line",
+
+
+            tension:.25,
+
+
+            pointRadius:4,
+
+
+            pointHoverRadius:6
+
+          }]
+
+        },
+
+
+        options:{
+
+          responsive:true,
+
+          maintainAspectRatio:false,
+
+          animation:false,
+
+
+          plugins:{
+
+            legend:{
+              display:
+                mostrarLeyenda
+            },
+
+
+            tooltip:{
+
+              callbacks:{
+
+                label:function(
+                  context
+                ){
+
+                  return (
+                    titulo +
+                    ": " +
+                    formato(
+                      context.raw
+                    )
+                  );
+
+                }
 
               }
 
@@ -1623,38 +3072,56 @@ function crearOActualizarGrafico(
           },
 
 
-          onClick:
-            function (
-              evento,
-              elementos
-            ) {
+          scales:{
 
-              if (
-                !elementos.length
-              ) return;
+            x:{
 
+              ticks:{
 
-              const indice =
-                elementos[0].index;
+                maxRotation:0,
 
+                minRotation:0,
 
-              const elemento =
-                metadata[indice]
-                ? metadata[indice].nombre
-                : labels[indice];
+                autoSkip:true,
+
+                maxTicksLimit:8,
 
 
-              const valor =
-                valores[indice];
+                callback:function(
+                  value
+                ){
+
+                  const texto =
+                    this.getLabelForValue(
+                      value
+                    );
 
 
-              mostrarDetalleClick(
-                elemento,
-                valor,
-                indicador
-              );
+                  return texto.length>12
+
+                    ? texto.substring(
+                        0,
+                        12
+                      ) + "…"
+
+                    : texto;
+
+                }
+
+              }
+
+            },
+
+
+            y:{
+
+              beginAtZero:true,
+
+              grace:"15%"
 
             }
+
+          }
 
         }
 
@@ -1664,259 +3131,85 @@ function crearOActualizarGrafico(
 }
 
 
-// ======================================================
-// 26. AGRUPAR POR MES
-// ======================================================
+/* ======================================================
+   TABLA
+====================================================== */
 
-function agruparPorMes(
-  datos,
-  indicador
-) {
-
-  const grupos =
-    {};
-
-
-  datos.forEach(
-    registro => {
-
-      const mes =
-        normalizarMes(
-          registro["MES"]
-        );
-
-
-      if (
-        !MESES.includes(mes)
-      ) return;
-
-
-      if (!grupos[mes]) {
-
-        grupos[mes] = [];
-
-      }
-
-
-      const valor =
-        obtenerNumero(
-          registro[
-            INDICADORES[indicador].campo
-          ]
-        );
-
-
-      if (
-        valor !== null
-      ) {
-
-        grupos[mes].push(
-          valor
-        );
-
-      }
-
-    }
-  );
-
-
-  return MESES
-
-    .filter(
-      mes =>
-        grupos[mes] &&
-        grupos[mes].length
-    )
-
-    .map(
-      mes => {
-
-        return {
-
-          nombre: mes,
-
-          valor:
-            INDICADORES[indicador].tipo ===
-            "promedio"
-
-              ? promedioArray(
-                  grupos[mes]
-                )
-
-              : grupos[mes].reduce(
-                  (
-                    a,
-                    b
-                  ) =>
-                    a + b,
-                  0
-                )
-
-        };
-
-      }
-    );
-
-}
-
-
-// ======================================================
-// 27. TABLA COMPLETA
-// ======================================================
-
-function construirTabla() {
+function actualizarTabla(){
 
   const cuerpo =
     document.getElementById(
-      "tablaCompletaCuerpo"
+      "tabla"
     );
-
-
-  if (!cuerpo) return;
 
 
   const fragmento =
     document.createDocumentFragment();
 
 
-  datosFiltrados.forEach(
-    registro => {
-
-      const fila =
-        document.createElement(
-          "tr"
-        );
+  const limite =
+    Math.min(
+      filtrados.length,
+      1000
+    );
 
 
-      const columnas = [
+  for(
+    let i=0;
+    i<limite;
+    i++
+  ){
 
-        registro[
-          "Marca / Tipo / Version"
-        ],
-
-        registro[
-          "Maquina"
-        ],
-
-        registro[
-          "Juego"
-        ],
-
-        registro[
-          "COIN"
-        ],
-
-        registro[
-          "COIN PROM"
-        ],
-
-        registro[
-          "VENTA"
-        ],
-
-        registro[
-          "VENTA PROM"
-        ],
-
-        registro[
-          "NETWIN ($)"
-        ],
-
-        registro[
-          "G.PLAYED"
-        ],
-
-        registro[
-          "% PAGO"
-        ],
-
-        registro[
-          "LOCAL"
-        ],
-
-        registro[
-          "MES"
-        ],
-
-        registro[
-          "AÑO"
-        ],
-
-        registro[
-          "T.C"
-        ]
-
-      ];
+    const x =
+      filtrados[i];
 
 
-      columnas.forEach(
-        (
-          valor,
-          indice
-        ) => {
-
-          const td =
-            document.createElement(
-              "td"
-            );
-
-
-          if (
-            indice >= 3 &&
-            indice <= 9 ||
-            indice === 13
-          ) {
-
-            const numero =
-              obtenerNumero(
-                valor
-              );
-
-
-            td.textContent =
-              numero === null
-                ? ""
-                : formatearIndicador(
-                    numero,
-                    [
-                      "COIN",
-                      "COIN PROM",
-                      "VENTA",
-                      "VENTA PROM",
-                      "NETWIN ($)",
-                      "G.PLAYED",
-                      "% PAGO",
-                      "T.C"
-                    ][
-                      indice - 3
-                    ] || ""
-                  );
-
-          } else {
-
-            td.textContent =
-              valor ?? "";
-
-          }
-
-
-          fila.appendChild(
-            td
-          );
-
-        }
+    const tr =
+      document.createElement(
+        "tr"
       );
 
 
-      fragmento.appendChild(
-        fila
-      );
+    tr.innerHTML = `
 
-    }
-  );
+      <td>${escapeHTML(x.marca)}</td>
+
+      <td>${escapeHTML(x.serie)}</td>
+
+      <td>${escapeHTML(x.juego)}</td>
+
+      <td>${formato(x.coin)}</td>
+
+      <td>${formato(x.coinProm)}</td>
+
+      <td>${formato(x.venta)}</td>
+
+      <td>${formato(x.ventaProm)}</td>
+
+      <td>${formato(x.netwin)}</td>
+
+      <td>${formato(x.pago)}%</td>
+
+      <td>${escapeHTML(x.sala)}</td>
+
+      <td>${escapeHTML(x.mes)}</td>
+
+      <td>${escapeHTML(x.anio)}</td>
+
+      <td>${formato(x.tc)}</td>
+
+    `;
 
 
-  cuerpo.innerHTML = "";
+    fragmento.appendChild(
+      tr
+    );
+
+  }
+
+
+  cuerpo.innerHTML="";
+
 
   cuerpo.appendChild(
     fragmento
@@ -1925,502 +3218,143 @@ function construirTabla() {
 }
 
 
-// ======================================================
-// 28. CLICK EN GRÁFICO
-// ======================================================
+/* ======================================================
+   ESCAPAR HTML
+====================================================== */
 
-function mostrarDetalleClick(
-  elemento,
-  valor,
-  indicador
-) {
-
-  establecerTexto(
-    "elementoSeleccionado",
-    elemento
-  );
-
-
-  establecerTexto(
-    "valorSeleccionado",
-    formatearIndicador(
-      valor,
-      indicador
-    )
-  );
-
-
-  establecerTexto(
-    "indicadorSeleccionado",
-    indicador
-  );
-
-}
-
-
-// ======================================================
-// 29. INDICADOR
-// ======================================================
-
-function obtenerIndicador() {
-
-  const select =
-    document.getElementById(
-      "filtroIndicador"
-    );
-
-
-  return (
-    select?.value ||
-    "COIN"
-  );
-
-}
-
-
-// ======================================================
-// 30. VALOR SELECT
-// ======================================================
-
-function obtenerValor(id) {
+function escapeHTML(valor){
 
   return String(
-    document.getElementById(
-      id
-    )?.value || ""
-  ).trim();
+    valor ?? ""
+  )
 
-}
+  .replace(
+    /&/g,
+    "&amp;"
+  )
 
+  .replace(
+    /</g,
+    "&lt;"
+  )
 
-// ======================================================
-// 31. TEXTO
-// ======================================================
+  .replace(
+    />/g,
+    "&gt;"
+  )
 
-function limpiarTexto(valor) {
+  .replace(
+    /"/g,
+    "&quot;"
+  )
 
-  if (
-    valor === null ||
-    valor === undefined
-  ) {
-
-    return "";
-
-  }
-
-
-  return String(valor)
-    .trim()
-    .toUpperCase();
-
-}
-
-
-// ======================================================
-// 32. MES
-// ======================================================
-
-function normalizarMes(valor) {
-
-  if (
-    valor === null ||
-    valor === undefined
-  ) {
-
-    return "";
-
-  }
-
-
-  let texto =
-    String(valor)
-      .trim()
-      .toUpperCase();
-
-
-  texto =
-    texto
-      .normalize("NFD")
-      .replace(
-        /[\u0300-\u036f]/g,
-        ""
-      );
-
-
-  const numero =
-    Number(texto);
-
-
-  if (
-    Number.isInteger(numero) &&
-    numero >= 1 &&
-    numero <= 12
-  ) {
-
-    return MESES[
-      numero - 1
-    ];
-
-  }
-
-
-  const equivalencias = {
-
-    ENE: "ENERO",
-    FEB: "FEBRERO",
-    MAR: "MARZO",
-    ABR: "ABRIL",
-    MAY: "MAYO",
-    JUN: "JUNIO",
-    JUL: "JULIO",
-    AGO: "AGOSTO",
-    SEP: "SEPTIEMBRE",
-    SET: "SEPTIEMBRE",
-    OCT: "OCTUBRE",
-    NOV: "NOVIEMBRE",
-    DIC: "DICIEMBRE"
-
-  };
-
-
-  return (
-    equivalencias[texto] ||
-    texto
+  .replace(
+    /'/g,
+    "&#039;"
   );
 
 }
 
 
-// ======================================================
-// 33. NÚMERO
-// ======================================================
+/* ======================================================
+   VALOR TEXTO
+====================================================== */
 
-function obtenerNumero(valor) {
+function valorTexto(
+  valor
+){
 
-  if (
-    valor === null ||
-    valor === undefined ||
-    valor === ""
-  ) {
+  if(
 
-    return null;
+    valor===null ||
 
-  }
+    valor===undefined ||
 
+    String(valor).trim()===""
 
-  if (
-    typeof valor === "number"
-  ) {
+  ){
 
-    return Number.isFinite(
-      valor
-    )
-      ? valor
-      : null;
+    return "-";
 
   }
 
 
-  let texto =
-    String(valor)
-      .trim()
-      .replace(
-        /%/g,
-        ""
-      );
-
-
-  if (
-    texto.includes(",") &&
-    texto.includes(".")
-  ) {
-
-    if (
-      texto.lastIndexOf(",") >
-      texto.lastIndexOf(".")
-    ) {
-
-      texto =
-        texto
-          .replace(
-            /\./g,
-            ""
-          )
-          .replace(
-            ",",
-            "."
-          );
-
-    } else {
-
-      texto =
-        texto.replace(
-          /,/g,
-          ""
-        );
-
-    }
-
-  } else if (
-    texto.includes(",")
-  ) {
-
-    const partes =
-      texto.split(",");
-
-
-    if (
-      partes.length === 2 &&
-      partes[1].length <= 2
-    ) {
-
-      texto =
-        texto.replace(
-          ",",
-          "."
-        );
-
-    } else {
-
-      texto =
-        texto.replace(
-          /,/g,
-          ""
-        );
-
-    }
-
-  }
-
-
-  texto =
-    texto.replace(
-      /[^0-9.-]/g,
-      ""
-    );
-
-
-  const numero =
-    Number(texto);
-
-
-  return Number.isFinite(
-    numero
-  )
-    ? numero
-    : null;
+  return String(valor);
 
 }
 
 
-// ======================================================
-// 34. PROMEDIO
-// ======================================================
+/* ======================================================
+   FORMATO
+====================================================== */
 
-function promedioArray(
-  valores
-) {
+function formato(
+  numero
+){
 
-  if (
-    !valores ||
-    !valores.length
-  ) {
-
-    return 0;
-
-  }
-
-
-  return valores.reduce(
-    (
-      total,
-      valor
-    ) =>
-      total +
-      Number(valor),
-    0
-  ) /
-  valores.length;
-
-}
-
-
-// ======================================================
-// 35. FORMATO
-// ======================================================
-
-function formatearNumero(
-  valor,
-  decimales = 2
-) {
-
-  const numero =
-    Number(valor) || 0;
-
-
-  return numero.toLocaleString(
+  return Number(
+    numero || 0
+  ).toLocaleString(
     "es-PE",
     {
-
-      minimumFractionDigits:
-        decimales,
-
-      maximumFractionDigits:
-        decimales
-
+      maximumFractionDigits:2
     }
   );
 
 }
 
 
-// ======================================================
-// 36. FORMATO INDICADOR
-// ======================================================
+/* ======================================================
+   CARGANDO
+====================================================== */
 
-function formatearIndicador(
-  valor,
-  indicador
-) {
-
-  const numero =
-    Number(valor) || 0;
-
-
-  if (
-    indicador === "% PAGO"
-  ) {
-
-    return (
-      numero.toLocaleString(
-        "es-PE",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }
-      ) +
-      "%"
-    );
-
-  }
-
-
-  if (
-    indicador === "T.C"
-  ) {
-
-    return numero.toLocaleString(
-      "es-PE",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    );
-
-  }
-
-
-  return formatearNumero(
-    numero
-  );
-
-}
-
-
-// ======================================================
-// 37. CONTAR ÚNICOS
-// ======================================================
-
-function contarUnicos(
-  datos,
-  campo
-) {
-
-  return new Set(
-
-    datos
-
-      .map(
-        registro =>
-          limpiarTexto(
-            registro[campo]
-          )
-      )
-
-      .filter(Boolean)
-
-  ).size;
-
-}
-
-
-// ======================================================
-// 38. ABREVIAR EJE X
-// ======================================================
-
-function abreviarEtiqueta(
+function mostrarCargando(
   texto
-) {
-
-  const valor =
-    String(texto || "")
-      .trim();
-
-
-  if (
-    valor.length <= 16
-  ) {
-
-    return valor;
-
-  }
-
-
-  return (
-    valor.substring(
-      0,
-      14
-    ) +
-    "…"
-  );
-
-}
-
-
-// ======================================================
-// 39. ESTABLECER TEXTO
-// ======================================================
-
-function establecerTexto(
-  id,
-  texto
-) {
+){
 
   const elemento =
     document.getElementById(
-      id
+      "cargando"
     );
 
 
-  if (elemento) {
+  elemento.textContent =
+    texto;
 
-    elemento.textContent =
-      texto;
 
-  }
+  elemento.style.display =
+    "flex";
 
 }
 
 
-// ======================================================
-// 40. ACTUALIZACIÓN AUTOMÁTICA
-// ======================================================
+function ocultarCargando(){
 
-setInterval(
-  function () {
+  document
+    .getElementById(
+      "cargando"
+    )
+    .style.display =
+      "none";
 
-    cargarDatos();
+}
 
-  },
-  5 * 60 * 1000
-);
+
+function mostrarError(
+  mensaje
+){
+
+  const elemento =
+    document.getElementById(
+      "cargando"
+    );
+
+
+  elemento.textContent =
+    mensaje;
+
+
+  elemento.style.display =
+    "flex";
+
+}
