@@ -1,668 +1,607 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Dashboard de Producción</title>
+  <title>Análisis de Producción</title>
 
   <link rel="stylesheet" href="style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
-
 
 <body>
 
+<div id="cargando" class="cargando">
+  Cargando información...
+</div>
 
-<!-- ======================================================
-     ENCABEZADO
-====================================================== -->
+<div class="header">
 
-<header class="topbar">
-
-  <div class="titulo">
-
-    <span class="titulo-mini">
-      DASHBOARD OPERATIVO
-    </span>
-
-    <h1>
-      Análisis de Producción
-    </h1>
-
-    <p>
-      Análisis de salas, marcas, juegos y máquinas
-    </p>
-
-  </div>
-
-
-  <div class="estado">
-
-    <span
-      id="indicadorConexion"
-      class="estado-punto"
-    ></span>
-
-    <span id="textoConexion">
-      Conectando con Google Sheets...
-    </span>
-
-  </div>
-
-</header>
-
-
-
-<main class="contenedor">
-
-
-<!-- ======================================================
-     RESUMEN SUPERIOR
-====================================================== -->
-
-<section class="resumen">
-
-  <div class="tarjeta-resumen">
-
-    <span>
-      REGISTROS
-    </span>
-
-    <strong id="contadorResultados">
-      0
-    </strong>
-
-  </div>
-
-
-  <div class="tarjeta-resumen">
-
-    <span>
-      SALAS
-    </span>
-
-    <strong id="resumenSalas">
-      0
-    </strong>
-
-  </div>
-
-
-  <div class="tarjeta-resumen">
-
-    <span>
-      MARCAS
-    </span>
-
-    <strong id="resumenMarcas">
-      0
-    </strong>
-
-  </div>
-
-
-  <div class="tarjeta-resumen">
-
-    <span>
-      JUEGOS
-    </span>
-
-    <strong id="resumenJuegos">
-      0
-    </strong>
-
-  </div>
-
-
-  <div class="tarjeta-resumen indicador-activo">
-
-    <span>
-      INDICADOR
-    </span>
-
-    <strong id="resumenIndicador">
-      COIN
-    </strong>
-
-  </div>
-
-
-  <button
-    id="btnActualizar"
-    class="btn-actualizar"
-    type="button"
-  >
-    ↻ Actualizar datos
-  </button>
-
-</section>
-
-
-
-<!-- ======================================================
-     FILTROS
-====================================================== -->
-
-<section class="filtros-panel">
-
-  <div class="filtros-titulo">
+  <div class="header-contenido">
 
     <div>
-
-      <span>
-        FILTROS DE ANÁLISIS
-      </span>
-
-      <h2>
-        Selecciona el nivel de análisis
-      </h2>
-
+      <h1>ANÁLISIS DE PRODUCCIÓN</h1>
+      <p>Dashboard de producción y rendimiento</p>
     </div>
 
     <button
-      id="btnLimpiar"
-      class="btn-limpiar"
-      type="button"
-    >
-      Limpiar filtros
+      id="btnActualizarDatos"
+      class="btn-actualizar"
+      type="button">
+      ↻ ACTUALIZAR DATOS
     </button>
 
   </div>
 
+</div>
 
-  <div class="filtros-grid">
+
+<div class="contenedor">
 
 
-    <!-- SALA -->
+  <!-- ======================================================
+       FILTROS
+  ====================================================== -->
+
+  <div class="filtros">
 
     <div class="filtro">
+      <label>LOCAL</label>
 
-      <label for="filtroSala">
-        SALA
-      </label>
-
-      <select id="filtroSala">
-
-        <option value="">
-          Todas las salas
-        </option>
-
+      <select id="sala">
+        <option value="">TODOS LOS LOCALES</option>
       </select>
-
     </div>
 
 
-    <!-- MODELO -->
-
     <div class="filtro">
+      <label>MODELO</label>
 
-      <label for="filtroModelo">
-        MARCA / MODELO
-      </label>
-
-      <select id="filtroModelo">
-
-        <option value="">
-          Todas las marcas
-        </option>
-
+      <select id="marca">
+        <option value="">TODOS LOS MODELOS</option>
       </select>
-
     </div>
 
 
-    <!-- SERIE -->
-
     <div class="filtro">
+      <label>SERIE DE MÁQUINA</label>
 
-      <label for="filtroNumero">
-        SERIE / MÁQUINA
-      </label>
-
-      <select id="filtroNumero">
-
-        <option value="">
-          Todas las series
-        </option>
-
+      <select id="serie">
+        <option value="">TODAS LAS SERIES</option>
       </select>
-
     </div>
 
 
-    <!-- JUEGO -->
-
     <div class="filtro">
+      <label>JUEGO</label>
 
-      <label for="filtroJuego">
-        JUEGO
-      </label>
-
-      <select id="filtroJuego">
-
-        <option value="">
-          Todos los juegos
-        </option>
-
+      <select id="juego">
+        <option value="">TODOS LOS JUEGOS</option>
       </select>
-
     </div>
 
 
-    <!-- MES -->
-
     <div class="filtro">
+      <label>MES</label>
 
-      <label for="filtroMes">
-        MES
-      </label>
-
-      <select id="filtroMes">
-
-        <option value="">
-          Todos los meses
-        </option>
-
+      <select id="mes">
+        <option value="">TODOS</option>
       </select>
-
     </div>
 
 
-    <!-- INDICADOR -->
+    <div class="filtro">
+      <label>AÑO</label>
 
-    <div class="filtro indicador-filtro">
+      <select id="anio">
+        <option value="">TODOS</option>
+      </select>
+    </div>
 
-      <label for="filtroIndicador">
-        INDICADOR
-      </label>
 
-      <select id="filtroIndicador">
+    <div class="filtro">
+      <label>INDICADOR</label>
 
-        <option value="COIN">
+      <select id="indicador">
+
+        <option value="coin">
           COIN
         </option>
 
-        <option value="COIN PROM">
-          COIN PROM
-        </option>
-
-        <option value="VENTA">
+        <option value="venta">
           VENTA
         </option>
 
-        <option value="VENTA PROM">
-          VENTA PROM
+        <option value="netwin">
+          NETWIN
         </option>
 
-        <option value="NETWIN ($)">
-          NETWIN ($)
-        </option>
-
-        <option value="T.C">
-          T.C.
-        </option>
-
-        <option value="% PAGO">
+        <option value="pago">
           % PAGO
         </option>
 
+        <option value="coinProm">
+          COIN PROM
+        </option>
+
+        <option value="ventaProm">
+          VENTA PROM
+        </option>
+
       </select>
+    </div>
+
+
+    <div class="filtro">
+
+      <label>BUSCAR</label>
+
+      <input
+        type="text"
+        id="busqueda"
+        class="busqueda-input"
+        placeholder="Escribe una palabra..."
+        autocomplete="off">
 
     </div>
 
-  </div>
 
-</section>
+    <div class="filtro filtros-botones">
 
+      <button
+        id="btnLimpiar"
+        class="btn-limpiar"
+        type="button">
 
+        LIMPIAR FILTROS
 
-<!-- ======================================================
-     RESUMEN DE SELECCIÓN
-====================================================== -->
-
-<section class="seleccion-panel">
-
-  <div>
-
-    <span>
-      ANÁLISIS ACTUAL
-    </span>
-
-    <h2 id="tituloAnalisis">
-      COIN
-    </h2>
-
-  </div>
-
-  <div class="seleccion-detalle">
-
-    <span id="detalleSeleccion">
-      Todos los registros
-    </span>
-
-  </div>
-
-</section>
-
-
-
-<!-- ======================================================
-     GRÁFICO EVOLUTIVO
-====================================================== -->
-
-<section class="panel grafico-principal">
-
-  <div class="panel-header">
-
-    <div>
-
-      <span>
-        EVOLUCIÓN
-      </span>
-
-      <h2>
-        Evolutivo por indicador
-      </h2>
-
-      <p>
-        Evolución mensual del indicador seleccionado
-      </p>
+      </button>
 
     </div>
 
   </div>
 
 
-  <div class="grafico-area grande">
+  <!-- ======================================================
+       INDICADORES
+  ====================================================== -->
 
-    <canvas id="graficoEvolutivo"></canvas>
+  <div class="indicadores">
 
-  </div>
+    <div class="card">
+      <small>COIN</small>
+      <strong id="totalCoin">0</strong>
+    </div>
 
-</section>
+    <div class="card">
+      <small>VENTA</small>
+      <strong id="totalVenta">0</strong>
+    </div>
 
+    <div class="card">
+      <small>NETWIN</small>
+      <strong id="totalNetwin">0</strong>
+    </div>
 
-
-<!-- ======================================================
-     RANKING SALAS
-====================================================== -->
-
-<section class="panel">
-
-  <div class="panel-header">
-
-    <div>
-
-      <span>
-        RANKING 01
-      </span>
-
-      <h2>
-        Ranking de salas
-      </h2>
-
-      <p>
-        Salas ordenadas según el indicador seleccionado
-      </p>
-
+    <div class="card">
+      <small>% PAGO</small>
+      <strong id="totalPago">0%</strong>
     </div>
 
   </div>
 
 
-  <div class="grafico-area">
+  <!-- ======================================================
+       DASHBOARD
+  ====================================================== -->
 
-    <canvas id="graficoSalas"></canvas>
-
-  </div>
-
-</section>
+  <div class="dashboard">
 
 
+    <div class="panel">
 
-<!-- ======================================================
-     RANKING JUEGOS
-====================================================== -->
+      <h2>📈 Evolución del indicador</h2>
 
-<section class="panel">
+      <div class="grafico">
+        <canvas id="evolucion"></canvas>
+      </div>
 
-  <div class="panel-header">
+    </div>
 
-    <div>
 
-      <span>
-        RANKING 02
-      </span>
+    <div class="panel">
 
-      <h2>
-        Ranking de juegos
-      </h2>
+      <h2>🏆 Ranking de locales</h2>
 
-      <p>
-        Juegos ordenados según el indicador seleccionado
-      </p>
+      <div class="grafico-scroll">
+
+        <div class="grafico-ancho">
+
+          <canvas id="rankingSala"></canvas>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <h2>🏷️ Ranking de modelos</h2>
+
+      <div class="grafico-scroll">
+
+        <div class="grafico-ancho">
+
+          <canvas id="rankingMarca"></canvas>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <h2>🎮 Ranking de juegos</h2>
+
+      <div class="grafico-scroll">
+
+        <div class="grafico-ancho">
+
+          <canvas id="rankingJuego"></canvas>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <h2>🎰 Ranking de series de máquina</h2>
+
+      <div class="grafico-scroll">
+
+        <div class="grafico-ancho">
+
+          <canvas id="rankingSerie"></canvas>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================
+         MAPA
+    ===================================================== -->
+
+    <div class="panel mapa-panel">
+
+      <h2>🇵🇪 Distribución de locales</h2>
+
+      <div class="mapa-contenedor">
+
+        <svg
+          id="mapaPeru"
+          viewBox="0 0 600 760"
+          preserveAspectRatio="xMidYMid meet">
+        </svg>
+
+
+        <div
+          id="mapaCargando"
+          class="mapa-cargando">
+
+          Cargando mapa...
+
+        </div>
+
+
+        <div class="mapa-leyenda">
+
+          <div class="leyenda-titulo">
+            SEMÁFORO
+          </div>
+
+
+          <div class="leyenda-item">
+
+            <span
+              class="leyenda-punto"
+              style="background:#dc2626">
+            </span>
+
+            Bajo
+
+          </div>
+
+
+          <div class="leyenda-item">
+
+            <span
+              class="leyenda-punto"
+              style="background:#f59e0b">
+            </span>
+
+            Medio
+
+          </div>
+
+
+          <div class="leyenda-item">
+
+            <span
+              class="leyenda-punto"
+              style="background:#16a34a">
+            </span>
+
+            Alto
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================
+         TABLA
+    ===================================================== -->
+
+    <div class="panel tabla-panel">
+
+      <h2>📋 Detalle completo</h2>
+
+      <div class="tabla-scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>MODELO</th>
+              <th>SERIE</th>
+              <th>JUEGO</th>
+              <th>COIN</th>
+              <th>COIN PROM</th>
+              <th>VENTA</th>
+              <th>VENTA PROM</th>
+              <th>NETWIN</th>
+              <th>% PAGO</th>
+              <th>LOCAL</th>
+              <th>MES</th>
+              <th>AÑO</th>
+              <th>T.C.</th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="tabla"></tbody>
+
+        </table>
+
+      </div>
 
     </div>
 
   </div>
 
-
-  <div class="grafico-area">
-
-    <canvas id="graficoJuegos"></canvas>
-
-  </div>
-
-</section>
-
+</div>
 
 
 <!-- ======================================================
-     RANKING MARCAS
+     MODAL DEPARTAMENTO
 ====================================================== -->
 
-<section class="panel">
+<div
+  id="modalDepartamento"
+  class="modal modal-departamento">
 
-  <div class="panel-header">
+  <div class="modal-contenido">
 
-    <div>
+    <div class="modal-header">
 
-      <span>
-        RANKING 03
-      </span>
+      <h3 id="modalDepartamentoTitulo">
+        Departamento
+      </h3>
 
-      <h2>
-        Ranking de marcas
-      </h2>
+      <button
+        class="modal-cerrar"
+        id="cerrarModalDepartamento"
+        type="button">
 
-      <p>
-        Marcas ordenadas según el indicador seleccionado
-      </p>
+        ×
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="departamento-resumen">
+
+        <div class="resumen-box">
+
+          <small>SALAS</small>
+
+          <strong id="departamentoCantidad">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="resumen-box">
+
+          <small>INDICADOR</small>
+
+          <strong id="departamentoIndicador">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="resumen-box">
+
+          <small>PROMEDIO</small>
+
+          <strong id="departamentoPromedio">
+            0
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="listaSalasDepartamento"
+        class="lista-salas">
+      </div>
 
     </div>
 
   </div>
 
-
-  <div class="grafico-area">
-
-    <canvas id="graficoMarcas"></canvas>
-
-  </div>
-
-</section>
-
+</div>
 
 
 <!-- ======================================================
-     RESUMEN DE GRÁFICO
+     MODAL DETALLE
 ====================================================== -->
 
-<section class="detalle-click">
+<div
+  id="modalDetalle"
+  class="modal">
 
-  <div>
+  <div class="modal-contenido">
 
-    <span>
-      ELEMENTO SELECCIONADO
-    </span>
+    <div class="modal-header">
 
-    <strong id="elementoSeleccionado">
-      —
-    </strong>
+      <h3 id="modalTitulo">
+        Detalle
+      </h3>
 
-  </div>
+      <button
+        class="modal-cerrar"
+        id="cerrarModal"
+        type="button">
 
+        ×
 
-  <div>
+      </button>
 
-    <span>
-      VALOR
-    </span>
-
-    <strong id="valorSeleccionado">
-      —
-    </strong>
-
-  </div>
+    </div>
 
 
-  <div>
+    <div class="modal-body">
 
-    <span>
-      INDICADOR
-    </span>
+      <div class="detalle-grid">
 
-    <strong id="indicadorSeleccionado">
-      COIN
-    </strong>
+        <div class="detalle-item">
 
-  </div>
+          <span>LOCAL</span>
 
-</section>
+          <strong id="detalleSala">
+            -
+          </strong>
+
+        </div>
 
 
+        <div class="detalle-item">
 
-<!-- ======================================================
-     TABLA COMPLETA AL FINAL
-====================================================== -->
+          <span>MODELO</span>
 
-<section class="panel tabla-panel">
+          <strong id="detalleMarca">
+            -
+          </strong>
 
-  <div class="panel-header">
+        </div>
 
-    <div>
 
-      <span>
-        INFORMACIÓN DETALLADA
-      </span>
+        <div class="detalle-item">
 
-      <h2>
-        Detalle completo de producción
-      </h2>
+          <span>SERIE</span>
 
-      <p>
-        Información correspondiente a los filtros seleccionados
-      </p>
+          <strong id="detalleSerie">
+            -
+          </strong>
+
+        </div>
+
+
+        <div class="detalle-item">
+
+          <span>JUEGO</span>
+
+          <strong id="detalleJuego">
+            -
+          </strong>
+
+        </div>
+
+
+        <div class="detalle-item">
+
+          <span>MES</span>
+
+          <strong id="detalleMes">
+            -
+          </strong>
+
+        </div>
+
+
+        <div class="detalle-item">
+
+          <span>AÑO</span>
+
+          <strong id="detalleAnio">
+            -
+          </strong>
+
+        </div>
+
+
+        <div
+          class="detalle-item detalle-indicador">
+
+          <span id="detalleIndicadorNombre">
+            INDICADOR
+          </span>
+
+          <strong id="detalleIndicadorValor">
+            0
+          </strong>
+
+        </div>
+
+      </div>
 
     </div>
 
   </div>
 
-
-  <div class="tabla-scroll">
-
-    <table id="tablaCompleta">
-
-      <thead>
-
-        <tr>
-
-          <th>
-            MARCA / TIPO / VERSION
-          </th>
-
-          <th>
-            MAQUINA / SERIE
-          </th>
-
-          <th>
-            JUEGO
-          </th>
-
-          <th>
-            COIN
-          </th>
-
-          <th>
-            COIN PROM
-          </th>
-
-          <th>
-            VENTA
-          </th>
-
-          <th>
-            VENTA PROM
-          </th>
-
-          <th>
-            NETWIN ($)
-          </th>
-
-          <th>
-            G.PLAYED
-          </th>
-
-          <th>
-            % PAGO
-          </th>
-
-          <th>
-            LOCAL
-          </th>
-
-          <th>
-            MES
-          </th>
-
-          <th>
-            AÑO
-          </th>
-
-          <th>
-            T.C.
-          </th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody id="tablaCompletaCuerpo">
-
-      </tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-</main>
+</div>
 
 
 <script src="script.js"></script>
 
 </body>
-
 </html>
