@@ -12,7 +12,7 @@
 */
 
 const API_URL =
-  "PEGAR_AQUI_URL_DE_TU_APPS_SCRIPT";
+  "https://script.google.com/macros/s/AKfycby08y54yRHcUEyPZsWQnwgm8EbIYX8ep_zG-d69JkbbZW2OeeIvDc0izt1eDTiHwplH/exec";
 
 
 /* ======================================================
